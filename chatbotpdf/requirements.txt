@@ -1,0 +1,11 @@
+flask
+flask_cors 
+gunicorn
+langchain_community
+langchain-chroma
+langchain_text_splitters
+langchain
+langchain_core
+fastembed
+chromadb
+pdfplumber
