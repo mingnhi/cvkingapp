@@ -9,28 +9,29 @@ import RightSidebarPanel from "@/components/ui/client/job/post-job/SidebarPanel"
 import { Job } from "@/types/job.type";
 
 export default function PostJobPage() {
-const [form, setForm] = useState<Job>({
-  slug: "",
-  title: "",
-  company: "",
-  location: "",
-  type: "",               
-  mode: "",                 
-  level: "",             
-  salaryMin: "",
-  salaryMax: "",
-  salaryCurrency: "USD",  
-  description: "",
-  requirements: "",
-  benefits: "",
-  deadline: "",         
-  email: "",
-  urgent: false,
-  featured: false,
-  expires: "",              
-  status: "draft",       
-  skills: [],
-});
+  const [form, setForm] = useState<Job>({
+    slug: "",
+    title: "",
+    logo: "",
+    company: "",
+    location: "",
+    type: "",
+    mode: "",
+    level: "",
+    salaryMin: "",
+    salaryMax: "",
+    salaryCurrency: "USD",
+    description: "",
+    requirements: "",
+    benefits: "",
+    deadline: "",
+    email: "",
+    urgent: false,
+    featured: false,
+    expires: "",
+    status: "draft",
+    skills: [],
+  });
 
   const [skills, setSkills] = useState<string[]>([]);
 
