@@ -458,6 +458,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "default": "1",
           "mappedType": "boolean"
         },
         "is_verify": {
@@ -467,6 +468,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "default": "0",
           "mappedType": "boolean"
         },
         "otp_code": {
@@ -475,7 +477,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 255
         }
       },
