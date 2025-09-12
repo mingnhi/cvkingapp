@@ -17,7 +17,8 @@ export class RolesRepository {
    * @returns List of all roles
    */
   async findAll(): Promise<Roles[]> {
-    return this.roleRepository.findAll();
+    const results = await this.em.getConnection().execute('EXEC SP_GetAllRole');
+    return results ?? [];
   }
 
   /**
@@ -26,7 +27,11 @@ export class RolesRepository {
    * @returns Role or null if not found
    */
   async findOne(id: string): Promise<Roles | null> {
-    return this.roleRepository.findOne({ id });
+    const result = await this.em
+      .getConnection()
+      .execute('EXEC SP_GetRoleById ?', [id]);
+    const role = result?.[0] ?? result;
+    return role ?? null;
   }
 
   /**
@@ -36,12 +41,15 @@ export class RolesRepository {
    * @returns Created role
    */
   async create(createRoleDto: CreateRoleDto): Promise<Roles> {
-    const role = this.roleRepository.create({
-      ...createRoleDto,
-      id: undefined,
-    });
-    await this.em.persistAndFlush(role);
-    return role;
+    const result = this.em
+      .getConnection()
+      .execute('EXEC SP_InsertRole ?, ?', [
+        createRoleDto.name,
+        createRoleDto.description,
+      ]);
+
+    const newRole = result?.[0] ?? result;
+    return newRole as Roles;
   }
 
   /**
@@ -50,14 +58,14 @@ export class RolesRepository {
    * @returns Updated role or null if not found
    */
   async update(updateRoleDto: UpdateRoleDto): Promise<Roles | null> {
-    const role = await this.roleRepository.findOne({ id: updateRoleDto.id });
-    if (!role) {
-      return null;
-    }
-    role.name = updateRoleDto.name;
-    role.description = updateRoleDto.description;
-    await this.em.flush();
-    return role;
+    await this.em
+      .getConnection()
+      .execute('EXEC SP_UpdateRole ?, ?, ?', [
+        updateRoleDto.id,
+        updateRoleDto.name,
+        updateRoleDto.description,
+      ]);
+    return this.findOne(updateRoleDto.id);
   }
 
   /**
@@ -66,11 +74,7 @@ export class RolesRepository {
    * @returns True if deletion is successful, false if not found
    */
   async delete(id: string): Promise<boolean> {
-    const role = await this.roleRepository.findOne({ id });
-    if (!role) {
-      return false;
-    }
-    await this.em.removeAndFlush(role);
+    await this.em.getConnection().execute('EXEC SP_DeleteRole ?', [id]);
     return true;
   }
 }
