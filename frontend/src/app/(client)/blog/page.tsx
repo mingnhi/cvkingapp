@@ -73,9 +73,9 @@ const BlogPage = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8 md:mb-10">
-          <h1 className="text-4xl font-semibold text-gray-900 mb-3">Career Insights & Tips</h1>
+          <h1 className="text-4xl font-semibold text-gray-900 mb-3">Hiểu biết & Mẹo nghề nghiệp</h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-            Expert advice, industry insights, and practical tips to accelerate your career growth
+            Lời khuyên từ các chuyên gia, thông tin ngành và mẹo thực tiễn để thúc đẩy sự nghiệp của bạn
           </p>
         </div>
 
@@ -84,7 +84,7 @@ const BlogPage = () => {
             <Box sx={{ flex: { xs: "100%", md: 1 }, minWidth: 0 }}>
               <TextField
                 fullWidth
-                placeholder="Search articles, topics, or tags..."
+                placeholder="Tìm kiếm bài viết..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 InputProps={{
@@ -124,9 +124,9 @@ const BlogPage = () => {
               <h2 className="text-2xl font-semibold text-gray-900">
                 {selectedCategory === "all" ? "Tất cả các bài viết" : selectedCategory}
               </h2>
-              <p className="text-gray-600">{filteredArticles.length} articles found</p>
+              <p className="text-gray-600">{filteredArticles.length} bài viết được tìm thấy</p>
             </div>
-
+ 
             {featuredArticles.length > 0 && (
               <div className="mb-8 space-y-4">
                 <h3 className="text-xl font-semibold text-gray-900">Bài viết nổi bật</h3>
