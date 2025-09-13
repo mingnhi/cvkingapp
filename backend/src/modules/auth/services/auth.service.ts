@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
+  [x: string]: any;
   constructor() {}
 
   // Example method for user login
