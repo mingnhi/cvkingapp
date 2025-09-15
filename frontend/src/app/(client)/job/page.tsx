@@ -6,7 +6,7 @@ import JobSearch from "@/components/ui/client/job/JobSearch";
 import ActiveFilters from "@/components/ui/client/job/ActiveFilters";
 import JobFilters from "@/components/ui/client/job/JobFilters";
 import JobList from "@/components/ui/client/job/JobList";
-
+import { useRouter } from "next/navigation";
 // Mock data chuẩn với type Job
 const jobs: Job[] = [
   {
@@ -78,6 +78,7 @@ const jobs: Job[] = [
 ];
 
 const JobsPage = () => {
+  const router = useRouter();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("newest");
@@ -180,7 +181,7 @@ const JobsPage = () => {
   // Handlers
   const handleJobClick = (job: Job) => {
     console.log("Navigating to job details:", job);
-    // router.push(`/job/${job.slug}`);
+    router.push(`/job/${job.slug}`);
   };
 
   const toggleAdvancedFilter = (
