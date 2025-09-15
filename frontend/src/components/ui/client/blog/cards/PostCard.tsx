@@ -5,7 +5,6 @@ import { Button } from "@mui/material";
 import { Calendar, Clock, Eye, MessageSquare, User } from "lucide-react";
 import type { StaticImageData } from "next/image"; // Add this import if needed
 
-
 interface PostCardProps {
   post: {
     id: string;
@@ -111,8 +110,8 @@ const PostCard: React.FC<PostCardProps> = ({
                 <User className="h-4 w-4 text-gray-500" />
               </div>
               <div className="leading-tight">
-                <div className="font-medium">CVKING Editor</div>
-                <div className="text-xs text-gray-500">Career Coach</div>
+                <div className="font-medium">Biên tập viên CVKING</div>
+                <div className="text-xs text-gray-500">Huấn luyện viên CVKING</div>
               </div>
             </div>
             <Button
@@ -121,7 +120,7 @@ const PostCard: React.FC<PostCardProps> = ({
               component={Link}
               href={`/blog/read-more?id=${post.id}`}
             >
-              Read More →
+              Đọc thêm →
             </Button>
           </div>
         </div>
