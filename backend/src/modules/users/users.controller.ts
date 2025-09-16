@@ -42,7 +42,7 @@ export class UsersController {
    * @returns User wrapped in ApiResponse
    */
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Users> {
+  findOne(@Param('id', ParseIntPipe) id: string): Promise<Users> {
     return this.usersService.getUserById(id);
   }
 
@@ -70,7 +70,7 @@ export class UsersController {
    */
   @Put()
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: string,
     @Body() dto: UpdateUserDto,
   ): Promise<Users> {
     return this.usersService.update(id, dto);
@@ -82,7 +82,7 @@ export class UsersController {
    * @returns Success message wrapped in ApiResponse
    */
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
+  async remove(@Param('id', ParseIntPipe) id: string): Promise<boolean> {
     return this.usersService.delete(id);
   }
 

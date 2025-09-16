@@ -25,8 +25,8 @@ export class RolesRepository {
    * @param id ID of the role
    * @returns Role or null if not found
    */
-  findOne(id: number): Promise<Roles | null> {
-    return this.roleRepository.findOne({ RoleId: id });
+  findOne(id: string): Promise<Roles | null> {
+    return this.roleRepository.findOne({ id });
   }
 
   /**
@@ -55,7 +55,7 @@ export class RolesRepository {
    * @param updateRoleDto Data to update the role
    * @returns Updated role or null if not found
    */
-  async update(id: number, dto: UpdateRoleDto): Promise<Roles | null> {
+  async update(id: string, dto: UpdateRoleDto): Promise<Roles | null> {
     const role = await this.findOne(id);
     if (!role) return null;
     this.roleRepository.assign(role, dto);
@@ -69,7 +69,7 @@ export class RolesRepository {
    * @param id ID of the role to delete
    * @returns True if deletion is successful, false if not found
    */
-  async delete(id: number): Promise<boolean> {
+  async delete(id: string): Promise<boolean> {
     const role = await this.findOne(id);
     if (!role) return false;
     await this.em.removeAndFlush(role);

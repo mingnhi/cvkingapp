@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
 import { RegisterDto } from './dtos/register.dto';
 import { loginDto } from './dtos/login.dto';
@@ -21,15 +21,15 @@ export class AuthController {
     @UseGuards(AuthGuard('jwt-refresh'))
     @Post('refresh')
     async refresh(@Req() req: any) {
-        const userId = req.user.sub as number;
+        const userId = req.user.sub ;
         const refreshToken = req.user.refreshToken as string;
         return this.authService.refresh(userId, refreshToken);
     }
 
     @UseGuards(AuthGuard('jwt'))
-    @Post('logout')
-    async logout(@Req() req: any) {
-        const userId = req.user.sub as number;
+    @Post('logout/:id')
+    async logout(@Req() req) {
+        const userId: string = req.user.sub; // đảm bảo là string
         return this.authService.logout(userId);
     }
 }

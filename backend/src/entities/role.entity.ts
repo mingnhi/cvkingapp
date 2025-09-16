@@ -3,8 +3,6 @@ import { AuditableEntity } from './base/auditable_entity';
 
 @Entity({ tableName: 'Roles' })
 export class Roles extends AuditableEntity {
-  @PrimaryKey({ type: 'number', autoincrement: true })
-  RoleId: number;
 
   @Property({ type: 'string', fieldName: 'role_name' })
   @Unique()

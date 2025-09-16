@@ -1,10 +1,7 @@
 import { Collection, Entity, OneToMany, PrimaryKey, Property, Unique } from '@mikro-orm/core';
 import { AuditableEntity } from './base/auditable_entity';
-import { UserRole } from './user_role.entity';
 @Entity({ tableName: 'Users' })
 export class Users extends AuditableEntity {
-  @PrimaryKey({ type: 'number', autoincrement: true })
-  userId!: number;
 
   @Property({ type: 'string' })
   @Unique()
@@ -42,7 +39,4 @@ export class Users extends AuditableEntity {
 
   @Property({ type: 'string', nullable: true })
   refreshToken?: string;
-
-  @OneToMany(() => UserRole, (userRole) => userRole.user)
-  userRoles = new Collection<UserRole>(this);
 }

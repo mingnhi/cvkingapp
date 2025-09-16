@@ -25,8 +25,8 @@ export class UsersRepository {
    * @param id ID of the user
    * @returns user or null if not found
    */
-  async findOne(id: number): Promise<Users | null> {
-    return this.userRepository.findOne({ userId: id });
+  async findOne(id: string): Promise<Users | null> {
+    return this.userRepository.findOne({ id });
   }
 
   findByEmail(email: string): Promise<Users | null> {
@@ -48,8 +48,8 @@ export class UsersRepository {
    * @param updateuserDto Data to update the user
    * @returns Updated user or null if not found
    */
-  async update(UserId: number, data: Partial<Users>): Promise<Users | null> {
-    const user = await this.findOne(UserId);
+  async update(id: string, data: Partial<Users>): Promise<Users | null> {
+    const user = await this.findOne(id);
     if (!user) return null;
     this.userRepository.assign(user, data);
     await this.em.flush();
@@ -61,7 +61,7 @@ export class UsersRepository {
    * @param id ID of the user to delete
    * @returns True if deletion is successful, false if not found
    */
-  async delete(id: number): Promise<boolean> {
+  async delete(id: string): Promise<boolean> {
     const user = await this.findOne(id);
     if (!user) return false;
     await this.em.removeAndFlush(user);

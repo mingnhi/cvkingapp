@@ -9,7 +9,7 @@ export abstract class AuditableEntity {
   @Property({ type: 'date', fieldName: 'created_at', onCreate: () => new Date() })
   createdAt: Date = new Date();
 
-  @Property({ type: 'date', fieldName: 'updatedAt', onUpdate: () => new Date(), nullable: true })
+  @Property({ type: 'date', fieldName: 'updated_at', onUpdate: () => new Date(), nullable: true })
   updatedAt?: Date;
 
 }

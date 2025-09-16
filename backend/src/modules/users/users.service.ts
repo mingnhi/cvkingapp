@@ -25,7 +25,7 @@ export class UsersService {
    * @returns User
    * @throws NotFoundException if the user does not exist
    */
-  async getUserById(id: number): Promise<Users> {
+  async getUserById(id: string): Promise<Users> {
     const user = await this.usersRepository.findOne(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -59,7 +59,7 @@ export class UsersService {
    * @returns Updated user
    * @throws NotFoundException if the user does not exist
    */
-  async update(id: number, data: Partial<Users>): Promise<Users> {
+  async update(id: string, data: Partial<Users>): Promise<Users> {
     const updated = await this.usersRepository.update(id, data);
     if (!updated) throw new NotFoundException('User not found');
     return updated;
@@ -70,7 +70,7 @@ export class UsersService {
    * @param id ID of the user to delete
    * @throws NotFoundException if the user does not exist
    */
-  async delete(id: number): Promise<boolean> {
+  async delete(id: string): Promise<boolean> {
     const ok = await this.usersRepository.delete(id);
     if (!ok) throw new NotFoundException('User not found');
     return true;

@@ -8,6 +8,7 @@ import { RegisterDto } from '../dtos/register.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersRepository } from '@modules/users/users.repository';
 import { loginDto } from '../dtos/login.dto';
+import { log } from 'util';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
     private readonly em: EntityManager,
     private readonly jwt: JwtService
   ) { }
-  private async signTokens(userId: number, email: string) {
+  private async signTokens(userId: string, email: string) {
     const payload = { sub: userId, email };
     const accessToken = await this.jwt.signAsync(payload, {
       secret: process.env.JWT_ACCESS_SECRET || 'access_secret',
@@ -31,12 +32,12 @@ export class AuthService {
     });
     return { accessToken, refreshToken };
   }
-  private async setRefreshToken(userId: number, token: string) {
+  private async setRefreshToken(userId: string, token: string) {
     const hash = await bcrypt.hash(token, 10);
     await this.usersService.update(userId, { refreshToken: hash });
   }
 
-  async validateUser(userId: number) {
+  async validateUser(userId: string) {
     // ví dụ: tìm user theo id
     const user = await this.usersService.getUserById(userId);
     if (!user) {
@@ -58,14 +59,15 @@ export class AuthService {
       password: hashedPassword
     });
 
-    const jobSeekerRole = await this.rolesService.findByName('JobSeeker');
+    const jobSeekerRole = await this.rolesService.findByName('Admin');
+    console.log("role" + jobSeekerRole.roleName)
 
     await this.usersRoleService.createUserRole({
-      userId: user.userId,  
-      roleId: jobSeekerRole.RoleId,         
+      userId: user.id,
+      roleId: jobSeekerRole.id,
     });
 
-    
+
     // const role = await this.rolesService.findByName('JobSeeker');
     // if (!role) throw new NotFoundException('Role không tồn tại');
     // await this.usersRoleService.createUserRole({
@@ -73,8 +75,8 @@ export class AuthService {
     //   roleId: role.RoleId,
     // });
     const { accessToken, refreshToken } =
-      await this.signTokens(user.userId, user.email);
-    await this.setRefreshToken(user.userId, refreshToken);
+      await this.signTokens(user.id, user.email);
+    await this.setRefreshToken(user.id, refreshToken);
 
     return { user, accessToken, refreshToken };
   }
@@ -87,26 +89,26 @@ export class AuthService {
     if (!ok) throw new UnauthorizedException('Sai email hoặc mật khẩu');
 
     const { accessToken, refreshToken } =
-      await this.signTokens(user.userId, user.email);
-    await this.setRefreshToken(user.userId, refreshToken);
+      await this.signTokens(user.id, user.email);
+    await this.setRefreshToken(user.id, refreshToken);
 
     return { user, accessToken, refreshToken };
   }
 
-  async refresh(userId: number, refreshToken: string) {
+  async refresh(userId: string, refreshToken: string) {
     const user = await this.usersService.getUserById(userId);
     if (!user?.refreshToken) throw new UnauthorizedException();
 
-    const match = await bcrypt.compare(refreshToken, user.refreshToken );
+    const match = await bcrypt.compare(refreshToken, user.refreshToken);
     if (!match) throw new UnauthorizedException();
 
     const { accessToken, refreshToken: newRefresh } =
-      await this.signTokens(user.userId, user.email);
-    await this.setRefreshToken(user.userId, newRefresh);
+      await this.signTokens(user.id, user.email);
+    await this.setRefreshToken(user.id, newRefresh);
     return { accessToken, refreshToken: newRefresh };
   }
 
-  async logout(userId: number) {
+  async logout(userId: string) {
     await this.usersService.update(userId, { refreshToken: null });
     return { success: true };
   }

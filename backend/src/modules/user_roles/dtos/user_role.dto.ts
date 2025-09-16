@@ -2,15 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsInt, IsString } from 'class-validator';
 
 export class CreateUserRoleDto {
-  @IsInt()
-  userId: number;
+  @IsString()
+  userId: string;
 
-  @IsInt()
-  roleId: number;
+  @IsString()
+  roleId: string;
 }
 
 export class UpdateUserRoleDto extends CreateUserRoleDto { 
-  @IsInt()
-  userRoleId: number
-
 }

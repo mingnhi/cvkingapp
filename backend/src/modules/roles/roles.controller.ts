@@ -36,7 +36,7 @@ export class RolesController {
    * @returns Role wrapped in ApiResponse
    */
   @Get(':id')
-  getOne(@Param('id', ParseIntPipe) id: number): Promise<Roles> {
+  getOne(@Param('id', ParseIntPipe) id: string): Promise<Roles> {
     return this.rolesService.findOne(id);
   }
 
@@ -64,7 +64,7 @@ export class RolesController {
    */
   @Put(':id')
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: string,
     @Body() dto: UpdateRoleDto,
   ): Promise<Roles> {
     return this.rolesService.updateRole(id, dto);
@@ -76,7 +76,7 @@ export class RolesController {
    * @returns Success message wrapped in ApiResponse
    */
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
+  remove(@Param('id', ParseIntPipe) id: string): Promise<boolean> {
     return this.rolesService.deleteRole(id);
   }
 }

@@ -28,14 +28,12 @@ export class UserRolesRepository {
    * @param id ID of the userRole
    * @returns UserRole or null if not found
    */
-  findOne(id: number): Promise<UserRole | null> {
-    return this.userRoleRepository.findOne({ userRoleId: id }, { populate: ['user', 'role'] });
+  findOne(id: string): Promise<UserRole | null> {
+    return this.userRoleRepository.findOne({ id });
   }
 
-  findByUser(userId: number): Promise<UserRole[]> {
-    return this.userRoleRepository.find(
-      { user: { userId } },
-      { populate: ['role'] });
+  findByUser(userId: string): Promise<UserRole[]> {
+    return this.userRoleRepository.find({ userId } )
   }
   /**
    * Create a new userRole
@@ -45,8 +43,8 @@ export class UserRolesRepository {
    */
   async create(dto: CreateUserRoleDto): Promise<UserRole> {
     const userRole = this.userRoleRepository.create({
-      user: dto.userId,
-      role: dto.roleId,
+      userId: dto.userId,
+      roleId: dto.roleId,
     });
     await this.em.persistAndFlush(userRole);
     return userRole;
@@ -57,20 +55,11 @@ export class UserRolesRepository {
    * @param updateUserRoleDto Data to update the userRole
    * @returns Updated userRole or null if not found
    */
-  async update(userroleId: number, dto: UpdateUserRoleDto): Promise<UserRole> {
-    const userRole = await this.userRoleRepository.findOne(
-      { userRoleId: userroleId },
-      {populate: ['user', 'role']},
-    );
+  async update(id: string, dto: UpdateUserRoleDto): Promise<UserRole> {
+    const userRole = await this.userRoleRepository.findOne(id);
     if (!userRole) throw new NotFoundException('UserRole not found');
     
-    if (dto.userId) {
-      userRole.user = dto.userId as any;
-    }
-    if (dto.roleId) {
-      userRole.role = dto.roleId as any;
-    }
-
+    this.userRoleRepository.assign(userRole, dto);
     await this.em.flush();
     return userRole;
   }
@@ -80,7 +69,7 @@ export class UserRolesRepository {
    * @param id ID of the userRole to delete
    * @returns True if deletion is successful, false if not found
    */
-  async delete(id: number): Promise<boolean> {
+  async delete(id: string): Promise<boolean> {
     const userRole = this.findOne(id);
     if (!userRole) return false;
     await this.em.removeAndFlush(userRole);

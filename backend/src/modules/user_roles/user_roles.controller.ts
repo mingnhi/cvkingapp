@@ -22,7 +22,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('UserRole')
 @Controller('user-role')
 export class UserRoleController {
-  constructor(private readonly userRoleService: UserRolesService) {}
+  constructor(private readonly userRoleService: UserRolesService) { }
 
   /**
    * Retrieve all userUserRole
@@ -39,7 +39,7 @@ export class UserRoleController {
    * @returns Role wrapped in ApiResponse
    */
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<UserRole> {
+  findOne(@Param('id', ParseIntPipe) id: string): Promise<UserRole> {
     return this.userRoleService.getUserRoleById(id);
   }
 
@@ -60,7 +60,7 @@ export class UserRoleController {
    */
   @Put(':id')
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: string,
     @Body() dto: UpdateUserRoleDto,
   ): Promise<UserRole> {
     return this.userRoleService.update(id, dto);
@@ -72,7 +72,7 @@ export class UserRoleController {
    * @returns Success message wrapped in ApiResponse
    */
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
+  async remove(@Param('id', ParseIntPipe) id: string): Promise<boolean> {
     return this.userRoleService.deleteUserRole(id);
   }
 }

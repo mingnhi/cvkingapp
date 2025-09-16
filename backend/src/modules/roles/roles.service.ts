@@ -25,7 +25,7 @@ export class RolesService {
    * @returns Role
    * @throws NotFoundException if the role does not exist
    */
-  async findOne(id: number) {
+  async findOne(id: string) {
     const role = await this.rolesRepository.findOne(id);
     if (!role) throw new NotFoundException('Role not found');
     return role;
@@ -47,7 +47,7 @@ export class RolesService {
    * @returns Updated role
    * @throws NotFoundException if the role does not exist
    */
-  async updateRole(id: number, updateRoleDto: UpdateRoleDto): Promise<Roles> {
+  async updateRole(id: string, updateRoleDto: UpdateRoleDto): Promise<Roles> {
     const role = await this.rolesRepository.update(id, updateRoleDto);
     if (!role) throw new NotFoundException(`Role with ID ${id} not found`);
     return role;
@@ -58,7 +58,7 @@ export class RolesService {
    * @param id ID of the role to delete
    * @throws NotFoundException if the role does not exist
    */
-  async deleteRole(id: number): Promise<boolean> {
+  async deleteRole(id: string): Promise<boolean> {
     const deleted = await this.rolesRepository.delete(id);
     if (!deleted) throw new NotFoundException(`Role with ID ${id} not found`);
     return true;

@@ -4,14 +4,12 @@ import { Users } from './user.entity';
 import { Roles } from './role.entity';
 @Entity({ tableName: 'UserRoles' })
 export class UserRole extends AuditableEntity {
-  @PrimaryKey({ type: 'number', autoincrement: true })
-  userRoleId!: number;
-  
-  @ManyToOne(() => Users, { deleteRule: 'cascade' })
-  user!: Users;
 
-  @ManyToOne(() => Roles)
-  role!: Roles;
+  @Property({ type: 'string' })
+  userId!:string;
+
+  @Property({ type: 'string' })
+  roleId!: string;
 
   @Property({ type: 'date', defaultRaw: 'SYSUTCDATETIME()' })
   assignedAt: Date = new Date();
