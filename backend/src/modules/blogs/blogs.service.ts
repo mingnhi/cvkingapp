@@ -5,6 +5,9 @@ import { BlogPosts } from '../../entities/blog-post.entity';
 import { BlogTags } from '../../entities/blog-tag.entity';
 import { BlogPostTags } from '../../entities/blog-post-tag.entity';
 import { BlogComments } from '../../entities/blog-comment.entity';
+import { CreateBlogPostDto } from './dtos/create-blog-post.dto';
+import { Users } from '../../entities/user.entity';
+import { UpdateBlogPostDto } from './dtos/update-blog-post.dto';
 
 @Injectable()
 export class BlogsService {
@@ -17,12 +20,35 @@ export class BlogsService {
     @InjectRepository(BlogPostTags)
     private readonly blogPostTagsRepository: EntityRepository<BlogPostTags>,
     @InjectRepository(BlogComments)
-    private readonly blogCommentsRepository: EntityRepository<BlogComments>,
+    private readonly blogCommentsRepository: EntityRepository<BlogComments>
   ) {}
 
   // CRUD BlogPosts
-  async createBlogPost(data: any, user: any): Promise<BlogPosts> {
-    const blogPost = this.blogPostsRepository.create(data);
+  async createBlogPost(
+    createBlogPostDto: CreateBlogPostDto,
+    author: Users
+  ): Promise<BlogPosts> {
+    const { tags, ...rest } = createBlogPostDto;
+    const blogPost = this.blogPostsRepository.create({
+      ...rest,
+      author,
+    });
+
+    if (tags) {
+      for (const tagName of tags) {
+        let tag = await this.blogTagsRepository.findOne({ name: tagName });
+        if (!tag) {
+          tag = this.blogTagsRepository.create({ name: tagName });
+          await this.em.persistAndFlush(tag);
+        }
+        const blogPostTag = this.blogPostTagsRepository.create({
+          blogPost,
+          blogTag: tag,
+        });
+        await this.em.persistAndFlush(blogPostTag);
+      }
+    }
+
     await this.em.persistAndFlush(blogPost);
     return blogPost;
   }
@@ -35,9 +61,12 @@ export class BlogsService {
     return this.blogPostsRepository.findOne(id);
   }
 
-  async updateBlogPost(id: string, data: any): Promise<BlogPosts> {
+  async updateBlogPost(
+    id: string,
+    updateBlogPostDto: UpdateBlogPostDto
+  ): Promise<BlogPosts> {
     const blogPost = await this.blogPostsRepository.findOne(id);
-    this.blogPostsRepository.assign(blogPost, data);
+    this.blogPostsRepository.assign(blogPost, updateBlogPostDto);
     await this.em.flush();
     return blogPost;
   }
@@ -103,7 +132,9 @@ export class BlogsService {
 
   // Get blog post details
   async getBlogPostDetails(id: string): Promise<BlogPosts> {
-    return this.blogPostsRepository.findOne(id, { populate: ['author', 'comments'] });
+    return this.blogPostsRepository.findOne(id, {
+      populate: ['author', 'comments'],
+    });
   }
 
   // Search blog posts by title
