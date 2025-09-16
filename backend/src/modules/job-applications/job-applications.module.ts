@@ -1,0 +1,14 @@
+import { Module } from '@nestjs/common';
+import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { JobApplication } from '../../entities/job-application.entity';
+import { JobApplicationsController } from './job-applications.controller';
+import { JobApplicationsService } from './job-applications.service';
+import { Users } from '../../entities/user.entity';
+import { Job } from '../../entities/job.entity';
+
+@Module({
+  imports: [MikroOrmModule.forFeature([JobApplication, Users, Job])],
+  controllers: [JobApplicationsController],
+  providers: [JobApplicationsService],
+})
+export class JobApplicationsModule {}

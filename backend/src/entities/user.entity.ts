@@ -1,5 +1,6 @@
-import { Entity, Property } from '@mikro-orm/core';
+import { Collection, Entity, ManyToMany, Property } from '@mikro-orm/core';
 import { AuditableEntity } from './base/auditable_entity';
+import { Roles } from './role.entity';
 
 @Entity({ tableName: 'Users' })
 export class Users extends AuditableEntity {
@@ -17,4 +18,10 @@ export class Users extends AuditableEntity {
 
   @Property({ type: 'string', nullable: true })
   otpCode: string;
+
+  @ManyToMany(() => Roles, roles => roles.users, {
+    owner: true,
+    pivotTable: 'user_roles',
+  })
+  roles = new Collection<Roles>(this);
 }

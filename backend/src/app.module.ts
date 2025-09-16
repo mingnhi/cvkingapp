@@ -8,6 +8,11 @@ import { UsersModule } from '@modules/users/users.module';
 import { RolesModule } from '@modules/roles/roles.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserRolesModule } from './modules/user_roles/user_roles.module';
+import { BlogsModule } from './modules/blogs/blogs.module';
+import { JobsModule } from './modules/jobs/jobs.module';
+import { JobApplicationsModule } from './modules/job-applications/job-applications.module';
+import { SavedJobsModule } from './modules/saved-jobs/saved-jobs.module';
+import { JobViewsModule } from './modules/job-views/job-views.module';
 
 @Module({
   imports: [
@@ -25,6 +30,11 @@ import { UserRolesModule } from './modules/user_roles/user_roles.module';
     RolesModule,
     AuthModule,
     UserRolesModule,
+    BlogsModule,
+    JobsModule,
+    JobApplicationsModule,
+    SavedJobsModule,
+    JobViewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
