@@ -1,9 +1,10 @@
-import { Entity, Property, Unique } from '@mikro-orm/core';
-import { AuditableEntity } from './base/auditable_entity';
+import { Entity, Property, PrimaryKey } from '@mikro-orm/core';
 
-@Entity({ tableName: 'job_categories' })
-export class JobCategory extends AuditableEntity {
-  @Property()
-  @Unique()
-  name!: string;
+@Entity({ tableName: 'JobCategories' })
+export class JobCategory {
+  @PrimaryKey({ columnType: 'int', autoincrement: true })
+  JobCategoryId: number;
+
+  @Property({ type: 'nvarchar', length: 200, nullable: false, unique: true })
+  Name: string;
 }

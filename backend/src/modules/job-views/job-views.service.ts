@@ -21,14 +21,16 @@ export class JobViewsService {
     sessionId?: string
   ): Promise<void> {
     // Check if job exists
-    await this.jobRepository.findOneOrFail(jobId);
+    await this.jobRepository.findOneOrFail({ JobId: parseInt(jobId) });
 
     // Check if view already exists for this user/session in the last hour
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
+    const jobInt = await this.jobRepository.findOneOrFail({ JobId: parseInt(jobId) });
+
     const existingView = await this.jobViewRepository.findOne({
-      job: jobId,
-      $or: [{ viewer: user?.id }, { sessionId }],
+      job: jobInt,
+      $or: [{ viewer: user }, { sessionId }],
       viewedAt: { $gte: oneHourAgo },
     });
 
@@ -37,17 +39,17 @@ export class JobViewsService {
     }
 
     const jobView = this.jobViewRepository.create({
-      job: jobId,
-      viewer: user?.id,
+      job: jobInt,
+      viewer: user,
       sessionId,
     });
 
     await this.em.persistAndFlush(jobView);
 
     // Update job views count
-    const job = await this.jobRepository.findOneOrFail(jobId);
-    job.viewsCount += 1;
-    await this.em.persistAndFlush(job);
+    const jobToUpdate = await this.jobRepository.findOneOrFail({ JobId: parseInt(jobId) });
+    jobToUpdate.ViewsCount += 1;
+    await this.em.persistAndFlush(jobToUpdate);
   }
 
   async getJobViews(
@@ -55,7 +57,7 @@ export class JobViewsService {
     user: Users
   ): Promise<{ views: JobView[]; total: number }> {
     // Check if user is employer for this job
-    const job = await this.jobRepository.findOneOrFail(jobId, {
+    const job = await this.jobRepository.findOneOrFail({ JobId: parseInt(jobId) }, {
       populate: ['company'],
     });
 
@@ -70,7 +72,7 @@ export class JobViewsService {
     }
 
     const [views, total] = await this.jobViewRepository.findAndCount(
-      { job: jobId },
+      { job: job },
       {
         populate: ['viewer'],
         orderBy: { viewedAt: 'DESC' },
@@ -82,10 +84,10 @@ export class JobViewsService {
 
   async getPopularJobs(limit: number = 10): Promise<Job[]> {
     return this.jobRepository.find(
-      { status: JobStatus.ACTIVE },
+      { Status: JobStatus.ACTIVE },
       {
         populate: ['company', 'category'],
-        orderBy: { viewsCount: 'DESC' },
+        orderBy: { ViewsCount: 'DESC' },
         limit,
       }
     );

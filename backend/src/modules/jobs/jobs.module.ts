@@ -9,6 +9,7 @@ import { Users } from '../../entities/user.entity';
 import { JobsController } from './jobs.controller';
 import { JobsService } from './jobs.service';
 import { JobViewsModule } from '../job-views/job-views.module';
+import { JobsRepository } from './jobs.repository';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { JobViewsModule } from '../job-views/job-views.module';
     JobViewsModule,
   ],
   controllers: [JobsController],
-  providers: [JobsService],
+  providers: [JobsRepository, JobsService],
   exports: [JobsService],
 })
 export class JobsModule {}

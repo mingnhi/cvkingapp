@@ -5,12 +5,12 @@ import { JobApplication } from '../../entities/job-application.entity';
 import { CreateJobApplicationDto } from './dtos/create-job-application.dto';
 import { Users } from '../../entities/user.entity';
 import { Job } from '../../entities/job.entity';
+import { JobApplicationsRepository } from './job-applications.repository';
 
 @Injectable()
 export class JobApplicationsService {
   constructor(
-    @InjectRepository(JobApplication)
-    private readonly jobApplicationRepository: EntityRepository<JobApplication>,
+    private readonly jobApplicationsRepository: JobApplicationsRepository,
     @InjectRepository(Users)
     private readonly userRepository: EntityRepository<Users>,
     @InjectRepository(Job)
@@ -23,36 +23,36 @@ export class JobApplicationsService {
     user: Users
   ): Promise<JobApplication> {
     const job = await this.jobRepository.findOneOrFail({
-      id: createJobApplicationDto.jobId,
+      JobId: parseInt(createJobApplicationDto.jobId),
     });
 
-    const jobApplication = this.jobApplicationRepository.create({
+    const jobApplication = this.jobApplicationsRepository.create({
       ...createJobApplicationDto,
       job,
       jobSeeker: user,
     });
 
-    await this.em.persistAndFlush(jobApplication);
+    await this.jobApplicationsRepository.persistAndFlush(jobApplication);
     return jobApplication;
   }
 
   async findAll(): Promise<JobApplication[]> {
-    return this.jobApplicationRepository.findAll();
+    return this.jobApplicationsRepository.findAll();
   }
 
   async findOne(id: string): Promise<JobApplication> {
-    return this.jobApplicationRepository.findOneOrFail({ id });
+    return this.jobApplicationsRepository.findOneOrFail({ id });
   }
 
   async update(
     id: string,
     jobApplication: JobApplication
   ): Promise<JobApplication> {
-    await this.jobApplicationRepository.nativeUpdate({ id }, jobApplication);
+    await this.jobApplicationsRepository.nativeUpdate({ id }, jobApplication);
     return this.findOne(id);
   }
 
   async remove(id: string): Promise<void> {
-    await this.jobApplicationRepository.nativeDelete({ id });
+    await this.jobApplicationsRepository.nativeDelete({ id });
   }
 }

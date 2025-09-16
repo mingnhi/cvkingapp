@@ -10,12 +10,14 @@ import { Skill } from '../../entities/skill.entity';
 import { JobTag } from '../../entities/job-tag.entity';
 import { Users } from '../../entities/user.entity';
 import { JobViewsService } from '../job-views/job-views.service';
+import { JobsRepository } from './jobs.repository';
+// Removed constants import
 
 @Injectable()
 export class JobsService {
+  [x: string]: any;
   constructor(
-    @InjectRepository(Job)
-    private readonly jobRepository: EntityRepository<Job>,
+    private readonly jobsRepository: JobsRepository,
     @InjectRepository(Company)
     private readonly companyRepository: EntityRepository<Company>,
     @InjectRepository(JobCategory)
@@ -37,12 +39,12 @@ export class JobsService {
       ...rest
     } = createJobDto;
 
-    const company = await this.companyRepository.findOneOrFail(companyId);
+    const company = await this.companyRepository.findOneOrFail(companyId.toString());
     const category = categoryId
-      ? await this.jobCategoryRepository.findOneOrFail(categoryId)
+      ? await this.jobCategoryRepository.findOneOrFail({ JobCategoryId: categoryId })
       : undefined;
 
-    const job = this.jobRepository.create({
+    const job = this.jobsRepository.create({
       ...rest,
       company,
       category,
@@ -51,9 +53,9 @@ export class JobsService {
 
     if (skillNames) {
       for (const name of skillNames) {
-        let skill = await this.skillRepository.findOne({ name });
+        let skill = await this.skillRepository.findOne({ Name: name });
         if (!skill) {
-          skill = this.skillRepository.create({ name });
+          skill = this.skillRepository.create({ Name: name });
           await this.em.persistAndFlush(skill);
         }
         job.skills.add(skill);
@@ -62,31 +64,31 @@ export class JobsService {
 
     if (tagNames) {
       for (const name of tagNames) {
-        let tag = await this.jobTagRepository.findOne({ name });
+        let tag = await this.jobTagRepository.findOne({ Name: name });
         if (!tag) {
-          tag = this.jobTagRepository.create({ name });
+          tag = this.jobTagRepository.create({ Name: name });
           await this.em.persistAndFlush(tag);
         }
         job.tags.add(tag);
       }
     }
 
-    await this.em.persistAndFlush(job);
+    await this.jobsRepository.persistAndFlush(job);
     return job;
   }
 
   async findOne(
-    id: string,
+    id: number,
     user?: Users,
     sessionId?: string
   ): Promise<Job | null> {
-    const job = await this.jobRepository.findOne(id, {
+    const job = await this.jobsRepository.findOne(id, {
       populate: ['company', 'category', 'skills', 'tags', 'postedBy'],
     });
 
     if (job) {
       // Track view
-      await this.jobViewsService.trackView(id, user, sessionId);
+      await this.jobViewsService.trackView(id.toString(), user, sessionId);
     }
 
     return job;
@@ -142,14 +144,14 @@ export class JobsService {
     }
 
     if (skills && skills.length > 0) {
-      where.skills = { name: { $in: skills } };
+      where.skills = { Name: { $in: skills } };
     }
 
     if (tags && tags.length > 0) {
-      where.tags = { name: { $in: tags } };
+      where.tags = { Name: { $in: tags } };
     }
 
-    const [jobs, total] = await this.jobRepository.findAndCount(where, {
+    const [jobs, total] = await this.jobsRepository.findAll(where, {
       populate: ['company', 'category', 'skills', 'tags', 'postedBy'],
       limit,
       offset,
@@ -160,7 +162,7 @@ export class JobsService {
   }
 
   async findPopular(limit: number = 10): Promise<Job[]> {
-    return this.jobRepository.find(
+    return this.jobsRepository.find(
       { status: JobStatus.ACTIVE },
       {
         populate: ['company', 'category'],
@@ -171,7 +173,7 @@ export class JobsService {
   }
 
   async findRecent(limit: number = 10): Promise<Job[]> {
-    return this.jobRepository.find(
+    return this.jobsRepository.find(
       { status: JobStatus.ACTIVE },
       {
         populate: ['company', 'category'],
@@ -193,7 +195,7 @@ export class JobsService {
       status,
     };
 
-    const [jobs, total] = await this.jobRepository.findAndCount(where, {
+    const [jobs, total] = await this.jobsRepository.findAll(where, {
       populate: ['company', 'category', 'skills', 'tags'],
       limit,
       offset,
@@ -204,11 +206,11 @@ export class JobsService {
   }
 
   async update(
-    id: string,
+    id: number,
     updateJobDto: Partial<CreateJobDto>,
     user: Users
   ): Promise<Job> {
-    const job = await this.jobRepository.findOneOrFail(id, {
+    const job = await this.jobsRepository.findOneOrFail(id, {
       populate: ['company'],
     });
 
@@ -232,20 +234,20 @@ export class JobsService {
     } = updateJobDto;
 
     if (companyId) {
-      job.company = await this.companyRepository.findOneOrFail(companyId);
+      job.company = await this.companyRepository.findOneOrFail(companyId.toString());
     }
 
     if (categoryId) {
-      job.category = await this.jobCategoryRepository.findOneOrFail(categoryId);
+      job.category = await this.jobCategoryRepository.findOneOrFail({ JobCategoryId: categoryId });
     }
 
     // Update skills
     if (skillNames) {
       job.skills.removeAll();
       for (const name of skillNames) {
-        let skill = await this.skillRepository.findOne({ name });
+        let skill = await this.skillRepository.findOne({ Name: name });
         if (!skill) {
-          skill = this.skillRepository.create({ name });
+          skill = this.skillRepository.create({ Name: name });
           await this.em.persistAndFlush(skill);
         }
         job.skills.add(skill);
@@ -256,9 +258,9 @@ export class JobsService {
     if (tagNames) {
       job.tags.removeAll();
       for (const name of tagNames) {
-        let tag = await this.jobTagRepository.findOne({ name });
+        let tag = await this.jobTagRepository.findOne({ Name: name });
         if (!tag) {
-          tag = this.jobTagRepository.create({ name });
+          tag = this.jobTagRepository.create({ Name: name });
           await this.em.persistAndFlush(tag);
         }
         job.tags.add(tag);
@@ -266,14 +268,14 @@ export class JobsService {
     }
 
     Object.assign(job, rest);
-    job.updatedAt = new Date();
+    job.UpdatedAt = new Date();
 
-    await this.em.persistAndFlush(job);
+    await this.jobsRepository.persistAndFlush(job);
     return job;
   }
 
-  async remove(id: string, user: Users): Promise<void> {
-    const job = await this.jobRepository.findOneOrFail(id);
+  async remove(id: number, user: Users): Promise<void> {
+    const job = await this.em.findOneOrFail(Job, { JobId: id });
 
     // Check if user is the one who posted the job or is admin
     const userWithRoles = await this.em.findOneOrFail(Users, user.id, {
@@ -286,11 +288,11 @@ export class JobsService {
       throw new Error('You can only delete your own jobs');
     }
 
-    await this.em.removeAndFlush(job);
+    await this.jobsRepository.removeAndFlush(job);
   }
 
-  async getJobStats(jobId: string, user: Users): Promise<any> {
-    const job = await this.jobRepository.findOneOrFail(jobId, {
+  async getJobStats(jobId: number, user: Users): Promise<any> {
+    const job = await this.em.findOneOrFail(Job, { JobId: jobId }, {
       populate: ['company'],
     });
 
@@ -305,10 +307,10 @@ export class JobsService {
       throw new Error('You can only view stats for your own jobs');
     }
 
-    const views = await this.jobViewsService.getJobViews(jobId, user);
+    const views = await this.jobViewsService.getJobViews(jobId.toString(), user);
 
     return {
-      viewsCount: job.viewsCount,
+      viewsCount: job.ViewsCount,
       totalViews: views.total,
       recentViews: views.views.slice(0, 10),
     };

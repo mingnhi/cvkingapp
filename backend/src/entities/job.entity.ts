@@ -6,9 +6,8 @@ import {
   ManyToMany,
   ManyToOne,
   Property,
-  Unique,
+  PrimaryKey,
 } from '@mikro-orm/core';
-import { AuditableEntity } from './base/auditable_entity';
 import { Company } from './company.entity';
 import { Users } from './user.entity';
 import { JobCategory } from './job-category.entity';
@@ -22,73 +21,111 @@ export enum JobStatus {
   CLOSED = 'Closed',
 }
 
-@Entity({ tableName: 'jobs' })
-export class Job extends AuditableEntity {
-  @ManyToOne(() => Company)
-  company!: Company;
+@Entity({ tableName: 'Jobs' })
+export class Job {
+  @PrimaryKey({ columnType: 'int', autoincrement: true })
+  JobId: number;
 
-  @ManyToOne(() => Users, { nullable: true })
+  @Property({ columnType: 'int' })
+  CompanyId: number;
+
+  @Property({ columnType: 'int', nullable: true })
+  PostedByUserId?: number;
+
+  @Property({ type: 'nvarchar', length: 300, nullable: false })
+  Title: string;
+
+  @Property({ type: 'nvarchar', length: 300, nullable: false, unique: true })
+  Slug: string;
+
+  @Property({ type: 'nvarchar', length: 1000, nullable: true })
+  ShortDescription?: string;
+
+  @Property({ type: 'nvarchar', length: -1, nullable: true })
+  Description?: string;
+
+  @Property({ type: 'nvarchar', length: -1, nullable: true })
+  Requirements?: string;
+
+  @Property({ type: 'nvarchar', length: -1, nullable: true })
+  Benefits?: string;
+
+  @Property({ columnType: 'int', nullable: true })
+  SalaryMin?: number;
+
+  @Property({ columnType: 'int', nullable: true })
+  SalaryMax?: number;
+
+  @Property({ type: 'nvarchar', length: 10, nullable: true })
+  Currency?: string;
+
+  @Property({ type: 'nvarchar', length: 50, nullable: true })
+  JobType?: string;
+
+  @Property({ type: 'nvarchar', length: 300, nullable: true })
+  Location?: string;
+
+  @Property({ columnType: 'int', nullable: true })
+  CategoryId?: number;
+
+  @Property({
+    type: 'nvarchar',
+    length: 50,
+    nullable: false,
+    default: 'Active',
+  })
+  Status: string = JobStatus.ACTIVE;
+
+  @Property({ columnType: 'int', nullable: false, default: 0 })
+  ViewsCount: number = 0;
+
+  @Property({
+    type: 'datetime2',
+    nullable: false,
+    defaultRaw: 'SYSUTCDATETIME()',
+  })
+  PostedAt: Date = new Date();
+
+  @Property({ type: 'datetime2', nullable: true })
+  ExpiresAt?: Date;
+
+  @Property({
+    type: 'datetime2',
+    nullable: false,
+    defaultRaw: 'SYSUTCDATETIME()',
+  })
+  CreatedAt: Date = new Date();
+
+  @Property({ type: 'datetime2', nullable: true })
+  UpdatedAt?: Date;
+
+  @ManyToOne(() => Company, { fieldName: 'CompanyId', deleteRule: 'cascade' })
+  company: Company;
+
+  @ManyToOne(() => Users, {
+    fieldName: 'PostedByUserId',
+    deleteRule: 'set null',
+    nullable: true,
+  })
   postedBy?: Users;
 
-  @Property()
-  title!: string;
-
-  @Property()
-  @Unique()
-  slug!: string;
-
-  @Property({ type: 'text', nullable: true })
-  shortDescription?: string;
-
-  @Property({ type: 'text', nullable: true })
-  description?: string;
-
-  @Property({ type: 'text', nullable: true })
-  requirements?: string;
-
-  @Property({ type: 'text', nullable: true })
-  benefits?: string;
-
-  @Property({ nullable: true })
-  salaryMin?: number;
-
-  @Property({ nullable: true })
-  salaryMax?: number;
-
-  @Property({ nullable: true })
-  currency?: string;
-
-  @Property({ nullable: true })
-  jobType?: string; // Full-time, Part-time, Internship...
-
-  @Property({ nullable: true })
-  location?: string;
-
-  @ManyToOne(() => JobCategory, { nullable: true })
+  @ManyToOne(() => JobCategory, {
+    fieldName: 'CategoryId',
+    deleteRule: 'set null',
+    nullable: true,
+  })
   category?: JobCategory;
-
-  @Enum(() => JobStatus)
-  status: JobStatus = JobStatus.ACTIVE;
-
-  @Property()
-  viewsCount: number = 0;
-
-  @Property()
-  postedAt: Date = new Date();
-
-  @Property({ nullable: true })
-  expiresAt?: Date;
 
   @ManyToMany(() => Skill, 'jobs', {
     owner: true,
-    pivotTable: 'job_skills',
+    pivotTable: 'JobSkills',
     cascade: [Cascade.ALL],
   })
   skills = new Collection<Skill>(this);
 
   @ManyToMany(() => JobTag, 'jobs', {
     owner: true,
-    pivotTable: 'job_job_tags',
+    pivotTable: 'JobJobTags',
     cascade: [Cascade.ALL],
   })
   tags = new Collection<JobTag>(this);

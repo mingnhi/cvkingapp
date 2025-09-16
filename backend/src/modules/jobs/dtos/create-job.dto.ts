@@ -1,19 +1,17 @@
 import {
   IsArray,
   IsDate,
-  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
-  IsUUID,
 } from 'class-validator';
 import { JobStatus } from '../../../entities/job.entity';
 
 export class CreateJobDto {
-  @IsUUID()
+  @IsNumber()
   @IsNotEmpty()
-  companyId!: string;
+  companyId!: number;
 
   @IsString()
   @IsNotEmpty()
@@ -59,13 +57,13 @@ export class CreateJobDto {
   @IsOptional()
   location?: string;
 
-  @IsUUID()
+  @IsNumber()
   @IsOptional()
-  categoryId?: string;
+  categoryId?: number;
 
-  @IsEnum(JobStatus)
+  @IsString()
   @IsOptional()
-  status?: JobStatus;
+  status?: string;
 
   @IsDate()
   @IsOptional()
