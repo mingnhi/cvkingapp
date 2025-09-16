@@ -10,7 +10,7 @@ export class UsersRepository {
     @InjectRepository(Users)
     private readonly userRepository: EntityRepository<Users>,
     private readonly em: EntityManager
-  ) {}
+  ) { }
 
   /**
    * Retrieve all users
@@ -25,8 +25,12 @@ export class UsersRepository {
    * @param id ID of the user
    * @returns user or null if not found
    */
-  async findOne(id: string): Promise<Users | null> {
-    return this.userRepository.findOne({ id });
+  async findOne(id: number): Promise<Users | null> {
+    return this.userRepository.findOne({ userId: id });
+  }
+
+  findByEmail(email: string): Promise<Users | null> {
+    return this.userRepository.findOne({ email });
   }
 
   /**
@@ -35,13 +39,8 @@ export class UsersRepository {
    * @param createuserDto Data to create the user
    * @returns Created user
    */
-  async create(createuserDto: CreateUserDto): Promise<Users> {
-    const user = this.userRepository.create({
-      ...createuserDto,
-      id: undefined,
-    });
-    await this.em.persistAndFlush(user);
-    return user;
+  create(dto: CreateUserDto): Users {
+    return this.userRepository.create(dto);
   }
 
   /**
@@ -49,15 +48,10 @@ export class UsersRepository {
    * @param updateuserDto Data to update the user
    * @returns Updated user or null if not found
    */
-  async update(updateuserDto: UpdateUserDto): Promise<Users | null> {
-    const user = await this.userRepository.findOne({ id: updateuserDto.id });
-    if (!user) {
-      return null;
-    }
-    user.email = updateuserDto.email;
-    user.password = updateuserDto.password;
-    user.isActive = updateuserDto.isActive;
-    user.isVerify = updateuserDto.isVerify;
+  async update(UserId: number, data: Partial<Users>): Promise<Users | null> {
+    const user = await this.findOne(UserId);
+    if (!user) return null;
+    this.userRepository.assign(user, data);
     await this.em.flush();
     return user;
   }
@@ -67,12 +61,16 @@ export class UsersRepository {
    * @param id ID of the user to delete
    * @returns True if deletion is successful, false if not found
    */
-  async delete(id: string): Promise<boolean> {
-    const user = await this.userRepository.findOne({ id });
-    if (!user) {
-      return false;
-    }
+  async delete(id: number): Promise<boolean> {
+    const user = await this.findOne(id);
+    if (!user) return false;
     await this.em.removeAndFlush(user);
     return true;
   }
+
+  /**
+ * Find a user by email
+ * @param email Email of the user
+ * @returns user or null if not found
+ */
 }

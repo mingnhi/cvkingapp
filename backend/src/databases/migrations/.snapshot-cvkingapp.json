@@ -1,0 +1,671 @@
+{
+  "namespaces": [
+    "dbo"
+  ],
+  "name": "dbo",
+  "tables": [
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "name": {
+          "name": "name",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "tax_code": {
+          "name": "tax_code",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "address": {
+          "name": "address",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "website": {
+          "name": "website",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "industry_id": {
+          "name": "industry_id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "size": {
+          "name": "size",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "description": {
+          "name": "description",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "logo_url": {
+          "name": "logo_url",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "banner_url": {
+          "name": "banner_url",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "contact_person": {
+          "name": "contact_person",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "contact_email": {
+          "name": "contact_email",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "contact_phone": {
+          "name": "contact_phone",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        }
+      },
+      "name": "Company",
+      "schema": "dbo",
+      "indexes": [
+        {
+          "keyName": "Company_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "name": {
+          "name": "name",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "slug": {
+          "name": "slug",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "description": {
+          "name": "description",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "parant_id": {
+          "name": "parant_id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        }
+      },
+      "name": "Industry",
+      "schema": "dbo",
+      "indexes": [
+        {
+          "keyName": "Industry_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "role_id": {
+          "name": "role_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "role_name": {
+          "name": "role_name",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "description": {
+          "name": "description",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255
+        }
+      },
+      "name": "Roles",
+      "schema": "dbo",
+      "indexes": [
+        {
+          "columnNames": [
+            "role_name"
+          ],
+          "composite": false,
+          "keyName": "Roles_role_name_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "Roles_pkey",
+          "columnNames": [
+            "id",
+            "role_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "email": {
+          "name": "email",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "password": {
+          "name": "password",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "is_email_confirmed": {
+          "name": "is_email_confirmed",
+          "type": "bit",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
+          "mappedType": "boolean"
+        },
+        "last_login_at": {
+          "name": "last_login_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "bit",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "1",
+          "mappedType": "boolean"
+        },
+        "is_deleted": {
+          "name": "is_deleted",
+          "type": "bit",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
+          "mappedType": "boolean"
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255
+        },
+        "avatar_url": {
+          "name": "avatar_url",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255
+        },
+        "preferred_locale": {
+          "name": "preferred_locale",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255
+        },
+        "google_id": {
+          "name": "google_id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255
+        },
+        "linked_in_id": {
+          "name": "linked_in_id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255
+        }
+      },
+      "name": "Users",
+      "schema": "dbo",
+      "indexes": [
+        {
+          "columnNames": [
+            "email"
+          ],
+          "composite": false,
+          "keyName": "Users_email_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "Users_pkey",
+          "columnNames": [
+            "id",
+            "user_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "user_role_id": {
+          "name": "user_role_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "user_user_id": {
+          "name": "user_user_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "integer"
+        },
+        "role_id": {
+          "name": "role_id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "role_role_id": {
+          "name": "role_role_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "integer"
+        },
+        "assigned_at": {
+          "name": "assigned_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "default": "SYSUTCDATETIME()",
+          "mappedType": "date"
+        }
+      },
+      "name": "UserRoles",
+      "schema": "dbo",
+      "indexes": [
+        {
+          "keyName": "UserRoles_pkey",
+          "columnNames": [
+            "id",
+            "user_role_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "UserRoles_user_id_user_user_id_foreign": {
+          "constraintName": "UserRoles_user_id_user_user_id_foreign",
+          "columnNames": [
+            "user_id",
+            "user_user_id"
+          ],
+          "localTableName": "dbo.UserRoles",
+          "referencedColumnNames": [
+            "id",
+            "user_id"
+          ],
+          "referencedTableName": "dbo.Users",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "UserRoles_role_id_role_role_id_foreign": {
+          "constraintName": "UserRoles_role_id_role_role_id_foreign",
+          "columnNames": [
+            "role_id",
+            "role_role_id"
+          ],
+          "localTableName": "dbo.UserRoles",
+          "referencedColumnNames": [
+            "id",
+            "role_id"
+          ],
+          "referencedTableName": "dbo.Roles",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    }
+  ],
+  "nativeEnums": {}
+}

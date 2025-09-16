@@ -9,6 +9,6 @@ import { Roles } from '@entities/role.entity';
   imports: [MikroOrmModule.forFeature([Roles])],
   providers: [RolesRepository, RolesService],
   controllers: [RolesController],
-  exports: [RolesService],
+  exports: [RolesService, RolesRepository],
 })
 export class RolesModule {}

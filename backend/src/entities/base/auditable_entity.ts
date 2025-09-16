@@ -6,9 +6,10 @@ export abstract class AuditableEntity {
   @PrimaryKey({ type: 'string' })
   id: string = uuidv4();
 
-  @Property({ type: 'date', nullable: false })
+  @Property({ type: 'date', fieldName: 'created_at', onCreate: () => new Date() })
   createdAt: Date = new Date();
 
-  @Property({ type: 'date', nullable: true, onUpdate: () => new Date() })
+  @Property({ type: 'date', fieldName: 'updatedAt', onUpdate: () => new Date(), nullable: true })
   updatedAt?: Date;
+
 }

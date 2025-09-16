@@ -8,6 +8,7 @@ import {
   ValidationPipe,
   ParseUUIDPipe,
   Put,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from '@modules/users/dtos/user.dto';
@@ -18,7 +19,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   /**
    * Retrieve all users
@@ -41,15 +42,8 @@ export class UsersController {
    * @returns User wrapped in ApiResponse
    */
   @Get(':id')
-  async findOne(
-    @Param('id', ParseUUIDPipe) id: string
-  ): Promise<ApiResponse<Users>> {
-    const user = await this.usersService.getUserById(id);
-    return {
-      status: 'success',
-      message: `Successfully retrieved user with ID ${id}`,
-      data: user,
-    };
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Users> {
+    return this.usersService.getUserById(id);
   }
 
   /**
@@ -76,14 +70,10 @@ export class UsersController {
    */
   @Put()
   async update(
-    @Body(ValidationPipe) updateUserDto: UpdateUserDto
-  ): Promise<ApiResponse<Users>> {
-    const user = await this.usersService.updateUser(updateUserDto);
-    return {
-      status: 'success',
-      message: `User with ID ${updateUserDto.id} updated successfully`,
-      data: user,
-    };
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateUserDto,
+  ): Promise<Users> {
+    return this.usersService.update(id, dto);
   }
 
   /**
@@ -92,14 +82,8 @@ export class UsersController {
    * @returns Success message wrapped in ApiResponse
    */
   @Delete(':id')
-  async delete(
-    @Param('id', ParseUUIDPipe) id: string
-  ): Promise<ApiResponse<null>> {
-    await this.usersService.deleteUser(id);
-    return {
-      status: 'success',
-      message: `User with ID ${id} deleted successfully`,
-      data: null,
-    };
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
+    return this.usersService.delete(id);
   }
+
 }

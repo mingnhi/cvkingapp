@@ -1,14 +1,18 @@
-import { Entity, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
 import { AuditableEntity } from './base/auditable_entity';
-
+import { Users } from './user.entity';
+import { Roles } from './role.entity';
 @Entity({ tableName: 'UserRoles' })
 export class UserRole extends AuditableEntity {
-  @Property({ type: 'string' })
-  userId: string;
+  @PrimaryKey({ type: 'number', autoincrement: true })
+  userRoleId!: number;
+  
+  @ManyToOne(() => Users, { deleteRule: 'cascade' })
+  user!: Users;
 
-  @Property({ type: 'string' })
-  roleId: string;
+  @ManyToOne(() => Roles)
+  role!: Roles;
 
-  @Property({ type: 'bit' })
-  isActive: boolean;
+  @Property({ type: 'date', defaultRaw: 'SYSUTCDATETIME()' })
+  assignedAt: Date = new Date();
 }

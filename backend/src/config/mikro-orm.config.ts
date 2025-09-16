@@ -12,7 +12,7 @@ export const mikroOrmConfig = (configService: ConfigService): Options => ({
   dbName: configService.get<string>('DB_NAME'),
   host: configService.get<string>('DB_HOST'),
   port: parseInt(configService.get<string>('DB_PORT'), 10) || 1433,
-  user: configService.get<string>('DB_USER'),
+  user: configService.get<string>('DB_USERNAME'),
   password: configService.get<string>('DB_PASSWORD'),
   migrations: {
     path: 'dist/migrations',
@@ -27,7 +27,7 @@ export default defineConfig({
   dbName: process.env.DB_NAME,
   host: process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT, 10) || 1433,
-  user: process.env.DB_USER,
+  user: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   migrations: {
     path: 'dist/migrations',

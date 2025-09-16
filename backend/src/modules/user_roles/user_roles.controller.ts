@@ -8,6 +8,7 @@ import {
   ValidationPipe,
   ParseUUIDPipe,
   Put,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UserRolesService } from './user_roles.service';
 import {
@@ -28,14 +29,8 @@ export class UserRoleController {
    * @returns List of all userUserRole wrapped in ApiResponse
    */
   @Get()
-  async findAll(): Promise<ApiResponse<UserRole[]>> {
-    const userRoles = await this.userRoleService.getAllUserRoles();
-    return {
-      status: 'success',
-      message: 'Successfully retrieved all userUserRole',
-      data: userRoles,
-      meta: { count: userRoles.length },
-    };
+  findAll(): Promise<UserRole[]> {
+    return this.userRoleService.getAllUserRoles();
   }
 
   /**
@@ -44,15 +39,8 @@ export class UserRoleController {
    * @returns Role wrapped in ApiResponse
    */
   @Get(':id')
-  async findOne(
-    @Param('id', ParseUUIDPipe) id: string
-  ): Promise<ApiResponse<UserRole>> {
-    const userRole = await this.userRoleService.getUserRoleById(id);
-    return {
-      status: 'success',
-      message: `Successfully retrieved userRole with ID ${id}`,
-      data: userRole,
-    };
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<UserRole> {
+    return this.userRoleService.getUserRoleById(id);
   }
 
   /**
@@ -61,16 +49,8 @@ export class UserRoleController {
    * @returns Created userRole wrapped in ApiResponse
    */
   @Post()
-  async create(
-    @Body(ValidationPipe) createUserRoleDto: CreateUserRoleDto
-  ): Promise<ApiResponse<UserRole>> {
-    const userRole =
-      await this.userRoleService.createUserRole(createUserRoleDto);
-    return {
-      status: 'success',
-      message: 'Role created successfully',
-      data: userRole,
-    };
+  create(@Body() dto: CreateUserRoleDto): Promise<UserRole> {
+    return this.userRoleService.createUserRole(dto);
   }
 
   /**
@@ -78,17 +58,12 @@ export class UserRoleController {
    * @param UpdateUserRoleDto Data to update the userRole
    * @returns Updated userRole wrapped in ApiResponse
    */
-  @Put()
-  async update(
-    @Body(ValidationPipe) updateUserRoleDto: UpdateUserRoleDto
-  ): Promise<ApiResponse<UserRole>> {
-    const userRole =
-      await this.userRoleService.updateUserRole(updateUserRoleDto);
-    return {
-      status: 'success',
-      message: `Role with ID ${updateUserRoleDto.id} updated successfully`,
-      data: userRole,
-    };
+  @Put(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateUserRoleDto,
+  ): Promise<UserRole> {
+    return this.userRoleService.update(id, dto);
   }
 
   /**
@@ -97,14 +72,7 @@ export class UserRoleController {
    * @returns Success message wrapped in ApiResponse
    */
   @Delete(':id')
-  async delete(
-    @Param('id', ParseUUIDPipe) id: string
-  ): Promise<ApiResponse<null>> {
-    await this.userRoleService.deleteUserRole(id);
-    return {
-      status: 'success',
-      message: `Role with ID ${id} deleted successfully`,
-      data: null,
-    };
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
+    return this.userRoleService.deleteUserRole(id);
   }
 }

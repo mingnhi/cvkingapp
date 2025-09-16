@@ -6,9 +6,16 @@ import { Users } from '@entities/user.entity';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UsersModule } from '@modules/users/users.module';
+import { RolesModule } from '@modules/roles/roles.module';
+import { UserRolesModule } from '@modules/user_roles/user_roles.module';
+import { JwtService } from './services/jwt.service';
 
 @Module({
   imports: [
+    UsersModule,
+    RolesModule,
+    UserRolesModule,
     MikroOrmModule.forFeature([Users]),
     PassportModule.register({ defaultStrategy: 'jwt-access' }),
     JwtModule.registerAsync({
@@ -22,7 +29,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService],
+  providers: [AuthService, JwtService],
   controllers: [AuthController],
+  exports:[AuthService, JwtService]
 })
 export class AuthModule {}
