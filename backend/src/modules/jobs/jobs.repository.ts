@@ -1,15 +1,24 @@
+import { JobSkillsRepository } from './../job-skills/job-skills.repository';
 import { EntityRepository, EntityManager } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
 import { Job } from '../../entities/job.entity';
 import { CreateJobDto } from './dtos/create-job.dto';
 import { UpdateJobDto } from './dtos/update-job.dto';
+import { JobJobTags } from '@entities/job-job-tags.entity';
+import { Skill } from '@entities/skill.entity';
+import { JobSkills } from '@entities/job-skills.entity';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class JobsRepository {
   constructor(
     @InjectRepository(Job)
     private readonly jobRepository: EntityRepository<Job>,
+    @InjectRepository(JobJobTags)
+    private readonly jobJobTagsRepository: EntityRepository<JobJobTags>,
+    @InjectRepository(JobSkills)
+    private readonly jobSkillsRepository: EntityRepository<JobSkills>,
     private readonly em: EntityManager
   ) {}
 
@@ -20,7 +29,11 @@ export class JobsRepository {
   async findAll(query?: object): Promise<Job[]> {
     const results = await this.em.getConnection().execute('EXEC SP_GetAllJob');
     let data: any;
-    if (Array.isArray(results) && results.length > 0 && typeof results[0] === 'string') {
+    if (
+      Array.isArray(results) &&
+      results.length > 0 &&
+      typeof results[0] === 'string'
+    ) {
       // If results is an array with a JSON string
       data = JSON.parse(results[0] as string);
     } else if (typeof results === 'string') {
@@ -49,52 +62,53 @@ export class JobsRepository {
    * @param createJobDto Data to create the job
    * @returns Created job
    */
-  async create(createJobDto: CreateJobDto): Promise<Job> {
-    const { skills, tags, ...jobData } = createJobDto;
-    const skillsStr = Array.isArray(skills) ? skills.join(',') : '';
-    const tagsStr = Array.isArray(tags) ? tags.join(',') : '';
+  async create(createJobDto: CreateJobDto): Promise<any> {
+    console.log('skills', createJobDto.skills);
+    console.log('tags', createJobDto.tags);
 
     const results = await this.em
       .getConnection()
       .execute(
         'EXEC SP_InsertJob ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
         [
-          jobData.companyId, // CompanyId
-          null, // PostedByUserId (optional)
-          jobData.title, // Title
-          jobData.title
-            .toLowerCase()
-            .replace(/\s+/g, '-')
-            .replace(/[^\w-]+/g, ''), // Slug (generated from title)
-          jobData.shortDescription, // ShortDescription
-          jobData.description, // Description
-          jobData.requirements, // Requirements
-          jobData.benefits, // Benefits
-          jobData.salaryMin, // SalaryMin
-          jobData.salaryMax, // SalaryMax
-          jobData.currency, // Currency
-          jobData.jobType, // JobType
-          jobData.location, // Location
-          jobData.categoryId, // CategoryId
-          jobData.status || 'Active', // Status
+          createJobDto.companyId, // CompanyId
+          createJobDto.userId, // PostedByUserId (optional)
+          createJobDto.title, // Title
+          createJobDto.shortDescription, // ShortDescription
+          createJobDto.description, // Description
+          createJobDto.requirements, // Requirements
+          createJobDto.benefits, // Benefits
+          createJobDto.salaryMin, // SalaryMin
+          createJobDto.salaryMax, // SalaryMax
+          createJobDto.currency, // Currency
+          createJobDto.jobType, // JobType
+          createJobDto.location, // Location
+          createJobDto.categoryId, // CategoryId
+          createJobDto.status || 'Active', // Status
           0, // ViewsCount
-          null, // PostedAt (auto-generated in SP)
-          jobData.expiresAt, // ExpiresAt
-          skillsStr, // Skills
-          tagsStr, // Tags
+          createJobDto.expiresAt, // ExpiresAtags
         ]
       );
-
-    let data: any;
-    if (Array.isArray(results) && results.length > 0 && typeof results[0] === 'string') {
-      data = JSON.parse(results[0] as string);
-    } else if (typeof results === 'string') {
-      data = JSON.parse(results);
-    } else {
-      data = results ?? [];
+    for (let skill of createJobDto.skills) {
+      this.jobSkillsRepository.create({
+        id: uuidv4(),
+        jobId: results[0].JobId,
+        skillId: skill,
+        createdAt: new Date(),
+        updatedAt: null,
+      });
     }
-
-    return data?.length > 0 ? data[0] : null;
+    for (let tag of createJobDto.tags) {
+      this.jobJobTagsRepository.create({
+        id: uuidv4(),
+        jobId: results[0].JobId,
+        jobTagId: tag,
+        createdAt: new Date(),
+        updatedAt: null,
+      });
+    }
+    await this.em.flush();
+    return results[0];
   }
 
   /**
@@ -132,7 +146,11 @@ export class JobsRepository {
         ]
       );
     let data: any;
-    if (Array.isArray(results) && results.length > 0 && typeof results[0] === 'string') {
+    if (
+      Array.isArray(results) &&
+      results.length > 0 &&
+      typeof results[0] === 'string'
+    ) {
       data = JSON.parse(results[0] as string);
     } else if (typeof results === 'string') {
       data = JSON.parse(results);
