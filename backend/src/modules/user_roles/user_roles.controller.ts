@@ -14,7 +14,7 @@ import {
   CreateUserRoleDto,
   UpdateUserRoleDto,
 } from '@modules/user_roles/dtos/user_role.dto';
-import { UserRole } from '@entities/user_role.entity';
+// import { UserRole } from '@entities/user_role.entity';
 import { ApiResponse } from '@common/interfaces/api-response.interface';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -28,7 +28,7 @@ export class UserRoleController {
    * @returns List of all userUserRole wrapped in ApiResponse
    */
   @Get()
-  async findAll(): Promise<ApiResponse<UserRole[]>> {
+  async findAll(): Promise<ApiResponse<any>> {
     const userRoles = await this.userRoleService.getAllUserRoles();
     return {
       status: 'success',
@@ -46,7 +46,7 @@ export class UserRoleController {
   @Get(':id')
   async findOne(
     @Param('id', ParseUUIDPipe) id: string
-  ): Promise<ApiResponse<UserRole>> {
+  ): Promise<ApiResponse<any>> {
     const userRole = await this.userRoleService.getUserRoleById(id);
     return {
       status: 'success',
@@ -63,7 +63,7 @@ export class UserRoleController {
   @Post()
   async create(
     @Body(ValidationPipe) createUserRoleDto: CreateUserRoleDto
-  ): Promise<ApiResponse<UserRole>> {
+  ): Promise<ApiResponse<any>> {
     const userRole =
       await this.userRoleService.createUserRole(createUserRoleDto);
     return {
@@ -81,7 +81,7 @@ export class UserRoleController {
   @Put()
   async update(
     @Body(ValidationPipe) updateUserRoleDto: UpdateUserRoleDto
-  ): Promise<ApiResponse<UserRole>> {
+  ): Promise<ApiResponse<any>> {
     const userRole =
       await this.userRoleService.updateUserRole(updateUserRoleDto);
     return {

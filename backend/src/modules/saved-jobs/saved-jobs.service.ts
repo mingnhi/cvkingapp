@@ -7,7 +7,7 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityManager, EntityRepository } from '@mikro-orm/core';
 import { SavedJob } from '../../entities/saved-job.entity';
 import { Job } from '../../entities/job.entity';
-import { Users } from '../../entities/user.entity';
+// import { Users } from '../../entities/user.entity';
 import { SavedJobQueryDto } from './dtos/saved-job-query.dto';
 import { SavedJobsRepository } from './saved-jobs.repository';
 
@@ -20,7 +20,7 @@ export class SavedJobsService {
     private readonly em: EntityManager
   ) {}
 
-  async saveJob(jobId: string, user: Users): Promise<SavedJob> {
+  async saveJob(jobId: string, user: any): Promise<SavedJob> {
     // Check if job exists
     const job = await this.jobRepository.findOneOrFail({ id: jobId });
 
@@ -45,7 +45,7 @@ export class SavedJobsService {
 
   async findAll(
     query: SavedJobQueryDto,
-    user: Users
+    user: any
   ): Promise<{ savedJobs: SavedJob[]; total: number }> {
     const { page = 1, limit = 10 } = query;
     const offset = (page - 1) * limit;
@@ -62,7 +62,7 @@ export class SavedJobsService {
     return { savedJobs, total };
   }
 
-  async findOne(id: string, user: Users): Promise<SavedJob> {
+  async findOne(id: string, user: any): Promise<SavedJob> {
     const savedJob = await this.savedJobsRepository.findOne(id);
 
     if (!savedJob) {
@@ -76,12 +76,12 @@ export class SavedJobsService {
     return savedJob;
   }
 
-  async remove(id: string, user: Users): Promise<void> {
+  async remove(id: string, user: any): Promise<void> {
     const savedJob = await this.findOne(id, user);
     await this.savedJobsRepository.removeAndFlush(savedJob);
   }
 
-  async removeByJobId(jobId: string, user: Users): Promise<void> {
+  async removeByJobId(jobId: string, user: any): Promise<void> {
     const savedJob = await this.savedJobsRepository.findOne({
       jobId,
       jobSeekerId: user.id,
@@ -94,7 +94,7 @@ export class SavedJobsService {
     await this.savedJobsRepository.removeAndFlush(savedJob);
   }
 
-  async isJobSaved(jobId: string, user: Users): Promise<boolean> {
+  async isJobSaved(jobId: string, user: any): Promise<boolean> {
     const savedJob = await this.savedJobsRepository.findOne({
       jobId,
       jobSeekerId: user.id,
