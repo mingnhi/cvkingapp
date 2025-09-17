@@ -1,103 +1,68 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  Param,
   Post,
   Put,
-  Req,
-  UseGuards,
-  ValidationPipe,
+  Delete,
+  Param,
+  Body,
   ParseUUIDPipe,
+  ValidationPipe,
 } from '@nestjs/common';
-import { JobApplicationsService } from './job-applications.service';
-import { CreateJobApplicationDto } from './dtos/create-job-application.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { Roles } from '@modules/auth/roles.decorator';
 import { ApiTags } from '@nestjs/swagger';
+import { JobApplicationsRepository } from './job-applications.repository';
 import { ApiResponse } from '@common/interfaces/api-response.interface';
-import { JobApplication } from '../../entities/job-application.entity';
+import { CreateJobApplicationDto } from './dtos/create-job-application.dto';
+import { UpdateJobApplicationDto } from './dtos/update-job-application.dto';
 
 @ApiTags('job-applications')
 @Controller('job-applications')
 export class JobApplicationsController {
-  constructor(
-    private readonly jobApplicationsService: JobApplicationsService
-  ) {}
-
-  @Post()
-  @UseGuards(AuthGuard('jwt'))
-  @Roles('JobSeeker')
-  async create(
-    @Body(ValidationPipe) createJobApplicationDto: CreateJobApplicationDto,
-    @Req() req
-  ): Promise<ApiResponse<JobApplication>> {
-    const application = await this.jobApplicationsService.create(
-      createJobApplicationDto
-      // req.user
-    );
-    return {
-      status: 'success',
-      message: 'Application created successfully',
-      data: application,
-    };
-  }
+  constructor(private readonly repo: JobApplicationsRepository) {}
 
   @Get()
-  @UseGuards(AuthGuard('jwt'))
-  @Roles('Employer', 'Admin')
-  async findAll(): Promise<ApiResponse<JobApplication[]>> {
-    const items = await this.jobApplicationsService.findAll();
+  async findAll(): Promise<ApiResponse<any>> {
+    const data = await this.repo.findAll();
     return {
       status: 'success',
-      message: 'Successfully retrieved applications',
-      data: items,
-      meta: { count: items.length },
+      message: 'All job applications',
+      data,
+      meta: { count: data.length },
     };
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
   async findOne(
     @Param('id', ParseUUIDPipe) id: string
-  ): Promise<ApiResponse<JobApplication>> {
-    const item = await this.jobApplicationsService.findOne(id);
-    return {
-      status: 'success',
-      message: 'Successfully retrieved application',
-      data: item,
-    };
+  ): Promise<ApiResponse<any>> {
+    const data = await this.repo.findOne(id);
+    return { status: 'success', message: 'Found job application', data };
   }
 
-  @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
-  @Roles('Employer', 'Admin')
+  @Post()
+  async create(
+    @Body(ValidationPipe) dto: CreateJobApplicationDto
+  ): Promise<ApiResponse<any>> {
+    const data = await this.repo.create(dto);
+    return { status: 'success', message: 'Created job application', data };
+  }
+
+  @Put()
   async update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body(ValidationPipe) jobApplication: JobApplication
-  ): Promise<ApiResponse<JobApplication>> {
-    const updated = await this.jobApplicationsService.update(
-      id,
-      jobApplication
-    );
-    return {
-      status: 'success',
-      message: 'Application updated successfully',
-      data: updated,
-    };
+    @Body(ValidationPipe) dto: UpdateJobApplicationDto
+  ): Promise<ApiResponse<any>> {
+    const data = await this.repo.update(dto);
+    return { status: 'success', message: 'Updated job application', data };
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
-  @Roles('Employer', 'Admin', 'JobSeeker')
-  async remove(
+  async delete(
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<ApiResponse<null>> {
-    await this.jobApplicationsService.remove(id);
+    await this.repo.delete(id);
     return {
       status: 'success',
-      message: 'Application removed successfully',
+      message: 'Deleted job application',
       data: null,
     };
   }

@@ -1,41 +1,53 @@
-import { EntityManager, EntityRepository } from '@mikro-orm/core';
-import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { JobApplication } from '../../entities/job-application.entity';
+import extractJson, { extractJsonArray } from 'src/utils/extractJson';
+import { CreateJobApplicationDto } from './dtos/create-job-application.dto';
+import { UpdateJobApplicationDto } from './dtos/update-job-application.dto';
 
 @Injectable()
 export class JobApplicationsRepository {
-  constructor(
-    @InjectRepository(JobApplication)
-    private readonly jobApplicationRepository: EntityRepository<JobApplication>,
-    private readonly em: EntityManager
-  ) {}
+  constructor(private readonly em: EntityManager) {}
 
-  create(data: Partial<JobApplication>): JobApplication {
-    return this.jobApplicationRepository.create({ ...data, id: undefined });
+  async findAll(): Promise<any[]> {
+    const raw = await this.em
+      .getConnection()
+      .execute('EXEC SP_GetAllJobApplications');
+    return extractJsonArray(raw) ?? [];
   }
 
-  async persistAndFlush(entity: JobApplication): Promise<void> {
-    await this.em.persistAndFlush(entity);
+  async findOne(id: string): Promise<any | null> {
+    const raw = await this.em
+      .getConnection()
+      .execute('EXEC SP_GetJobApplicationById ?', [id]);
+    return extractJson(raw);
   }
 
-  async findAll(): Promise<JobApplication[]> {
-    return this.jobApplicationRepository.findAll();
+  async create(dto: CreateJobApplicationDto): Promise<any> {
+    const raw = await this.em
+      .getConnection()
+      .execute('EXEC SP_InsertJobApplication ?, ?, ?', [
+        dto.jobId,
+        dto.jobSeekerId,
+        dto.coverLetter ?? null,
+      ]);
+    return extractJson(raw);
   }
 
-  async findOneOrFail(where: any, options?: any): Promise<JobApplication> {
-    return this.jobApplicationRepository.findOneOrFail(where, options);
+  async update(dto: UpdateJobApplicationDto): Promise<any> {
+    const raw = await this.em
+      .getConnection()
+      .execute('EXEC SP_UpdateJobApplication ?, ?, ?', [
+        dto.id,
+        dto.coverLetter ?? null,
+        dto.status,
+      ]);
+    return extractJson(raw);
   }
 
-  async findOne(id: string, options?: any): Promise<JobApplication | null> {
-    return this.jobApplicationRepository.findOne(id, options);
-  }
-
-  async nativeUpdate(where: any, data: any): Promise<void> {
-    await this.jobApplicationRepository.nativeUpdate(where, data);
-  }
-
-  async nativeDelete(where: any): Promise<void> {
-    await this.jobApplicationRepository.nativeDelete(where);
+  async delete(id: string): Promise<boolean> {
+    await this.em
+      .getConnection()
+      .execute('EXEC SP_DeleteJobApplication ?', [id]);
+    return true;
   }
 }

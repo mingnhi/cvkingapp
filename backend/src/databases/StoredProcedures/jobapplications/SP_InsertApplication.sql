@@ -1,19 +1,26 @@
-use JOB_PORTAL
+use JOB_DB
 go
 
-create procedure [dbo].[SP_InsertApplication]
-(
-    @JobId int,
-    @JobSeekerProfileId int,
-    @CVId int = null,
-    @CoverLetter nvarchar(max) = null,
-    @Status nvarchar(50) = 'Pending'
-)
-as
-begin
-    insert into JobApplications(JobId, JobSeekerProfileId, CVId, CoverLetter, Status)
-    values (@JobId, @JobSeekerProfileId, @CVId, @CoverLetter, @Status)
+-- 📌 Thêm application mới
+CREATE OR ALTER PROCEDURE SP_InsertJobApplication
+  @JobId UNIQUEIDENTIFIER,
+  @JobSeekerId UNIQUEIDENTIFIER,
+  @CoverLetter NVARCHAR(MAX) = NULL
+AS
+BEGIN
+  SET NOCOUNT ON;
 
-    declare @ApplicationId int = SCOPE_IDENTITY()
-    select * from JobApplications where ApplicationId = @ApplicationId
-end
+  DECLARE @NewId UNIQUEIDENTIFIER = NEWID();
+
+  INSERT INTO job_applications (
+    id, job_id, job_seeker_id, cover_letter, status,
+    applied_at, is_deleted, created_at
+  )
+  VALUES (
+    @NewId, @JobId, @JobSeekerId, @CoverLetter, 'Pending',
+    GETDATE(), 0, GETDATE()
+  );
+
+  EXEC SP_GetJobApplicationById @NewId;
+END
+GO

@@ -26,9 +26,6 @@ export class JobApplication extends AuditableEntity {
   @Property()
   appliedAt: Date = new Date();
 
-  @Property({ nullable: true })
-  updatedAt?: Date;
-
   @Property()
   isDeleted: boolean = false;
 }

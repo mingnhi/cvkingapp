@@ -1,14 +1,14 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { ApplicationStatus } from '../../../entities/job-application.entity';
+import { ApplicationStatus } from '@entities/job-application.entity';
+import { IsUUID, IsOptional, IsString, IsEnum } from 'class-validator';
 
 export class UpdateJobApplicationDto {
-  @IsEnum(ApplicationStatus)
-  @IsOptional()
-  status?: ApplicationStatus;
+  @IsUUID()
+  id: string;
 
+  @IsOptional()
   @IsString()
-  @IsOptional()
   coverLetter?: string;
+
+  @IsEnum(ApplicationStatus)
+  status: ApplicationStatus;
 }
-
-
