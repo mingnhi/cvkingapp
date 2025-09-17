@@ -9,7 +9,4 @@ export class SavedJob extends AuditableEntity {
 
   @Property({ type: 'string' })
   jobId: string;
-
-  @Property()
-  savedAt: Date = new Date();
 }

@@ -1,11 +1,25 @@
-use JOB_PORTAL
+use JOB_DB
 go
 
 create procedure [dbo].[SP_DeleteJob]
 (
-    @JobId int
+    @JobId varchar(max)
 )
 as
 begin
-    delete from Jobs where JobId = @JobId
+    -- Delete related job skills
+    delete from JobSkills where job_id = @JobId
+
+    -- Delete related job tags
+    delete from JobJobTags where job_id = @JobId
+
+    -- Delete related job views
+    delete from JobViews where job_id = @JobId
+
+    -- Delete related saved jobs
+    delete from saved_jobs where job_id = @JobId
+
+    -- Finally delete the job
+    delete from Jobs where id = @JobId
 end
+go

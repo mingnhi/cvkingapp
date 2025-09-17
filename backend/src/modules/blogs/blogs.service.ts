@@ -17,7 +17,7 @@ export class BlogsService {
     @InjectRepository(BlogPostTags)
     private readonly blogPostTagsRepository: EntityRepository<BlogPostTags>,
     @InjectRepository(BlogComments)
-    private readonly blogCommentsRepository: EntityRepository<BlogComments>,
+    private readonly blogCommentsRepository: EntityRepository<BlogComments>
   ) {}
 
   // CRUD BlogPosts
@@ -103,7 +103,7 @@ export class BlogsService {
 
   // Get blog post details
   async getBlogPostDetails(id: string): Promise<BlogPosts> {
-    return this.blogPostsRepository.findOne(id, { populate: ['author', 'comments'] });
+    return this.blogPostsRepository.findOne(id);
   }
 
   // Search blog posts by title

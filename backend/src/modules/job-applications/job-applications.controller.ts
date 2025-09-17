@@ -34,8 +34,8 @@ export class JobApplicationsController {
     @Req() req
   ): Promise<ApiResponse<JobApplication>> {
     const application = await this.jobApplicationsService.create(
-      createJobApplicationDto,
-      req.user
+      createJobApplicationDto
+      // req.user
     );
     return {
       status: 'success',

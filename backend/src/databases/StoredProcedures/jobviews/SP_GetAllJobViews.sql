@@ -1,8 +1,8 @@
-use JOB_PORTAL
+use JOB_DB
 go
 
 create procedure [dbo].[SP_GetAllJobViews]
 as
 begin
-    select * from JobViews
+    select * from jobviews
 end

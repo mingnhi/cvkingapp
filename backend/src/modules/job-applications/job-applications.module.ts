@@ -4,11 +4,11 @@ import { JobApplication } from '../../entities/job-application.entity';
 import { JobApplicationsController } from './job-applications.controller';
 import { JobApplicationsService } from './job-applications.service';
 import { JobApplicationsRepository } from './job-applications.repository';
-import { Users } from '../../entities/user.entity';
+// import { Users } from '../../entities/user.entity';
 import { Job } from '../../entities/job.entity';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([JobApplication, Users, Job])],
+  imports: [MikroOrmModule.forFeature([JobApplication, Job])],
   controllers: [JobApplicationsController],
   providers: [JobApplicationsRepository, JobApplicationsService],
 })

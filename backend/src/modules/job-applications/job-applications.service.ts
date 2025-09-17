@@ -3,7 +3,7 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityManager, EntityRepository } from '@mikro-orm/core';
 import { JobApplication } from '../../entities/job-application.entity';
 import { CreateJobApplicationDto } from './dtos/create-job-application.dto';
-import { Users } from '../../entities/user.entity';
+// import { Users } from '../../entities/user.entity';
 import { Job } from '../../entities/job.entity';
 import { JobApplicationsRepository } from './job-applications.repository';
 
@@ -11,25 +11,25 @@ import { JobApplicationsRepository } from './job-applications.repository';
 export class JobApplicationsService {
   constructor(
     private readonly jobApplicationsRepository: JobApplicationsRepository,
-    @InjectRepository(Users)
-    private readonly userRepository: EntityRepository<Users>,
+    // @InjectRepository(Users)
+    // private readonly userRepository: EntityRepository<Users>,
     @InjectRepository(Job)
     private readonly jobRepository: EntityRepository<Job>,
     private readonly em: EntityManager
   ) {}
 
   async create(
-    createJobApplicationDto: CreateJobApplicationDto,
-    user: Users
+    createJobApplicationDto: CreateJobApplicationDto
+    // user: Users
   ): Promise<JobApplication> {
     const job = await this.jobRepository.findOneOrFail({
-      JobId: parseInt(createJobApplicationDto.jobId),
+      id: createJobApplicationDto.jobId,
     });
 
     const jobApplication = this.jobApplicationsRepository.create({
       ...createJobApplicationDto,
       jobId: createJobApplicationDto.jobId,
-      jobSeekerId: user.id,
+      // jobSeekerId: user.id,
     });
 
     await this.jobApplicationsRepository.persistAndFlush(jobApplication);

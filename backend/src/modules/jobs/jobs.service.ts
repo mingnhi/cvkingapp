@@ -8,7 +8,7 @@ import { Skill } from '../../entities/skill.entity';
 import { JobTag } from '../../entities/job-tag.entity';
 import { JobSkills } from '../../entities/job-skills.entity';
 import { JobJobTags } from '../../entities/job-job-tags.entity';
-import { Users } from '../../entities/user.entity';
+// import { Users } from '../../entities/user.entity';
 
 @Injectable()
 export class JobsService {

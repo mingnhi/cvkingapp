@@ -1,16 +1,10 @@
 import { Entity, Property, PrimaryKey } from '@mikro-orm/core';
-
+import { AuditableEntity } from './base/auditable_entity';
 @Entity({ tableName: 'JobJobTags' })
-export class JobJobTags {
-  @PrimaryKey({ columnType: 'int', autoincrement: true })
-  JobJobTagId: number;
+export class JobJobTags extends AuditableEntity{
+  @PrimaryKey()
+  jobId: string;
 
-  @Property({ columnType: 'int' })
-  JobId: number;
-
-  @Property({ columnType: 'int' })
-  JobTagId: number;
-
-  @Property({ type: 'bit' })
-  isActive: boolean;
+  @PrimaryKey()
+  jobTagId: string;
 }

@@ -2,18 +2,8 @@ import { EntityRepository, EntityManager } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
 import { Job } from '../../entities/job.entity';
-import { Skill } from '../../entities/skill.entity';
-import { JobTag } from '../../entities/job-tag.entity';
-import { JobSkills } from '../../entities/job-skills.entity';
-import { JobJobTags } from '../../entities/job-job-tags.entity';
 import { CreateJobDto } from './dtos/create-job.dto';
-
-interface UpdateJobDto {
-  id: string;
-  title?: string;
-  shortDescription?: string;
-  description?: string;
-}
+import { UpdateJobDto } from './dtos/update-job.dto';
 
 @Injectable()
 export class JobsRepository {
@@ -27,9 +17,18 @@ export class JobsRepository {
    * Retrieve all jobs
    * @returns List of all jobs
    */
-  async findAll(): Promise<Job[]> {
+  async findAll(query?: object): Promise<Job[]> {
     const results = await this.em.getConnection().execute('EXEC SP_GetAllJob');
-    return results ?? [];
+    let data: any;
+    if (Array.isArray(results) && results.length > 0 && typeof results[0] === 'string') {
+      // If results is an array with a JSON string
+      data = JSON.parse(results[0] as string);
+    } else if (typeof results === 'string') {
+      data = JSON.parse(results);
+    } else {
+      data = results ?? [];
+    }
+    return data;
   }
 
   /**
@@ -52,41 +51,50 @@ export class JobsRepository {
    */
   async create(createJobDto: CreateJobDto): Promise<Job> {
     const { skills, tags, ...jobData } = createJobDto;
+    const skillsStr = Array.isArray(skills) ? skills.join(',') : '';
+    const tagsStr = Array.isArray(tags) ? tags.join(',') : '';
 
-    const job = new Job();
-    Object.assign(job, jobData);
+    const results = await this.em
+      .getConnection()
+      .execute(
+        'EXEC SP_InsertJob ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
+        [
+          jobData.companyId, // CompanyId
+          null, // PostedByUserId (optional)
+          jobData.title, // Title
+          jobData.title
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w-]+/g, ''), // Slug (generated from title)
+          jobData.shortDescription, // ShortDescription
+          jobData.description, // Description
+          jobData.requirements, // Requirements
+          jobData.benefits, // Benefits
+          jobData.salaryMin, // SalaryMin
+          jobData.salaryMax, // SalaryMax
+          jobData.currency, // Currency
+          jobData.jobType, // JobType
+          jobData.location, // Location
+          jobData.categoryId, // CategoryId
+          jobData.status || 'Active', // Status
+          0, // ViewsCount
+          null, // PostedAt (auto-generated in SP)
+          jobData.expiresAt, // ExpiresAt
+          skillsStr, // Skills
+          tagsStr, // Tags
+        ]
+      );
 
-    await this.em.persistAndFlush(job);
-
-    // Handle skills if provided
-    if (skills && skills.length > 0) {
-      for (const skillName of skills) {
-        const skill = await this.em.findOne(Skill, { Name: skillName });
-        if (skill) {
-          const jobSkill = new JobSkills();
-          jobSkill.JobId = job.JobId;
-          jobSkill.SkillId = (skill as Skill).SkillId;
-          await this.em.persist(jobSkill);
-        }
-      }
+    let data: any;
+    if (Array.isArray(results) && results.length > 0 && typeof results[0] === 'string') {
+      data = JSON.parse(results[0] as string);
+    } else if (typeof results === 'string') {
+      data = JSON.parse(results);
+    } else {
+      data = results ?? [];
     }
 
-    // Handle tags if provided
-    if (tags && tags.length > 0) {
-      for (const tagName of tags) {
-        const tag = await this.em.findOne(JobTag, { Name: tagName });
-        if (tag) {
-          const jobTag = new JobJobTags();
-          jobTag.JobId = job.JobId;
-          jobTag.JobTagId = (tag as JobTag).JobTagId;
-          await this.em.persist(jobTag);
-        }
-      }
-    }
-
-    await this.em.flush();
-
-    return job;
+    return data?.length > 0 ? data[0] : null;
   }
 
   /**
@@ -95,15 +103,43 @@ export class JobsRepository {
    * @returns Updated job or null if not found
    */
   async update(updateJobDto: UpdateJobDto): Promise<Job | null> {
-    await this.em
+    const results = await this.em
       .getConnection()
-      .execute('EXEC SP_UpdateJob ?, ?, ?, ?', [
-        updateJobDto.id,
-        updateJobDto.title,
-        updateJobDto.shortDescription,
-        updateJobDto.description,
-      ]);
-    return this.findOne(updateJobDto.id);
+      .execute(
+        'EXEC SP_UpdateJob ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
+        [
+          updateJobDto.id, // JobId
+          updateJobDto.companyId, // CompanyId
+          updateJobDto.postedByUserId, // PostedByUserId
+          updateJobDto.title, // Title
+          updateJobDto.slug, // Slug
+          updateJobDto.shortDescription, // ShortDescription
+          updateJobDto.description, // Description
+          updateJobDto.requirements, // Requirements
+          updateJobDto.benefits, // Benefits
+          updateJobDto.salaryMin, // SalaryMin
+          updateJobDto.salaryMax, // SalaryMax
+          updateJobDto.currency, // Currency
+          updateJobDto.jobType, // JobType
+          updateJobDto.location, // Location
+          updateJobDto.categoryId, // CategoryId
+          updateJobDto.status, // Status
+          updateJobDto.viewsCount, // ViewsCount
+          updateJobDto.postedAt, // PostedAt
+          updateJobDto.expiresAt, // ExpiresAt
+          updateJobDto.skills ? updateJobDto.skills.join(',') : '', // Skills string
+          updateJobDto.tags ? updateJobDto.tags.join(',') : '', // Tags string
+        ]
+      );
+    let data: any;
+    if (Array.isArray(results) && results.length > 0 && typeof results[0] === 'string') {
+      data = JSON.parse(results[0] as string);
+    } else if (typeof results === 'string') {
+      data = JSON.parse(results);
+    } else {
+      data = results ?? [];
+    }
+    return data?.length > 0 ? data[0] : null;
   }
 
   /**
@@ -116,43 +152,6 @@ export class JobsRepository {
     return true;
   }
 
-  /**
-   * Find jobs using ORM
-   * @param where Filter conditions
-   * @param options Query options
-   * @returns List of jobs
-   */
-  async find(where: any, options?: any): Promise<Job[]> {
-    const { populate, limit, offset, orderBy } = options || {};
-    return await this.jobRepository.find(where, {
-      populate: populate || [],
-      limit,
-      offset,
-      orderBy,
-    });
-  }
-
-  /**
-   * Persist and flush an entity
-   * @param entity Entity to persist
-   */
-  async persistAndFlush(entity: any): Promise<void> {
-    await this.em.persistAndFlush(entity);
-  }
-
-  /**
-   * Remove and flush an entity
-   * @param entity Entity to remove
-   */
-  async removeAndFlush(entity: any): Promise<void> {
-    await this.em.removeAndFlush(entity);
-  }
-
-  /**
-   * Find a job by slug
-   * @param slug Slug of the job
-   * @returns Job or null if not found
-   */
   async findBySlug(slug: string): Promise<Job | null> {
     const result = await this.em
       .getConnection()

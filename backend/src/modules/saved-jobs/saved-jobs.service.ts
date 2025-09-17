@@ -22,7 +22,7 @@ export class SavedJobsService {
 
   async saveJob(jobId: string, user: Users): Promise<SavedJob> {
     // Check if job exists
-    const job = await this.jobRepository.findOneOrFail({ JobId: parseInt(jobId) });
+    const job = await this.jobRepository.findOneOrFail({ id: jobId });
 
     // Check if already saved
     const existingSavedJob = await this.savedJobsRepository.findOne({

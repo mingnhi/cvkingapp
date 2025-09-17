@@ -6,8 +6,6 @@ import { Skill } from '../../entities/skill.entity';
 import { JobTag } from '../../entities/job-tag.entity';
 import { JobSkills } from '../../entities/job-skills.entity';
 import { JobJobTags } from '../../entities/job-job-tags.entity';
-import { Company } from '../../entities/company.entity';
-import { Users } from '../../entities/user.entity';
 import { JobsController } from './jobs.controller';
 import { JobsService } from './jobs.service';
 import { JobViewsModule } from '../job-views/job-views.module';
@@ -22,8 +20,6 @@ import { JobsRepository } from './jobs.repository';
       JobTag,
       JobSkills,
       JobJobTags,
-      Company,
-      Users,
     ]),
     JobViewsModule,
   ],

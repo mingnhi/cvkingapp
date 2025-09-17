@@ -8,14 +8,26 @@ import {
 } from 'class-validator';
 import { JobStatus } from '../../../entities/job.entity';
 
-export class CreateJobDto {
+export class UpdateJobDto {
   @IsString()
   @IsNotEmpty()
-  companyId!: string;
+  id!: string;
 
   @IsString()
-  @IsNotEmpty()
-  title!: string;
+  @IsOptional()
+  companyId?: string;
+
+  @IsString()
+  @IsOptional()
+  postedByUserId?: string;
+
+  @IsString()
+  @IsOptional()
+  title?: string;
+
+  @IsString()
+  @IsOptional()
+  slug?: string;
 
   @IsString()
   @IsOptional()
@@ -60,6 +72,14 @@ export class CreateJobDto {
   @IsString()
   @IsOptional()
   status?: string;
+
+  @IsNumber()
+  @IsOptional()
+  viewsCount?: number;
+
+  @IsDate()
+  @IsOptional()
+  postedAt?: Date;
 
   @IsDate()
   @IsOptional()

@@ -1,11 +1,11 @@
-use JOB_PORTAL
+use JOB_DB
 go
 
 create procedure [dbo].[SP_GetJobViewsByJobId]
 (
-    @JobId int
+    @JobId varchar(max)
 )
 as
 begin
-    select * from JobViews where jobId = @JobId
+    select * from jobviews where job_id = @JobId
 end

@@ -8,12 +8,19 @@ describe('JobsRepository', () => {
   let em: EntityManager;
 
   const mockJob = {
-    JobId: 1,
+    id: '1',
+    CompanyId: '1',
+    PostedByUserId: '1',
     Title: 'Test Job',
     Slug: 'test-job',
-    CompanyId: 1,
-    PostedByUserId: 1,
-    CreatedAt: new Date(),
+    ShortDescription: 'Short desc',
+    Description: 'Test job description',
+    Location: 'Hanoi',
+    Status: 'Active',
+    ViewsCount: 0,
+    PostedAt: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
   } as Job;
 
   const mockEM = {
@@ -40,17 +47,30 @@ describe('JobsRepository', () => {
   });
 
   describe('findAll', () => {
-    it('should call stored procedure and return results', async () => {
+    it('should call stored procedure and return results when not JSON', async () => {
       const mockConnection = { execute: jest.fn() };
       const mockResults = [mockJob];
 
       mockEM.getConnection.mockReturnValue(mockConnection);
       mockConnection.execute.mockResolvedValue(mockResults);
 
-      const result = await repository.findAll();
+      const result = await repository.findAll({});
 
       expect(mockConnection.execute).toHaveBeenCalledWith('EXEC SP_GetAllJob');
       expect(result).toEqual(mockResults);
+    });
+
+    it('should parse JSON when results are JSON string', async () => {
+      const mockConnection = { execute: jest.fn() };
+      const mockJson = JSON.stringify([mockJob]);
+
+      mockEM.getConnection.mockReturnValue(mockConnection);
+      mockConnection.execute.mockResolvedValue(mockJson);
+
+      const result = await repository.findAll({});
+
+      expect(mockConnection.execute).toHaveBeenCalledWith('EXEC SP_GetAllJob');
+      expect(result).toEqual([mockJob]);
     });
   });
 
@@ -86,28 +106,44 @@ describe('JobsRepository', () => {
       const createData = {
         companyId: 1,
         title: 'New Job',
-        slug: 'new-job',
         shortDescription: 'Short desc',
         description: 'Job description',
         location: 'Hanoi',
         salaryMin: 1000,
         salaryMax: 2000,
       } as any;
+      const mockJson = JSON.stringify([mockJob]);
 
       mockEM.getConnection.mockReturnValue(mockConnection);
-      mockConnection.execute.mockResolvedValue([mockJob]);
+      mockConnection.execute.mockResolvedValue(mockJson); // SP_InsertJob returns JSON
 
       const result = await repository.create(createData);
 
-      expect(mockConnection.execute).toHaveBeenCalledWith('EXEC SP_PostJob ?, ?, ?, ?, ?, ?, ?', [
-        'New Job',
-        'new-job',
-        undefined, // shortDescription
-        'Job description',
-        'Hanoi',
-        1000,
-        2000,
-      ]);
+      expect(mockConnection.execute).toHaveBeenCalledWith(
+        'EXEC SP_InsertJob ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
+        [
+          1, // companyId
+          null, // PostedByUserId
+          'New Job', // title
+          'new-job', // slug
+          'Short desc', // shortDescription
+          'Job description', // description
+          null, // requirements
+          null, // benefits
+          1000, // salaryMin
+          2000, // salaryMax
+          null, // currency
+          null, // jobType
+          'Hanoi', // location
+          null, // categoryId
+          'Active', // status
+          0, // viewsCount
+          null, // postedAt
+          null, // expiresAt
+          '', // skillsStr
+          '', // tagsStr
+        ]
+      );
       expect(result).toEqual(mockJob);
     });
   });
@@ -121,19 +157,39 @@ describe('JobsRepository', () => {
         shortDescription: 'Updated desc',
         description: 'Updated description',
       };
+      const mockJson = JSON.stringify([mockJob]);
 
       mockEM.getConnection.mockReturnValue(mockConnection);
-      mockConnection.execute.mockResolvedValueOnce(undefined); // SP_UpdateJob call
-      mockConnection.execute.mockResolvedValueOnce([mockJob]); // findOne call
+      mockConnection.execute.mockResolvedValue(mockJson); // SP_UpdateJob call returns JSON
 
       const result = await repository.update(updateData);
 
-      expect(mockConnection.execute).toHaveBeenCalledWith('EXEC SP_UpdateJob ?, ?, ?, ?', [
-        '1',
-        'Updated Title',
-        'Updated desc',
-        'Updated description',
-      ]);
+      expect(mockConnection.execute).toHaveBeenCalledWith(
+        'EXEC SP_UpdateJob ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
+        [
+          '1', // id
+          null, // companyId
+          null, // postedByUserId
+          'Updated Title', // title
+          null, // slug
+          'Updated desc', // shortDescription
+          'Updated description', // description
+          null, // requirements
+          null, // benefits
+          null, // salaryMin
+          null, // salaryMax
+          null, // currency
+          null, // jobType
+          null, // location
+          null, // categoryId
+          null, // status
+          null, // viewsCount
+          null, // postedAt
+          null, // expiresAt
+          '', // skills
+          '', // tags
+        ]
+      );
       expect(result).toEqual(mockJob);
     });
   });

@@ -9,12 +9,19 @@ describe('JobsService', () => {
   let jobsRepository: JobsRepository;
 
   const mockJob = {
-    JobId: 1,
+    id: '1',
+    CompanyId: '1',
+    PostedByUserId: '1',
     Title: 'Test Job',
     Slug: 'test-job',
-    CompanyId: 1,
-    PostedByUserId: 1,
-    CreatedAt: new Date(),
+    ShortDescription: 'Short desc',
+    Description: 'Test job description',
+    Location: 'Hanoi',
+    Status: 'Active',
+    ViewsCount: 0,
+    PostedAt: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
   } as Job;
 
   const mockJobsRepository = {
@@ -27,12 +34,11 @@ describe('JobsService', () => {
 
   const mockCreateJobDto: CreateJobDto = {
     title: 'Software Developer',
-    slug: 'software-developer',
     shortDescription: 'Dev job',
     description: 'Great job opportunity',
     location: 'Hanoi',
-    companyId: 0
-  };
+    companyId: '0'
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

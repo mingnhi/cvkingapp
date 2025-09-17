@@ -11,21 +11,9 @@ import { Transform } from 'class-transformer';
 import { JobStatus } from '../../../entities/job.entity';
 
 export class JobQueryDto {
-  @IsNumber()
-  @Min(1)
-  @Transform(({ value }) => parseInt(value))
-  @IsOptional()
-  page?: number = 1;
-
-  @IsNumber()
-  @Min(1)
-  @Transform(({ value }) => parseInt(value))
-  @IsOptional()
-  limit?: number = 10;
-
   @IsString()
   @IsOptional()
-  search?: string;
+  key?: string;
 
   @IsString()
   @IsOptional()
@@ -73,5 +61,3 @@ export class JobQueryDto {
   @IsOptional()
   sortOrder?: 'ASC' | 'DESC' = 'DESC';
 }
-
-

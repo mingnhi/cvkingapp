@@ -1,4 +1,5 @@
 import { Entity, Property, PrimaryKey } from '@mikro-orm/core';
+import { AuditableEntity } from './base/auditable_entity';
 
 export enum JobStatus {
   ACTIVE = 'Active',
@@ -8,38 +9,35 @@ export enum JobStatus {
 }
 
 @Entity({ tableName: 'Jobs' })
-export class Job {
-  @PrimaryKey({ columnType: 'int', autoincrement: true })
-  JobId: number;
+export class Job extends AuditableEntity {
+  @Property({ type: 'string' })
+  CompanyId: string;
 
-  @Property({ columnType: 'int' })
-  CompanyId: number;
+  @Property({ type: 'string', nullable: true })
+  PostedByUserId?: string;
 
-  @Property({ columnType: 'int', nullable: true })
-  PostedByUserId?: number;
-
-  @Property({ type: 'nvarchar', length: 300, nullable: false })
+  @Property({ type: 'string', length: 500, nullable: false })
   Title: string;
 
-  @Property({ type: 'nvarchar', length: 300, nullable: false, unique: true })
+  @Property({ type: 'string', length: 500, nullable: false, unique: true })
   Slug: string;
 
-  @Property({ type: 'nvarchar', length: 1000, nullable: true })
+  @Property({ type: 'string', length: 1000, nullable: true })
   ShortDescription?: string;
 
-  @Property({ type: 'nvarchar', length: -1, nullable: true })
+  @Property({ type: 'string', length: -1, nullable: true })
   Description?: string;
 
-  @Property({ type: 'nvarchar', length: -1, nullable: true })
+  @Property({ type: 'string', length: -1, nullable: true })
   Requirements?: string;
 
-  @Property({ type: 'nvarchar', length: -1, nullable: true })
+  @Property({ type: 'string', length: -1, nullable: true })
   Benefits?: string;
 
-  @Property({ columnType: 'int', nullable: true })
+  @Property({ type: 'int', nullable: true })
   SalaryMin?: number;
 
-  @Property({ columnType: 'int', nullable: true })
+  @Property({ type: 'int', nullable: true })
   SalaryMax?: number;
 
   @Property({ type: 'nvarchar', length: 10, nullable: true })
@@ -51,7 +49,7 @@ export class Job {
   @Property({ type: 'nvarchar', length: 300, nullable: true })
   Location?: string;
 
-  @Property({ columnType: 'int', nullable: true })
+  @Property({ type: 'int', nullable: true })
   CategoryId?: number;
 
   @Property({
@@ -62,7 +60,7 @@ export class Job {
   })
   Status: string = JobStatus.ACTIVE;
 
-  @Property({ columnType: 'int', nullable: false, default: 0 })
+  @Property({ type: 'int', nullable: false, default: 0 })
   ViewsCount: number = 0;
 
   @Property({
@@ -74,14 +72,4 @@ export class Job {
 
   @Property({ type: 'datetime2', nullable: true })
   ExpiresAt?: Date;
-
-  @Property({
-    type: 'datetime2',
-    nullable: false,
-    defaultRaw: 'SYSUTCDATETIME()',
-  })
-  CreatedAt: Date = new Date();
-
-  @Property({ type: 'datetime2', nullable: true })
-  UpdatedAt?: Date;
 }
