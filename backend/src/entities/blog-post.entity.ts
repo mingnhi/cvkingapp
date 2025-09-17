@@ -2,10 +2,7 @@ import { Entity, Property } from '@mikro-orm/core';
 import { AuditableEntity } from './base/auditable_entity';
 
 @Entity({ tableName: 'BlogPosts' })
-export class BlogPosts {
-  @PrimaryKey({ type: 'int', autoincrement: true })
-  blogPostId: number;
-
+export class BlogPosts extends AuditableEntity {
   @Property({ type: 'string', length: 500 })
   title: string;
 
@@ -21,8 +18,8 @@ export class BlogPosts {
   @Property({ type: 'string', length: 1000, nullable: true })
   coverImageUrl?: string;
 
-  @Property({ type: 'number' })
-  authorId: number;
+  @Property({ type: 'string' })
+  authorId: string;
 
   @Property({ type: 'boolean', default: false })
   isPublished: boolean = false;
