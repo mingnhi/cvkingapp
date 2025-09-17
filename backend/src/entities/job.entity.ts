@@ -1,18 +1,4 @@
-import {
-  Cascade,
-  Collection,
-  Entity,
-  Enum,
-  ManyToMany,
-  ManyToOne,
-  Property,
-  PrimaryKey,
-} from '@mikro-orm/core';
-import { Company } from './company.entity';
-import { Users } from './user.entity';
-import { JobCategory } from './job-category.entity';
-import { Skill } from './skill.entity';
-import { JobTag } from './job-tag.entity';
+import { Entity, Property, PrimaryKey } from '@mikro-orm/core';
 
 export enum JobStatus {
   ACTIVE = 'Active',
@@ -98,35 +84,4 @@ export class Job {
 
   @Property({ type: 'datetime2', nullable: true })
   UpdatedAt?: Date;
-
-  @ManyToOne(() => Company, { fieldName: 'CompanyId', deleteRule: 'cascade' })
-  company: Company;
-
-  @ManyToOne(() => Users, {
-    fieldName: 'PostedByUserId',
-    deleteRule: 'set null',
-    nullable: true,
-  })
-  postedBy?: Users;
-
-  @ManyToOne(() => JobCategory, {
-    fieldName: 'CategoryId',
-    deleteRule: 'set null',
-    nullable: true,
-  })
-  category?: JobCategory;
-
-  @ManyToMany(() => Skill, 'jobs', {
-    owner: true,
-    pivotTable: 'JobSkills',
-    cascade: [Cascade.ALL],
-  })
-  skills = new Collection<Skill>(this);
-
-  @ManyToMany(() => JobTag, 'jobs', {
-    owner: true,
-    pivotTable: 'JobJobTags',
-    cascade: [Cascade.ALL],
-  })
-  tags = new Collection<JobTag>(this);
 }

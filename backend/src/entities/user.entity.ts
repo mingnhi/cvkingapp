@@ -20,7 +20,7 @@ export class Users extends AuditableEntity {
   otpCode: string;
 
   @ManyToMany(() => Roles, roles => roles.users, {
-    owner: true,
+    mappedBy: 'users',
     pivotTable: 'user_roles',
   })
   roles = new Collection<Roles>(this);

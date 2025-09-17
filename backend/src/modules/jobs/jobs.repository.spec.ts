@@ -1,49 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EntityRepository, EntityManager } from '@mikro-orm/core';
-import { getRepositoryToken } from '@mikro-orm/nestjs';
+import { EntityManager } from '@mikro-orm/core';
 import { JobsRepository } from './jobs.repository';
 import { Job } from '../../entities/job.entity';
 
 describe('JobsRepository', () => {
   let repository: JobsRepository;
-  let jobRepository: EntityRepository<Job>;
   let em: EntityManager;
 
   const mockJob = {
     JobId: 1,
     Title: 'Test Job',
     Slug: 'test-job',
-    Status: 'Active',
     CompanyId: 1,
     PostedByUserId: 1,
-    PostedAt: new Date(),
     CreatedAt: new Date(),
-    ViewsCount: 0,
-    company: { CompanyId: '1', name: 'Test Company' },
-    skills: [],
-    tags: [],
-  } as unknown as Job;
-
-  const mockJobRepository = {
-    findAndCount: jest.fn(),
-    findOne: jest.fn(),
-    find: jest.fn(),
-    create: jest.fn(),
-  };
+  } as Job;
 
   const mockEM = {
-    persistAndFlush: jest.fn(),
-    removeAndFlush: jest.fn(),
+    getConnection: jest.fn(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         JobsRepository,
-        {
-          provide: getRepositoryToken(Job),
-          useValue: mockJobRepository,
-        },
         {
           provide: EntityManager,
           useValue: mockEM,
@@ -52,7 +32,6 @@ describe('JobsRepository', () => {
     }).compile();
 
     repository = module.get<JobsRepository>(JobsRepository);
-    jobRepository = module.get(getRepositoryToken(Job));
     em = module.get<EntityManager>(EntityManager);
   });
 
@@ -61,110 +40,115 @@ describe('JobsRepository', () => {
   });
 
   describe('findAll', () => {
-    it('should find and count jobs with options', async () => {
-      const where = { status: 'ACTIVE' };
-      const options = { populate: ['company'], limit: 10 };
-      const mockResult = [[mockJob], 1];
+    it('should call stored procedure and return results', async () => {
+      const mockConnection = { execute: jest.fn() };
+      const mockResults = [mockJob];
 
-      mockJobRepository.findAndCount.mockResolvedValue(mockResult);
+      mockEM.getConnection.mockReturnValue(mockConnection);
+      mockConnection.execute.mockResolvedValue(mockResults);
 
-      const result = await repository.findAll(where, options);
+      const result = await repository.findAll();
 
-      expect(mockJobRepository.findAndCount).toHaveBeenCalledWith(where, options);
-      expect(result).toEqual(mockResult);
+      expect(mockConnection.execute).toHaveBeenCalledWith('EXEC SP_GetAllJob');
+      expect(result).toEqual(mockResults);
     });
   });
 
   describe('findOne', () => {
-    it('should find one job by id', async () => {
-      const id = 1;
-      const options = { populate: ['company'] };
+    it('should call stored procedure and return job', async () => {
+      const mockConnection = { execute: jest.fn() };
+      const mockResults = [mockJob];
 
-      mockJobRepository.findOne.mockResolvedValue(mockJob);
+      mockEM.getConnection.mockReturnValue(mockConnection);
+      mockConnection.execute.mockResolvedValue(mockResults);
 
-      const result = await repository.findOne(id, options);
+      const result = await repository.findOne('1');
 
-      expect(mockJobRepository.findOne).toHaveBeenCalledWith({ JobId: id }, { populate: ['company'] });
+      expect(mockConnection.execute).toHaveBeenCalledWith('EXEC SP_GetJobById ?', ['1']);
       expect(result).toEqual(mockJob);
     });
 
-    it('should return null if job not found', async () => {
-      const id = 999;
-      mockJobRepository.findOne.mockResolvedValue(null);
+    it('should return null if no job found', async () => {
+      const mockConnection = { execute: jest.fn() };
 
-      const result = await repository.findOne(id);
+      mockEM.getConnection.mockReturnValue(mockConnection);
+      mockConnection.execute.mockResolvedValue([]);
 
-      expect(mockJobRepository.findOne).toHaveBeenCalledWith({ JobId: id }, { populate: [] });
+      const result = await repository.findOne('999');
+
       expect(result).toBeNull();
     });
   });
 
-  describe('findOneOrFail', () => {
-    it('should return job if found', async () => {
-      const id = 1;
-      const populate = { populate: ['company'] };
-      mockJobRepository.findOne.mockResolvedValue(mockJob);
+  describe('create', () => {
+    it('should call stored procedure with parameters', async () => {
+      const mockConnection = { execute: jest.fn() };
+      const createData = {
+        companyId: 1,
+        title: 'New Job',
+        slug: 'new-job',
+        shortDescription: 'Short desc',
+        description: 'Job description',
+        location: 'Hanoi',
+        salaryMin: 1000,
+        salaryMax: 2000,
+      } as any;
 
-      const result = await repository.findOneOrFail(id, populate);
+      mockEM.getConnection.mockReturnValue(mockConnection);
+      mockConnection.execute.mockResolvedValue([mockJob]);
 
-      expect(mockJobRepository.findOne).toHaveBeenCalledWith({ JobId: id }, populate);
+      const result = await repository.create(createData);
+
+      expect(mockConnection.execute).toHaveBeenCalledWith('EXEC SP_PostJob ?, ?, ?, ?, ?, ?, ?', [
+        'New Job',
+        'new-job',
+        undefined, // shortDescription
+        'Job description',
+        'Hanoi',
+        1000,
+        2000,
+      ]);
       expect(result).toEqual(mockJob);
     });
+  });
 
-    it('should throw error if job not found', async () => {
-      const id = 999;
-      mockJobRepository.findOne.mockResolvedValue(null);
+  describe('update', () => {
+    it('should call stored procedure and return updated job', async () => {
+      const mockConnection = { execute: jest.fn() };
+      const updateData = {
+        id: '1',
+        title: 'Updated Title',
+        shortDescription: 'Updated desc',
+        description: 'Updated description',
+      };
 
-      await expect(repository.findOneOrFail(id)).rejects.toThrow(
-        `Job with id ${id} not found`
-      );
+      mockEM.getConnection.mockReturnValue(mockConnection);
+      mockConnection.execute.mockResolvedValueOnce(undefined); // SP_UpdateJob call
+      mockConnection.execute.mockResolvedValueOnce([mockJob]); // findOne call
+
+      const result = await repository.update(updateData);
+
+      expect(mockConnection.execute).toHaveBeenCalledWith('EXEC SP_UpdateJob ?, ?, ?, ?', [
+        '1',
+        'Updated Title',
+        'Updated desc',
+        'Updated description',
+      ]);
+      expect(result).toEqual(mockJob);
     });
   });
 
-  describe('find', () => {
-    it('should find jobs matching where conditions', async () => {
-      const where = { status: 'ACTIVE' };
-      const options = { orderBy: { createdAt: 'DESC' } };
-      const mockJobs = [mockJob];
+  describe('delete', () => {
+    it('should call stored procedure and return true', async () => {
+      const mockConnection = { execute: jest.fn() };
 
-      mockJobRepository.find.mockResolvedValue(mockJobs);
+      mockEM.getConnection.mockReturnValue(mockConnection);
+      mockConnection.execute.mockResolvedValue(undefined);
 
-      const result = await repository.find(where, options);
+      const result = await repository.delete('1');
 
-      expect(mockJobRepository.find).toHaveBeenCalledWith(where, options);
-      expect(result).toEqual(mockJobs);
-    });
-  });
-
-  describe('create', () => {
-    it('should create and persist a new job entity', async () => {
-      const data = { title: 'New Job', company: mockJob.company };
-      const newJob = { ...mockJob, ...data };
-
-      mockJobRepository.create.mockReturnValue(newJob);
-      mockEM.persistAndFlush.mockResolvedValue(undefined);
-
-      const result = await repository.create(data);
-
-      expect(mockJobRepository.create).toHaveBeenCalledWith(data);
-      expect(mockEM.persistAndFlush).toHaveBeenCalledWith(newJob);
-      expect(result).toEqual(newJob);
-    });
-  });
-
-  describe('persistAndFlush', () => {
-    it('should persist and flush entity', async () => {
-      await repository.persistAndFlush(mockJob as Job);
-
-      expect(mockEM.persistAndFlush).toHaveBeenCalledWith(mockJob);
-    });
-  });
-
-  describe('removeAndFlush', () => {
-    it('should remove and flush entity', async () => {
-      await repository.removeAndFlush(mockJob as Job);
-
-      expect(mockEM.removeAndFlush).toHaveBeenCalledWith(mockJob);
+      expect(mockConnection.execute).toHaveBeenCalledWith('EXEC SP_DeleteJob ?', ['1']);
+      expect(result).toBe(true);
     });
   });
 });

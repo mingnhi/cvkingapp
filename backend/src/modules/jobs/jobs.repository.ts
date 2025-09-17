@@ -3,10 +3,9 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
 import { Job } from '../../entities/job.entity';
 import { CreateJobDto } from './dtos/create-job.dto';
-import { JobQueryDto } from './dtos/job-query.dto';
 
 interface UpdateJobDto {
-  id: number;
+  id: string;
   title?: string;
   shortDescription?: string;
   description?: string;
@@ -21,35 +20,25 @@ export class JobsRepository {
   ) {}
 
   /**
-   * Retrieve all jobs with optional filtering
-   * @param where Filter conditions
-   * @param options Query options (populate, limit, offset, orderBy)
-   * @returns List of jobs and total count
+   * Retrieve all jobs
+   * @returns List of all jobs
    */
-  async findAll(where?: any, options?: any): Promise<[Job[], number]> {
-    const { populate, limit, offset, orderBy } = options || {};
-
-    const [jobs, total] = await this.jobRepository.findAndCount(where || {}, {
-      populate: populate || [],
-      limit,
-      offset,
-      orderBy,
-    });
-
-    return [jobs, total];
+  async findAll(): Promise<Job[]> {
+    const results = await this.em.getConnection().execute('EXEC SP_GetAllJob');
+    return results ?? [];
   }
 
   /**
    * Find a job by ID
    * @param id ID of the job
-   * @param options Query options
    * @returns Job or null if not found
    */
-  async findOne(id: number, options?: any): Promise<Job | null> {
-    const { populate } = options || {};
-    return await this.jobRepository.findOne({ JobId: id }, {
-      populate: populate || [],
-    });
+  async findOne(id: string): Promise<Job | null> {
+    const result = await this.em
+      .getConnection()
+      .execute('EXEC SP_GetJobById ?', [id]);
+    const job = result?.[0] ?? result;
+    return job ?? null;
   }
 
   /**
@@ -57,10 +46,21 @@ export class JobsRepository {
    * @param createJobDto Data to create the job
    * @returns Created job
    */
-  async create(createJobDto: Partial<CreateJobDto> & { company?: any; category?: any; postedBy?: any }): Promise<Job> {
-    const job = this.jobRepository.create(createJobDto);
-    await this.em.persistAndFlush(job);
-    return job;
+  async create(createJobDto: CreateJobDto): Promise<Job> {
+    const result = await this.em
+      .getConnection()
+      .execute('EXEC SP_PostJob ?, ?, ?, ?, ?, ?, ?', [
+        createJobDto.title,
+        createJobDto.slug,
+        createJobDto.shortDescription,
+        createJobDto.description,
+        createJobDto.location,
+        createJobDto.salaryMin,
+        createJobDto.salaryMax,
+      ]);
+
+    const newJob = result?.[0] ?? result;
+    return newJob as Job;
   }
 
   /**
@@ -69,14 +69,15 @@ export class JobsRepository {
    * @returns Updated job or null if not found
    */
   async update(updateJobDto: UpdateJobDto): Promise<Job | null> {
-    const job = await this.jobRepository.findOne({ JobId: updateJobDto.id });
-    if (!job) return null;
-
-    Object.assign(job, updateJobDto);
-    job.UpdatedAt = new Date();
-    await this.em.persistAndFlush(job);
-
-    return job;
+    await this.em
+      .getConnection()
+      .execute('EXEC SP_UpdateJob ?, ?, ?, ?', [
+        updateJobDto.id,
+        updateJobDto.title,
+        updateJobDto.shortDescription,
+        updateJobDto.description,
+      ]);
+    return this.findOne(updateJobDto.id);
   }
 
   /**
@@ -84,16 +85,13 @@ export class JobsRepository {
    * @param id ID of the job to delete
    * @returns True if deletion is successful, false if not found
    */
-  async delete(id: number): Promise<boolean> {
-    const job = await this.jobRepository.findOne({ JobId: id });
-    if (!job) return false;
-
-    await this.em.removeAndFlush(job);
+  async delete(id: string): Promise<boolean> {
+    await this.em.getConnection().execute('EXEC SP_DeleteJob ?', [id]);
     return true;
   }
 
   /**
-   * Find jobs using where conditions
+   * Find jobs using ORM
    * @param where Filter conditions
    * @param options Query options
    * @returns List of jobs
@@ -106,20 +104,6 @@ export class JobsRepository {
       offset,
       orderBy,
     });
-  }
-
-  /**
-   * Find one job or fail
-   * @param id Job ID
-   * @param options Query options
-   * @returns Job
-   */
-  async findOneOrFail(id: number, options?: any): Promise<Job> {
-    const job = await this.findOne(id, options);
-    if (!job) {
-      throw new Error(`Job with id ${id} not found`);
-    }
-    return job;
   }
 
   /**
