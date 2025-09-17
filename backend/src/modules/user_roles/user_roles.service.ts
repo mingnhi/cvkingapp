@@ -4,7 +4,7 @@ import {
   CreateUserRoleDto,
   UpdateUserRoleDto,
 } from '@modules/user_roles/dtos/user_role.dto';
-import { UserRole } from '@entities/user_role.entity';
+// import { UserRole } from '@entities/user_role.entity';
 
 @Injectable()
 export class UserRolesService {
@@ -14,7 +14,7 @@ export class UserRolesService {
    * Retrieve all userRoles
    * @returns List of all userRoles
    */
-  async getAllUserRoles(): Promise<UserRole[]> {
+  async getAllUserRoles(): Promise<any> {
     return this.userRolesRepository.findAll();
   }
 
@@ -24,7 +24,7 @@ export class UserRolesService {
    * @returns UserRole
    * @throws NotFoundException if the userRole does not exist
    */
-  async getUserRoleById(id: string): Promise<UserRole> {
+  async getUserRoleById(id: string): Promise<any> {
     const userRole = await this.userRolesRepository.findOne(id);
     if (!userRole) {
       throw new NotFoundException(`UserRole with ID ${id} not found`);
@@ -39,7 +39,7 @@ export class UserRolesService {
    */
   async createUserRole(
     createUserRoleDto: CreateUserRoleDto
-  ): Promise<UserRole> {
+  ): Promise<any> {
     return this.userRolesRepository.create(createUserRoleDto);
   }
 
@@ -51,7 +51,7 @@ export class UserRolesService {
    */
   async updateUserRole(
     updateUserRoleDto: UpdateUserRoleDto
-  ): Promise<UserRole> {
+  ): Promise<any> {
     const userRole = await this.userRolesRepository.update(updateUserRoleDto);
     if (!userRole) {
       throw new NotFoundException(

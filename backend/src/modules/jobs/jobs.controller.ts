@@ -1,89 +1,66 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  NotFoundException,
-  Param,
   Post,
   Put,
-  Query,
-  Req,
-  UseGuards,
+  Delete,
+  Param,
+  Body,
+  ParseUUIDPipe,
+  ValidationPipe,
 } from '@nestjs/common';
-import { JobsService } from './jobs.service';
-import { CreateJobDto } from './dtos/create-job.dto';
-import { JobQueryDto } from './dtos/job-query.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { Roles } from '@modules/auth/roles.decorator';
-// import { Role } from '../../enums/role.enum';
+import { ApiTags } from '@nestjs/swagger';
+import { JobsRepository } from './jobs.repository';
 
+import { ApiResponse } from '@common/interfaces/api-response.interface';
+import { CreateJobDto } from './dtos/create-job.dto';
+import { UpdateJobDto } from './dtos/update-job.dto';
+
+@ApiTags('jobs')
 @Controller('jobs')
 export class JobsController {
-  constructor(private readonly jobsService: JobsService) {}
-
-  @Post()
-  @UseGuards(AuthGuard('jwt'))
-  @Roles('Employer', 'Admin')
-  create(@Body() createJobDto: CreateJobDto, @Req() req) {
-    return this.jobsService.create(createJobDto, req.user);
-  }
+  constructor(private readonly repo: JobsRepository) {}
 
   @Get()
-  async findAll(@Query() query: JobQueryDto) {
-    return this.jobsService.findAll(query);
-  }
-
-  @Get('popular')
-  async findPopular(@Query('limit') limit?: number) {
-    return this.jobsService.findPopular(limit);
-  }
-
-  @Get('recent')
-  async findRecent(@Query('limit') limit?: number) {
-    return this.jobsService.findRecent(limit);
-  }
-
-  @Get('company/:companyId')
-  async findByCompany(
-    @Param('companyId') companyId: string,
-    @Query() query: JobQueryDto
-  ) {
-    return this.jobsService.findByCompany(companyId, query);
+  async findAll(): Promise<ApiResponse<any>> {
+    const data = await this.repo.findAll();
+    return {
+      status: 'success',
+      message: 'All jobs',
+      data,
+      meta: { count: data.length },
+    };
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string, @Req() req) {
-    const job = await this.jobsService.findOne(id, req.user, req.sessionId);
-    if (!job) {
-      throw new NotFoundException('Job not found');
-    }
-    return job;
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: string
+  ): Promise<ApiResponse<any>> {
+    const data = await this.repo.findOne(id);
+    return { status: 'success', message: 'Found job', data };
   }
 
-  @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
-  @Roles('Employer', 'Admin')
+  @Post()
+  async create(
+    @Body(ValidationPipe) dto: CreateJobDto
+  ): Promise<ApiResponse<any>> {
+    const data = await this.repo.create(dto);
+    return { status: 'success', message: 'Created job', data };
+  }
+
+  @Put()
   async update(
-    @Param('id') id: string,
-    @Body() updateJobDto: Partial<CreateJobDto>,
-    @Req() req
-  ) {
-    return this.jobsService.update(id, updateJobDto, req.user);
+    @Body(ValidationPipe) dto: UpdateJobDto
+  ): Promise<ApiResponse<any>> {
+    const data = await this.repo.update(dto);
+    return { status: 'success', message: 'Updated job', data };
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
-  @Roles('Employer', 'Admin')
-  async remove(@Param('id') id: string, @Req() req) {
-    await this.jobsService.remove(id, req.user);
-    return { message: 'Job deleted successfully' };
-  }
-
-  @Get(':id/stats')
-  @UseGuards(AuthGuard('jwt'))
-  @Roles('Employer', 'Admin')
-  async getStats(@Param('id') id: string, @Req() req) {
-    return this.jobsService.getJobStats(id, req.user);
+  async delete(
+    @Param('id', ParseUUIDPipe) id: string
+  ): Promise<ApiResponse<null>> {
+    await this.repo.delete(id);
+    return { status: 'success', message: 'Deleted job', data: null };
   }
 }

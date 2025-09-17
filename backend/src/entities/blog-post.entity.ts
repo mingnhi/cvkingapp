@@ -1,7 +1,5 @@
-import { Entity, Property, ManyToOne, OneToMany, Collection } from '@mikro-orm/core';
+import { Entity, Property } from '@mikro-orm/core';
 import { AuditableEntity } from './base/auditable_entity';
-import { Users } from './user.entity';
-import { BlogComments } from './blog-comment.entity';
 
 @Entity({ tableName: 'BlogPosts' })
 export class BlogPosts extends AuditableEntity {
@@ -20,15 +18,12 @@ export class BlogPosts extends AuditableEntity {
   @Property({ type: 'string', length: 1000, nullable: true })
   coverImageUrl?: string;
 
-  @ManyToOne(() => Users)
-  author: Users;
+  @Property({ type: 'string' })
+  authorId: string;
 
   @Property({ type: 'boolean', default: false })
   isPublished: boolean = false;
 
   @Property({ type: 'date', nullable: true })
   publishedAt?: Date;
-
-  @OneToMany(() => BlogComments, (comment) => comment.blogPost)
-  comments = new Collection<BlogComments>(this);
 }

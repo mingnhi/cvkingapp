@@ -1,14 +1,14 @@
 import { EntityRepository, EntityManager } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
-import { Roles } from '@entities/role.entity';
+// import { Roles } from '@entities/role.entity';
 import { CreateRoleDto, UpdateRoleDto } from '@modules/roles/dtos/role.dto';
 
 @Injectable()
 export class RolesRepository {
   constructor(
-    @InjectRepository(Roles)
-    private readonly roleRepository: EntityRepository<Roles>,
+    // @InjectRepository(Roles)
+    // private readonly roleRepository: EntityRepository<Roles>,
     private readonly em: EntityManager
   ) {}
 
@@ -16,8 +16,9 @@ export class RolesRepository {
    * Retrieve all roles
    * @returns List of all roles
    */
-  async findAll(): Promise<Roles[]> {
-    return this.roleRepository.findAll();
+  async findAll(): Promise<any> {
+    const results = await this.em.getConnection().execute('EXEC SP_GetAllRole');
+    return results ?? [];
   }
 
   /**
@@ -25,8 +26,12 @@ export class RolesRepository {
    * @param id ID of the role
    * @returns Role or null if not found
    */
-  async findOne(id: string): Promise<Roles | null> {
-    return this.roleRepository.findOne({ id });
+  async findOne(id: string): Promise<any | null> {
+    const result = await this.em
+      .getConnection()
+      .execute('EXEC SP_GetRoleById ?', [id]);
+    const role = result?.[0] ?? result;
+    return role ?? null;
   }
 
   /**
@@ -35,13 +40,16 @@ export class RolesRepository {
    * @param createRoleDto Data to create the role
    * @returns Created role
    */
-  async create(createRoleDto: CreateRoleDto): Promise<Roles> {
-    const role = this.roleRepository.create({
-      ...createRoleDto,
-      id: undefined,
-    });
-    await this.em.persistAndFlush(role);
-    return role;
+  async create(createRoleDto: CreateRoleDto): Promise<any> {
+    const result = this.em
+      .getConnection()
+      .execute('EXEC SP_InsertRole ?, ?', [
+        createRoleDto.name,
+        createRoleDto.description,
+      ]);
+
+    const newRole = result?.[0] ?? result;
+    return newRole as any;
   }
 
   /**
@@ -49,15 +57,15 @@ export class RolesRepository {
    * @param updateRoleDto Data to update the role
    * @returns Updated role or null if not found
    */
-  async update(updateRoleDto: UpdateRoleDto): Promise<Roles | null> {
-    const role = await this.roleRepository.findOne({ id: updateRoleDto.id });
-    if (!role) {
-      return null;
-    }
-    role.name = updateRoleDto.name;
-    role.description = updateRoleDto.description;
-    await this.em.flush();
-    return role;
+  async update(updateRoleDto: UpdateRoleDto): Promise<any | null> {
+    await this.em
+      .getConnection()
+      .execute('EXEC SP_UpdateRole ?, ?, ?', [
+        updateRoleDto.id,
+        updateRoleDto.name,
+        updateRoleDto.description,
+      ]);
+    return this.findOne(updateRoleDto.id);
   }
 
   /**
@@ -66,11 +74,7 @@ export class RolesRepository {
    * @returns True if deletion is successful, false if not found
    */
   async delete(id: string): Promise<boolean> {
-    const role = await this.roleRepository.findOne({ id });
-    if (!role) {
-      return false;
-    }
-    await this.em.removeAndFlush(role);
+    await this.em.getConnection().execute('EXEC SP_DeleteRole ?', [id]);
     return true;
   }
 }

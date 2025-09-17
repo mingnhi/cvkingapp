@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { CreateUserDto, UpdateUserDto } from '@modules/users/dtos/user.dto';
-import { Users } from '@entities/user.entity';
+// import { Users } from '@entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -11,7 +11,7 @@ export class UsersService {
    * Retrieve all users
    * @returns List of all users
    */
-  async getAllUsers(): Promise<Users[]> {
+  async getAllUsers(): Promise<any> {
     return this.usersRepository.findAll();
   }
 
@@ -21,7 +21,7 @@ export class UsersService {
    * @returns User
    * @throws NotFoundException if the user does not exist
    */
-  async getUserById(id: string): Promise<Users> {
+  async getUserById(id: string): Promise<any> {
     const user = await this.usersRepository.findOne(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -34,7 +34,7 @@ export class UsersService {
    * @param createUserDto Data to create the user
    * @returns Created user
    */
-  async createUser(createUserDto: CreateUserDto): Promise<Users> {
+  async createUser(createUserDto: CreateUserDto): Promise<any> {
     return this.usersRepository.create(createUserDto);
   }
 
@@ -44,7 +44,7 @@ export class UsersService {
    * @returns Updated user
    * @throws NotFoundException if the user does not exist
    */
-  async updateUser(updateUserDto: UpdateUserDto): Promise<Users> {
+  async updateUser(updateUserDto: UpdateUserDto): Promise<any> {
     const user = await this.usersRepository.update(updateUserDto);
     if (!user) {
       throw new NotFoundException(`User with ID ${updateUserDto.id} not found`);

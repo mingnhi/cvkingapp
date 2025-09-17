@@ -1,7 +1,7 @@
 import { EntityRepository, EntityManager } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
-import { UserRole } from '@entities/user_role.entity';
+// import { UserRole } from '@entities/user_role.entity';
 import {
   CreateUserRoleDto,
   UpdateUserRoleDto,
@@ -10,8 +10,8 @@ import {
 @Injectable()
 export class UserRolesRepository {
   constructor(
-    @InjectRepository(UserRole)
-    private readonly userRoleRepository: EntityRepository<UserRole>,
+    // @InjectRepository(UserRole)
+    // private readonly userRoleRepository: EntityRepository<UserRole>,
     private readonly em: EntityManager
   ) {}
 
@@ -19,8 +19,8 @@ export class UserRolesRepository {
    * Retrieve all userRoles
    * @returns List of all userRoles
    */
-  async findAll(): Promise<UserRole[]> {
-    return this.userRoleRepository.findAll();
+  async findAll(): Promise<any> {
+    return true;
   }
 
   /**
@@ -28,8 +28,8 @@ export class UserRolesRepository {
    * @param id ID of the userRole
    * @returns UserRole or null if not found
    */
-  async findOne(id: string): Promise<UserRole | null> {
-    return this.userRoleRepository.findOne({ id });
+  async findOne(id: string): Promise<any | null> {
+    return true;
   }
 
   /**
@@ -38,13 +38,14 @@ export class UserRolesRepository {
    * @param createUserRoleDto Data to create the userRole
    * @returns Created userRole
    */
-  async create(createUserRoleDto: CreateUserRoleDto): Promise<UserRole> {
-    const userRole = this.userRoleRepository.create({
-      ...createUserRoleDto,
-      id: undefined,
-    });
-    await this.em.persistAndFlush(userRole);
-    return userRole;
+  async create(createUserRoleDto: CreateUserRoleDto): Promise<any> {
+    // const userRole = this.userRoleRepository.create({
+    //   ...createUserRoleDto,
+    //   id: undefined,
+    // });
+    // await this.em.persistAndFlush(userRole);
+    // return userRole;
+    return true;
   }
 
   /**
@@ -52,18 +53,18 @@ export class UserRolesRepository {
    * @param updateUserRoleDto Data to update the userRole
    * @returns Updated userRole or null if not found
    */
-  async update(updateUserRoleDto: UpdateUserRoleDto): Promise<UserRole | null> {
-    const userRole = await this.userRoleRepository.findOne({
-      id: updateUserRoleDto.id,
-    });
-    if (!userRole) {
-      return null;
-    }
-    userRole.userId = updateUserRoleDto.userId;
-    userRole.roleId = updateUserRoleDto.roleId;
-    userRole.isActive = updateUserRoleDto.isActive;
-    await this.em.flush();
-    return userRole;
+  async update(updateUserRoleDto: UpdateUserRoleDto): Promise<any | null> {
+    // const userRole = await this.userRoleRepository.findOne({
+    //   id: updateUserRoleDto.id,
+    // });
+    // if (!userRole) {
+    //   return null;
+    // }
+    // userRole.userId = updateUserRoleDto.userId;
+    // userRole.roleId = updateUserRoleDto.roleId;
+    // userRole.isActive = updateUserRoleDto.isActive;
+    // await this.em.flush();
+    // return userRole;
   }
 
   /**
@@ -72,11 +73,11 @@ export class UserRolesRepository {
    * @returns True if deletion is successful, false if not found
    */
   async delete(id: string): Promise<boolean> {
-    const userRole = await this.userRoleRepository.findOne({ id });
-    if (!userRole) {
-      return false;
-    }
-    await this.em.removeAndFlush(userRole);
+    // const userRole = await this.userRoleRepository.findOne({ id });
+    // if (!userRole) {
+    //   return false;
+    // }
+    // await this.em.removeAndFlush(userRole);
     return true;
   }
 }

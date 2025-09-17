@@ -9,24 +9,27 @@ import {
   ParseUUIDPipe,
   Put,
 } from '@nestjs/common';
-import { RolesService } from './roles.service';
 import { CreateRoleDto, UpdateRoleDto } from '@modules/roles/dtos/role.dto';
-import { Roles } from '@entities/role.entity';
+// import { Roles } from '@entities/role.entity';
 import { ApiResponse } from '@common/interfaces/api-response.interface';
 import { ApiTags } from '@nestjs/swagger';
+import { RolesRepository } from './roles.repository';
 
 @ApiTags('roles')
 @Controller('roles')
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) {}
+  constructor(
+    // private readonly rolesService: RolesService
+    private readonly rolesRepository: RolesRepository
+  ) {}
 
   /**
    * Retrieve all roles
    * @returns List of all roles wrapped in ApiResponse
    */
   @Get()
-  async findAll(): Promise<ApiResponse<Roles[]>> {
-    const roles = await this.rolesService.getAllRoles();
+  async findAll(): Promise<ApiResponse<any>> {
+    const roles = await this.rolesRepository.findAll();
     return {
       status: 'success',
       message: 'Successfully retrieved all roles',
@@ -43,8 +46,8 @@ export class RolesController {
   @Get(':id')
   async findOne(
     @Param('id', ParseUUIDPipe) id: string
-  ): Promise<ApiResponse<Roles>> {
-    const role = await this.rolesService.getRoleById(id);
+  ): Promise<ApiResponse<any>> {
+    const role = await this.rolesRepository.findOne(id);
     return {
       status: 'success',
       message: `Successfully retrieved role with ID ${id}`,
@@ -60,8 +63,8 @@ export class RolesController {
   @Post()
   async create(
     @Body(ValidationPipe) createRoleDto: CreateRoleDto
-  ): Promise<ApiResponse<Roles>> {
-    const role = await this.rolesService.createRole(createRoleDto);
+  ): Promise<ApiResponse<any>> {
+    const role = await this.rolesRepository.create(createRoleDto);
     return {
       status: 'success',
       message: 'Role created successfully',
@@ -77,8 +80,8 @@ export class RolesController {
   @Put()
   async update(
     @Body(ValidationPipe) updateRoleDto: UpdateRoleDto
-  ): Promise<ApiResponse<Roles>> {
-    const role = await this.rolesService.updateRole(updateRoleDto);
+  ): Promise<ApiResponse<any>> {
+    const role = await this.rolesRepository.update(updateRoleDto);
     return {
       status: 'success',
       message: `Role with ID ${updateRoleDto.id} updated successfully`,
@@ -95,7 +98,7 @@ export class RolesController {
   async delete(
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<ApiResponse<null>> {
-    await this.rolesService.deleteRole(id);
+    await this.rolesRepository.delete(id);
     return {
       status: 'success',
       message: `Role with ID ${id} deleted successfully`,

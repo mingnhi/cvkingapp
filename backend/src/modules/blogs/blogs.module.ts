@@ -6,6 +6,7 @@ import { BlogPostTags } from '../../entities/blog-post-tag.entity';
 import { BlogComments } from '../../entities/blog-comment.entity';
 import { BlogsController } from './blogs.controller';
 import { BlogsService } from './blogs.service';
+import { BlogsRepository } from './blogs.repository';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { BlogsService } from './blogs.service';
     ]),
   ],
   controllers: [BlogsController],
-  providers: [BlogsService],
+  providers: [BlogsService, BlogsRepository],
+  exports: [BlogsService],
 })
 export class BlogsModule {}
