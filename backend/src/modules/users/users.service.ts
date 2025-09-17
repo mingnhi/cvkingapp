@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { CreateUserDto, UpdateUserDto } from '@modules/users/dtos/user.dto';
-// import { Users } from '@entities/user.entity';
+import { Users } from '@entities/user.entity';
+import { EntityManager } from '@mikro-orm/core';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly em: EntityManager
+  ) {}
 
   /**
    * Retrieve all users
@@ -30,12 +34,23 @@ export class UsersService {
   }
 
   /**
+   * Find a user by email
+   * @param email user's email
+   * @returns Users | null
+   */
+  async findByEmail(email: string): Promise<Users | null> {
+    return this.usersRepository.findByEmail(email);
+  }
+
+  /**
    * Create a new user
    * @param createUserDto Data to create the user
    * @returns Created user
    */
-  async createUser(createUserDto: CreateUserDto): Promise<any> {
-    return this.usersRepository.create(createUserDto);
+  async createUser(createUserDto: CreateUserDto): Promise<Users> {
+    const user = this.usersRepository.create(createUserDto);
+    await this.em.persistAndFlush(user);
+    return user;
   }
 
   /**
@@ -44,12 +59,10 @@ export class UsersService {
    * @returns Updated user
    * @throws NotFoundException if the user does not exist
    */
-  async updateUser(updateUserDto: UpdateUserDto): Promise<any> {
-    const user = await this.usersRepository.update(updateUserDto);
-    if (!user) {
-      throw new NotFoundException(`User with ID ${updateUserDto.id} not found`);
-    }
-    return user;
+  async update(id: string, data: Partial<Users>): Promise<Users> {
+    const updated = await this.usersRepository.update(id, data);
+    if (!updated) throw new NotFoundException('User not found');
+    return updated;
   }
 
   /**
@@ -57,10 +70,9 @@ export class UsersService {
    * @param id ID of the user to delete
    * @throws NotFoundException if the user does not exist
    */
-  async deleteUser(id: string): Promise<void> {
-    const deleted = await this.usersRepository.delete(id);
-    if (!deleted) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
+  async delete(id: string): Promise<boolean> {
+    const ok = await this.usersRepository.delete(id);
+    if (!ok) throw new NotFoundException('User not found');
+    return true;
   }
 }

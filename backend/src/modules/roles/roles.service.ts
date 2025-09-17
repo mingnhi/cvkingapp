@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { RolesRepository } from './roles.repository';
 import { CreateRoleDto, UpdateRoleDto } from '@modules/roles/dtos/role.dto';
-// import { Roles } from '@entities/role.entity';
+import { Roles } from '@entities/role.entity';
+import { EntityManager } from '@mikro-orm/core';
 
 @Injectable()
 export class RolesService {
-  constructor(private readonly rolesRepository: RolesRepository) {}
+  constructor(
+    private readonly rolesRepository: RolesRepository,
+    private readonly em: EntityManager
+  ) {}
 
   /**
    * Retrieve all roles
@@ -21,11 +25,9 @@ export class RolesService {
    * @returns Role
    * @throws NotFoundException if the role does not exist
    */
-  async getRoleById(id: string): Promise<any> {
+  async findOne(id: string) {
     const role = await this.rolesRepository.findOne(id);
-    if (!role) {
-      throw new NotFoundException(`Role with ID ${id} not found`);
-    }
+    if (!role) throw new NotFoundException('Role not found');
     return role;
   }
 
@@ -34,8 +36,8 @@ export class RolesService {
    * @param createRoleDto Data to create the role
    * @returns Created role
    */
-  async createRole(createRoleDto: CreateRoleDto): Promise<any> {
-    return this.rolesRepository.create(createRoleDto);
+  async createRole(dto: CreateRoleDto): Promise<Roles> {
+    return this.rolesRepository.create(dto);
   }
 
   /**
@@ -44,11 +46,9 @@ export class RolesService {
    * @returns Updated role
    * @throws NotFoundException if the role does not exist
    */
-  async updateRole(updateRoleDto: UpdateRoleDto): Promise<any> {
-    const role = await this.rolesRepository.update(updateRoleDto);
-    if (!role) {
-      throw new NotFoundException(`Role with ID ${updateRoleDto.id} not found`);
-    }
+  async updateRole(id: string, updateRoleDto: UpdateRoleDto): Promise<Roles> {
+    const role = await this.rolesRepository.update(id, updateRoleDto);
+    if (!role) throw new NotFoundException(`Role with ID ${id} not found`);
     return role;
   }
 
@@ -57,10 +57,23 @@ export class RolesService {
    * @param id ID of the role to delete
    * @throws NotFoundException if the role does not exist
    */
-  async deleteRole(id: string): Promise<void> {
+  async deleteRole(id: string): Promise<boolean> {
     const deleted = await this.rolesRepository.delete(id);
-    if (!deleted) {
-      throw new NotFoundException(`Role with ID ${id} not found`);
+    if (!deleted) throw new NotFoundException(`Role with ID ${id} not found`);
+    return true;
+  }
+
+  /**
+   * Find a role by its name (e.g., 'JobSeeker', 'Employer', 'Admin')
+   * @param roleName Tên role
+   * @returns Role entity
+   * @throws NotFoundException nếu không tìm thấy
+   */
+  async findByName(roleName: string): Promise<Roles> {
+    const role = await this.rolesRepository.findByName(roleName);
+    if (!role) {
+      throw new NotFoundException(`Role with name "${roleName}" not found`);
     }
+    return role;
   }
 }

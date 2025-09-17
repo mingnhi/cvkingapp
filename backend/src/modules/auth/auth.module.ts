@@ -6,11 +6,24 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UsersModule } from '@modules/users/users.module';
+import { RolesModule } from '@modules/roles/roles.module';
+import { UserRolesModule } from '@modules/user_roles/user_roles.module';
+import { JwtService } from './services/jwt.service';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RolesGuard } from './guards/roles.guard';
+import { AccessTokenStrategy } from './strategies/access-token.strategy';
+import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
+import { Users } from '@entities/user.entity';
 
 @Module({
   imports: [
-    // MikroOrmModule.forFeature([Users]),
-    PassportModule.register({ defaultStrategy: 'jwt-access' }),
+    UsersModule,
+    RolesModule,
+    UserRolesModule,
+    MikroOrmModule.forFeature([Users]),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -22,7 +35,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService],
+  providers: [
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+    AuthService,
+    JwtService,
+  ],
   controllers: [AuthController],
+  exports: [AuthService, JwtService],
 })
 export class AuthModule {}

@@ -26,12 +26,17 @@ export class RolesRepository {
    * @param id ID of the role
    * @returns Role or null if not found
    */
-  async findOne(id: string): Promise<any | null> {
-    const result = await this.em
-      .getConnection()
-      .execute('EXEC SP_GetRoleById ?', [id]);
-    const role = result?.[0] ?? result;
-    return role ?? null;
+  findOne(id: string): Promise<Roles | null> {
+    return this.roleRepository.findOne({ id });
+  }
+
+  /**
+   * Find a role by its name
+   * @param roleName tên role (ví dụ: 'JobSeeker', 'Employer', 'Admin')
+   * @returns Role hoặc null nếu không tìm thấy
+   */
+  async findByName(roleName: string): Promise<Roles | null> {
+    return this.roleRepository.findOne({ roleName });
   }
 
   /**
@@ -40,16 +45,10 @@ export class RolesRepository {
    * @param createRoleDto Data to create the role
    * @returns Created role
    */
-  async create(createRoleDto: CreateRoleDto): Promise<any> {
-    const result = this.em
-      .getConnection()
-      .execute('EXEC SP_InsertRole ?, ?', [
-        createRoleDto.name,
-        createRoleDto.description,
-      ]);
-
-    const newRole = result?.[0] ?? result;
-    return newRole as any;
+  async create(dto: CreateRoleDto): Promise<Roles> {
+    const role = this.roleRepository.create(dto);
+    await this.em.persistAndFlush(role);
+    return role;
   }
 
   /**
@@ -57,15 +56,12 @@ export class RolesRepository {
    * @param updateRoleDto Data to update the role
    * @returns Updated role or null if not found
    */
-  async update(updateRoleDto: UpdateRoleDto): Promise<any | null> {
-    await this.em
-      .getConnection()
-      .execute('EXEC SP_UpdateRole ?, ?, ?', [
-        updateRoleDto.id,
-        updateRoleDto.name,
-        updateRoleDto.description,
-      ]);
-    return this.findOne(updateRoleDto.id);
+  async update(id: string, dto: UpdateRoleDto): Promise<Roles | null> {
+    const role = await this.findOne(id);
+    if (!role) return null;
+    this.roleRepository.assign(role, dto);
+    await this.em.flush();
+    return role;
   }
 
   /**
@@ -74,7 +70,9 @@ export class RolesRepository {
    * @returns True if deletion is successful, false if not found
    */
   async delete(id: string): Promise<boolean> {
-    await this.em.getConnection().execute('EXEC SP_DeleteRole ?', [id]);
+    const role = await this.findOne(id);
+    if (!role) return false;
+    await this.em.removeAndFlush(role);
     return true;
   }
 }
