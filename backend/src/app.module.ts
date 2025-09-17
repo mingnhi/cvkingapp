@@ -8,6 +8,7 @@ import { UsersModule } from '@modules/users/users.module';
 import { RolesModule } from '@modules/roles/roles.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserRolesModule } from './modules/user_roles/user_roles.module';
+import { BlogsModule } from './modules/blogs/blogs.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UserRolesModule } from './modules/user_roles/user_roles.module';
     }),
     UsersModule,
     RolesModule,
+    BlogsModule,
     AuthModule,
     UserRolesModule,
   ],

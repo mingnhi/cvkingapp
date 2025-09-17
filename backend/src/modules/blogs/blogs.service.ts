@@ -53,6 +53,15 @@ export class BlogsService {
   }
 
   /**
+   * Search blog posts by title
+   * @param title Title keyword to search
+   * @returns List of blog posts matching the title
+   */
+  async searchPostsByTitle(title: string): Promise<BlogPosts[]> {
+    return this.blogsRepository.searchByTitle(title);
+  }
+
+  /**
    * Delete a blog post
    * @param id ID of the blog post to delete
    * @throws NotFoundException if the blog post does not exist

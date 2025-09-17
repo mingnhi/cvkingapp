@@ -8,28 +8,36 @@ import {
   ValidationPipe,
   ParseUUIDPipe,
   Put,
+  Query,
 } from '@nestjs/common';
-import { BlogsService } from './blogs.service';
 import { CreateBlogDto, UpdateBlogDto } from './dtos/blog.dto';
 import { BlogPosts } from '@entities/blog-post.entity';
 import { ApiResponse } from '@common/interfaces/api-response.interface';
 import { ApiTags } from '@nestjs/swagger';
+import { BlogsRepository } from './blogs.repository';
 
 @ApiTags('blogs')
 @Controller('blogs')
 export class BlogsController {
-  constructor(private readonly blogsService: BlogsService) {}
+  constructor(private readonly blogsRepository: BlogsRepository) {}
 
   /**
-   * Retrieve all blog posts
-   * @returns List of all blog posts wrapped in ApiResponse
+   * Retrieve all blog posts or search by title
+   * @param title Optional title query parameter for searching
+   * @returns List of all blog posts or filtered results wrapped in ApiResponse
    */
   @Get()
-  async findAll(): Promise<ApiResponse<BlogPosts[]>> {
-    const blogs = await this.blogsService.getAllBlogPosts();
+  async findAll(
+    @Query('title') title?: string
+  ): Promise<ApiResponse<BlogPosts[]>> {
+    const blogs = title
+      ? await this.blogsRepository.searchByTitle(title)
+      : await this.blogsRepository.findAll();
     return {
       status: 'success',
-      message: 'Successfully retrieved all blog posts',
+      message: title
+        ? `Successfully searched blog posts with title containing "${title}"`
+        : 'Successfully retrieved all blog posts',
       data: blogs,
       meta: { count: blogs.length },
     };
@@ -44,7 +52,7 @@ export class BlogsController {
   async findOne(
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<ApiResponse<BlogPosts>> {
-    const blog = await this.blogsService.getBlogPostById(id);
+    const blog = await this.blogsRepository.findOne(id);
     return {
       status: 'success',
       message: `Successfully retrieved blog post with ID ${id}`,
@@ -61,7 +69,7 @@ export class BlogsController {
   async create(
     @Body(ValidationPipe) createBlogDto: CreateBlogDto
   ): Promise<ApiResponse<BlogPosts>> {
-    const blog = await this.blogsService.createBlogPost(createBlogDto);
+    const blog = await this.blogsRepository.create(createBlogDto);
     return {
       status: 'success',
       message: 'Blog post created successfully',
@@ -78,7 +86,7 @@ export class BlogsController {
   async update(
     @Body(ValidationPipe) updateBlogDto: UpdateBlogDto
   ): Promise<ApiResponse<BlogPosts>> {
-    const blog = await this.blogsService.updateBlogPost(updateBlogDto);
+    const blog = await this.blogsRepository.update(updateBlogDto);
     return {
       status: 'success',
       message: `Blog post with ID ${updateBlogDto.id} updated successfully`,
@@ -95,11 +103,18 @@ export class BlogsController {
   async delete(
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<ApiResponse<null>> {
-    await this.blogsService.deleteBlogPost(id);
+    await this.blogsRepository.delete(id);
     return {
       status: 'success',
       message: `Blog post with ID ${id} deleted successfully`,
       data: null,
     };
+  }
+  //gộp chung
+  @Get('posts')
+  async findAllBlogPosts(@Query('title') title?: string): Promise<BlogPosts[]> {
+    return title
+      ? await this.blogsRepository.searchByTitle(title)
+      : await this.blogsRepository.findAll();
   }
 }
