@@ -44,7 +44,7 @@ export class JobsService {
       ? await this.jobCategoryRepository.findOneOrFail({ JobCategoryId: categoryId })
       : undefined;
 
-    const job = this.jobsRepository.create({
+    const job = await this.jobsRepository.create({
       ...rest,
       company,
       category,
@@ -220,7 +220,7 @@ export class JobsService {
     });
     const isAdmin = userWithRoles.roles
       ?.getItems()
-      .some(role => role.name === 'Admin');
+      .some(role => role.RoleName === 'Admin');
     if (!isAdmin && job.postedBy?.id !== user.id) {
       throw new Error('You can only update your own jobs');
     }
@@ -283,7 +283,7 @@ export class JobsService {
     });
     const isAdmin = userWithRoles.roles
       ?.getItems()
-      .some(role => role.name === 'Admin');
+      .some(role => role.RoleName === 'Admin');
     if (!isAdmin && job.postedBy?.id !== user.id) {
       throw new Error('You can only delete your own jobs');
     }
@@ -302,7 +302,7 @@ export class JobsService {
     });
     const isEmployer = userWithRoles.roles
       ?.getItems()
-      .some(role => role.name === 'Employer');
+      .some(role => role.RoleName === 'Employer');
     if (!isEmployer || job.company.postedBy?.id !== user.id) {
       throw new Error('You can only view stats for your own jobs');
     }

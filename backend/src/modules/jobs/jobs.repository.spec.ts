@@ -84,7 +84,7 @@ describe('JobsRepository', () => {
 
       const result = await repository.findOne(id, options);
 
-      expect(mockJobRepository.findOne).toHaveBeenCalledWith({ JobId: id }, options);
+      expect(mockJobRepository.findOne).toHaveBeenCalledWith({ JobId: id }, { populate: ['company'] });
       expect(result).toEqual(mockJob);
     });
 
@@ -94,7 +94,7 @@ describe('JobsRepository', () => {
 
       const result = await repository.findOne(id);
 
-      expect(mockJobRepository.findOne).toHaveBeenCalledWith({ JobId: id }, undefined);
+      expect(mockJobRepository.findOne).toHaveBeenCalledWith({ JobId: id }, { populate: [] });
       expect(result).toBeNull();
     });
   });
@@ -137,15 +137,17 @@ describe('JobsRepository', () => {
   });
 
   describe('create', () => {
-    it('should create a new job entity', () => {
+    it('should create and persist a new job entity', async () => {
       const data = { title: 'New Job', company: mockJob.company };
       const newJob = { ...mockJob, ...data };
 
       mockJobRepository.create.mockReturnValue(newJob);
+      mockEM.persistAndFlush.mockResolvedValue(undefined);
 
-      const result = repository.create(data);
+      const result = await repository.create(data);
 
       expect(mockJobRepository.create).toHaveBeenCalledWith(data);
+      expect(mockEM.persistAndFlush).toHaveBeenCalledWith(newJob);
       expect(result).toEqual(newJob);
     });
   });

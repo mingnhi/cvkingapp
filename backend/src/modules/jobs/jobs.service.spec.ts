@@ -169,7 +169,7 @@ describe('JobsService', () => {
   describe('create', () => {
     it('should create a new job successfully', async () => {
       mockCompanyRepository.findOneOrFail.mockResolvedValue(mockCompany);
-      mockJobsRepository.create.mockReturnValue(mockJob);
+      mockJobsRepository.create.mockResolvedValue(mockJob);
       mockJobsRepository.persistAndFlush.mockResolvedValue(undefined);
       mockSkillRepository.findOne.mockResolvedValue(null);
       mockSkillRepository.create.mockReturnValue({ Name: 'JavaScript' });
