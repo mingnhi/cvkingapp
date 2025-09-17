@@ -10,7 +10,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { CreateRoleDto, UpdateRoleDto } from '@modules/roles/dtos/role.dto';
-import { Roles } from '@entities/role.entity';
+// import { Roles } from '@entities/role.entity';
 import { ApiResponse } from '@common/interfaces/api-response.interface';
 import { ApiTags } from '@nestjs/swagger';
 import { RolesRepository } from './roles.repository';
@@ -28,7 +28,7 @@ export class RolesController {
    * @returns List of all roles wrapped in ApiResponse
    */
   @Get()
-  async findAll(): Promise<ApiResponse<Roles[]>> {
+  async findAll(): Promise<ApiResponse<any>> {
     const roles = await this.rolesRepository.findAll();
     return {
       status: 'success',
@@ -46,7 +46,7 @@ export class RolesController {
   @Get(':id')
   async findOne(
     @Param('id', ParseUUIDPipe) id: string
-  ): Promise<ApiResponse<Roles>> {
+  ): Promise<ApiResponse<any>> {
     const role = await this.rolesRepository.findOne(id);
     return {
       status: 'success',
@@ -63,7 +63,7 @@ export class RolesController {
   @Post()
   async create(
     @Body(ValidationPipe) createRoleDto: CreateRoleDto
-  ): Promise<ApiResponse<Roles>> {
+  ): Promise<ApiResponse<any>> {
     const role = await this.rolesRepository.create(createRoleDto);
     return {
       status: 'success',
@@ -80,7 +80,7 @@ export class RolesController {
   @Put()
   async update(
     @Body(ValidationPipe) updateRoleDto: UpdateRoleDto
-  ): Promise<ApiResponse<Roles>> {
+  ): Promise<ApiResponse<any>> {
     const role = await this.rolesRepository.update(updateRoleDto);
     return {
       status: 'success',

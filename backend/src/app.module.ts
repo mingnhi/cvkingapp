@@ -13,6 +13,8 @@ import { JobsModule } from './modules/jobs/jobs.module';
 import { JobApplicationsModule } from './modules/job-applications/job-applications.module';
 import { SavedJobsModule } from './modules/saved-jobs/saved-jobs.module';
 import { JobViewsModule } from './modules/job-views/job-views.module';
+import { JobTagsModule } from './modules/job-tags/job-tags.module';
+import { JobSkillsModule } from './modules/job-skills/job-skills.module';
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import { JobViewsModule } from './modules/job-views/job-views.module';
     JobApplicationsModule,
     SavedJobsModule,
     JobViewsModule,
+    JobTagsModule,
+    JobSkillsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20250917113042_init extends Migration {
+export class Migration20250917142403 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`CREATE TABLE [BlogComments] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [blog_post_id] nvarchar(500) null, [user_id] nvarchar(500) null, [content] text not null, [is_approved] bit not null CONSTRAINT [blogcomments_is_approved_default] DEFAULT 0, CONSTRAINT [BlogComments_pkey] PRIMARY KEY ([id]));`);
@@ -25,7 +25,7 @@ export class Migration20250917113042_init extends Migration {
 
     this.addSql(`CREATE TABLE [JobSkills] ([id] nvarchar(255) not null, [job_id] nvarchar(255) not null, [skill_id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, CONSTRAINT [JobSkills_pkey] PRIMARY KEY ([id], [job_id], [skill_id]));`);
 
-    this.addSql(`CREATE TABLE [JobTags] ([id] int identity(1,1) not null, [created_at] date not null, [updated_at] date null, [name] nvarchar(200) not null, CONSTRAINT [JobTags_pkey] PRIMARY KEY ([id]));`);
+    this.addSql(`CREATE TABLE [JobTags] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [name] nvarchar(200) not null, CONSTRAINT [JobTags_pkey] PRIMARY KEY ([id]));`);
     this.addSql(`CREATE UNIQUE INDEX [JobTags_name_unique] ON [JobTags] ([name]) WHERE [name] IS NOT NULL;`);
 
     this.addSql(`CREATE TABLE [saved_jobs] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [job_seeker_id] nvarchar(255) not null, [job_id] nvarchar(255) not null, CONSTRAINT [saved_jobs_pkey] PRIMARY KEY ([id]));`);
