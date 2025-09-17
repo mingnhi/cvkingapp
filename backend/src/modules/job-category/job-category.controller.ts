@@ -10,23 +10,22 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { JobsRepository } from './jobs.repository';
-
 import { ApiResponse } from '@common/interfaces/api-response.interface';
-import { CreateJobDto } from './dtos/create-job.dto';
-import { UpdateJobDto } from './dtos/update-job.dto';
+import { JobCategoriesRepository } from './job-category.repository';
+import { CreateJobCategoryDto } from './dtos/CreateJobCategoryDto';
+import { UpdateJobCategoryDto } from './dtos/UpdateJobCategoryDto';
 
-@ApiTags('jobs')
-@Controller('jobs')
-export class JobsController {
-  constructor(private readonly repo: JobsRepository) {}
+@ApiTags('job-categories')
+@Controller('job-categories')
+export class JobCategoriesController {
+  constructor(private readonly repo: JobCategoriesRepository) {}
 
   @Get()
   async findAll(): Promise<ApiResponse<any>> {
     const data = await this.repo.findAll();
     return {
       status: 'success',
-      message: 'All jobs',
+      message: 'All categories',
       data,
       meta: { count: data.length },
     };
@@ -37,23 +36,23 @@ export class JobsController {
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<ApiResponse<any>> {
     const data = await this.repo.findOne(id);
-    return { status: 'success', message: 'Found job', data };
+    return { status: 'success', message: 'Found category', data };
   }
 
   @Post()
   async create(
-    @Body(ValidationPipe) dto: CreateJobDto
+    @Body(ValidationPipe) dto: CreateJobCategoryDto
   ): Promise<ApiResponse<any>> {
     const data = await this.repo.create(dto);
-    return { status: 'success', message: 'Created job', data };
+    return { status: 'success', message: 'Created', data };
   }
 
   @Put()
   async update(
-    @Body(ValidationPipe) dto: UpdateJobDto
+    @Body(ValidationPipe) dto: UpdateJobCategoryDto
   ): Promise<ApiResponse<any>> {
     const data = await this.repo.update(dto);
-    return { status: 'success', message: 'Updated job', data };
+    return { status: 'success', message: 'Updated', data };
   }
 
   @Delete(':id')
@@ -61,6 +60,6 @@ export class JobsController {
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<ApiResponse<null>> {
     await this.repo.delete(id);
-    return { status: 'success', message: 'Deleted job', data: null };
+    return { status: 'success', message: 'Deleted', data: null };
   }
 }

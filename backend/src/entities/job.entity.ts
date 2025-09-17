@@ -49,7 +49,7 @@ export class Job extends AuditableEntity {
   @Property({ type: 'nvarchar', length: 300, nullable: true })
   Location?: string;
 
-  @Property({ type: 'int', nullable: true })
+  @Property({ type: 'nvarchar', nullable: true })
   CategoryId?: number;
 
   @Property({

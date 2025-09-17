@@ -15,6 +15,7 @@ import { SavedJobsModule } from './modules/saved-jobs/saved-jobs.module';
 import { JobViewsModule } from './modules/job-views/job-views.module';
 import { JobTagsModule } from './modules/job-tags/job-tags.module';
 import { JobSkillsModule } from './modules/job-skills/job-skills.module';
+import { JobCategoryModule } from './modules/job-category/job-category.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { JobSkillsModule } from './modules/job-skills/job-skills.module';
     JobViewsModule,
     JobTagsModule,
     JobSkillsModule,
+    JobCategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
