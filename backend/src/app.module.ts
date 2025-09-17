@@ -16,6 +16,9 @@ import { JobViewsModule } from './modules/job-views/job-views.module';
 import { JobTagsModule } from './modules/job-tags/job-tags.module';
 import { JobSkillsModule } from './modules/job-skills/job-skills.module';
 import { JobCategoryModule } from './modules/job-category/job-category.module';
+import { CompanyModule } from './modules/company/company.module';
+import { JobSeekerProfileModule } from './modules/job-seeker-profile/job-seeker-profile.module';
+import { EmployerProfileModule } from './modules/employer-profile/employer-profile.module';
 
 @Module({
   imports: [
@@ -41,6 +44,9 @@ import { JobCategoryModule } from './modules/job-category/job-category.module';
     JobTagsModule,
     JobSkillsModule,
     JobCategoryModule,
+    CompanyModule,
+    JobSeekerProfileModule,
+    EmployerProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
