@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { RolesRepository } from './roles.repository';
 import { CreateRoleDto, UpdateRoleDto } from '@modules/roles/dtos/role.dto';
-import { Roles } from '@entities/role.entity';
+// import { Roles } from '@entities/role.entity';
 
 @Injectable()
 export class RolesService {
@@ -11,7 +11,7 @@ export class RolesService {
    * Retrieve all roles
    * @returns List of all roles
    */
-  async getAllRoles(): Promise<Roles[]> {
+  async getAllRoles(): Promise<any> {
     return this.rolesRepository.findAll();
   }
 
@@ -21,7 +21,7 @@ export class RolesService {
    * @returns Role
    * @throws NotFoundException if the role does not exist
    */
-  async getRoleById(id: string): Promise<Roles> {
+  async getRoleById(id: string): Promise<any> {
     const role = await this.rolesRepository.findOne(id);
     if (!role) {
       throw new NotFoundException(`Role with ID ${id} not found`);
@@ -34,7 +34,7 @@ export class RolesService {
    * @param createRoleDto Data to create the role
    * @returns Created role
    */
-  async createRole(createRoleDto: CreateRoleDto): Promise<Roles> {
+  async createRole(createRoleDto: CreateRoleDto): Promise<any> {
     return this.rolesRepository.create(createRoleDto);
   }
 
@@ -44,7 +44,7 @@ export class RolesService {
    * @returns Updated role
    * @throws NotFoundException if the role does not exist
    */
-  async updateRole(updateRoleDto: UpdateRoleDto): Promise<Roles> {
+  async updateRole(updateRoleDto: UpdateRoleDto): Promise<any> {
     const role = await this.rolesRepository.update(updateRoleDto);
     if (!role) {
       throw new NotFoundException(`Role with ID ${updateRoleDto.id} not found`);
