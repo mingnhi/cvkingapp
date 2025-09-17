@@ -1,0 +1,10 @@
+import { Entity, Property, PrimaryKey } from '@mikro-orm/core';
+import { AuditableEntity } from './base/auditable_entity';
+@Entity({ tableName: 'JobSkills' })
+export class JobSkills extends AuditableEntity{
+  @PrimaryKey()
+  jobId: string;
+
+  @PrimaryKey()
+  skillId: string;
+}

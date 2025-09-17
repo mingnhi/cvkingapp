@@ -1,4 +1,5 @@
-import { Entity, Property, PrimaryKey } from '@mikro-orm/core';
+import { Entity, Property } from '@mikro-orm/core';
+import { AuditableEntity } from './base/auditable_entity';
 
 @Entity({ tableName: 'BlogPosts' })
 export class BlogPosts {
@@ -20,18 +21,12 @@ export class BlogPosts {
   @Property({ type: 'string', length: 1000, nullable: true })
   coverImageUrl?: string;
 
-  @Property({ type: 'int' })
-  authorUserId: number;
+  @Property({ type: 'number' })
+  authorId: number;
 
   @Property({ type: 'boolean', default: false })
   isPublished: boolean = false;
 
   @Property({ type: 'date', nullable: true })
   publishedAt?: Date;
-
-  @Property({ type: 'date', default: 'SYSDATETIME' })
-  createdAt: Date;
-
-  @Property({ type: 'date', nullable: true })
-  updatedAt?: Date;
 }

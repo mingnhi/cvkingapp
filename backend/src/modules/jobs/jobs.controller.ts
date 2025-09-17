@@ -1,0 +1,100 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  Query,
+  ValidationPipe,
+  ParseUUIDPipe,
+} from '@nestjs/common';
+import { JobsRepository } from './jobs.repository';
+import { CreateJobDto } from './dtos/create-job.dto';
+import { UpdateJobDto } from './dtos/update-job.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse } from '@common/interfaces/api-response.interface';
+import { Job } from '../../entities/job.entity';
+
+@ApiTags('jobs')
+@Controller('jobs')
+export class JobsController {
+  constructor(
+    // private readonly jobsService: JobsService
+    private readonly jobsRepository: JobsRepository
+  ) {}
+
+  @Post()
+  async create(
+    @Body(ValidationPipe) createJobDto: CreateJobDto
+  ): Promise<ApiResponse<Job>> {
+    const job = await this.jobsRepository.create(createJobDto);
+    return {
+      status: 'success',
+      message: 'Job created successfully',
+      data: job,
+    };
+  }
+
+  @Get()
+  async findAll(@Query('key') key?: string): Promise<ApiResponse<Job[]>> {
+    const query = { key };
+    const jobs = await this.jobsRepository.findAll(query);
+    return {
+      status: 'success',
+      message: 'Successfully retrieved jobs',
+      data: jobs,
+      meta: { total: jobs.length },
+    };
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<ApiResponse<Job>> {
+    const job = await this.jobsRepository.findOne(id);
+    if (!job) {
+      throw new NotFoundException('Job not found');
+    }
+    return {
+      status: 'success',
+      message: 'Successfully retrieved job',
+      data: job,
+    };
+  }
+
+  @Put()
+  async update(
+    @Body(ValidationPipe) updateJobDto: UpdateJobDto
+  ): Promise<ApiResponse<Job>> {
+    const job = await this.jobsRepository.update(updateJobDto);
+    return {
+      status: 'success',
+      message: 'Job updated successfully',
+      data: job,
+    };
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string): Promise<ApiResponse<null>> {
+    await this.jobsRepository.delete(id);
+    return {
+      status: 'success',
+      message: 'Job deleted successfully',
+      data: null,
+    };
+  }
+
+  @Get(':slug')
+  async findBySlug(@Param('slug') slug: string): Promise<ApiResponse<Job>> {
+    const job = await this.jobsRepository.findBySlug(slug);
+    if (!job) {
+      throw new NotFoundException('Job not found');
+    }
+    return {
+      status: 'success',
+      message: 'Successfully retrieved job',
+      data: job,
+    };
+  }
+}

@@ -9,6 +9,12 @@ import { RolesModule } from '@modules/roles/roles.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserRolesModule } from './modules/user_roles/user_roles.module';
 import { BlogsModule } from './modules/blogs/blogs.module';
+import { JobsModule } from './modules/jobs/jobs.module';
+import { JobApplicationsModule } from './modules/job-applications/job-applications.module';
+import { SavedJobsModule } from './modules/saved-jobs/saved-jobs.module';
+import { JobViewsModule } from './modules/job-views/job-views.module';
+import { JobTagsModule } from './modules/job-tags/job-tags.module';
+import { JobSkillsModule } from './modules/job-skills/job-skills.module';
 
 @Module({
   imports: [
@@ -22,11 +28,17 @@ import { BlogsModule } from './modules/blogs/blogs.module';
         mikroOrmConfig(configService),
       inject: [ConfigService],
     }),
-    UsersModule,
-    RolesModule,
+    // UsersModule,
+    // RolesModule,
+    // AuthModule,
+    // UserRolesModule,
     BlogsModule,
-    AuthModule,
-    UserRolesModule,
+    JobsModule,
+    JobApplicationsModule,
+    SavedJobsModule,
+    JobViewsModule,
+    JobTagsModule,
+    JobSkillsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

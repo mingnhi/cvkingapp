@@ -1,18 +1,13 @@
-import { Entity, Property, PrimaryKey } from '@mikro-orm/core';
+import { Entity, Property } from '@mikro-orm/core';
+import { AuditableEntity } from './base/auditable_entity';
 
 @Entity({ tableName: 'BlogComments' })
-export class BlogComments {
-  @PrimaryKey({ type: 'int', autoincrement: true })
-  commentId: number;
+export class BlogComments extends AuditableEntity {
+  @Property({ type: 'string', length: 500, nullable: true })
+  blogPostId?: string;
 
-  @Property({ type: 'int' })
-  blogPostId: number;
-
-  @Property({ type: 'int', nullable: true })
-  userId?: number;
-
-  @Property({ type: 'string', length: 200, nullable: true })
-  guestName?: string;
+  @Property({ type: 'string', length: 500, nullable: true })
+  userId?: string;
 
   @Property({ type: 'text' })
   content: string;

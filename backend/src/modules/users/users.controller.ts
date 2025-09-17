@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from '@modules/users/dtos/user.dto';
-import { Users } from '@entities/user.entity';
+// import { Users } from '@entities/user.entity';
 import { ApiResponse } from '@common/interfaces/api-response.interface';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -25,7 +25,7 @@ export class UsersController {
    * @returns List of all users wrapped in ApiResponse
    */
   @Get()
-  async findAll(): Promise<ApiResponse<Users[]>> {
+  async findAll(): Promise<ApiResponse<any>> {
     const users = await this.usersService.getAllUsers();
     return {
       status: 'success',
@@ -43,7 +43,7 @@ export class UsersController {
   @Get(':id')
   async findOne(
     @Param('id', ParseUUIDPipe) id: string
-  ): Promise<ApiResponse<Users>> {
+  ): Promise<ApiResponse<any>> {
     const user = await this.usersService.getUserById(id);
     return {
       status: 'success',
@@ -60,7 +60,7 @@ export class UsersController {
   @Post()
   async create(
     @Body(ValidationPipe) createUserDto: CreateUserDto
-  ): Promise<ApiResponse<Users>> {
+  ): Promise<ApiResponse<any>> {
     const user = await this.usersService.createUser(createUserDto);
     return {
       status: 'success',
@@ -77,7 +77,7 @@ export class UsersController {
   @Put()
   async update(
     @Body(ValidationPipe) updateUserDto: UpdateUserDto
-  ): Promise<ApiResponse<Users>> {
+  ): Promise<ApiResponse<any>> {
     const user = await this.usersService.updateUser(updateUserDto);
     return {
       status: 'success',
