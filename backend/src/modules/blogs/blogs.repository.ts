@@ -29,7 +29,7 @@ export class BlogsRepository {
    * @param id ID of the blog post
    * @returns Blog post or null if not found
    */
-  async findOne(id: string): Promise<BlogPosts | null> {
+  async findOne(id: number): Promise<BlogPosts | null> {
     const result = await this.em
       .getConnection()
       .execute('EXEC SP_GetBlogPostById ?', [id]);
@@ -77,7 +77,7 @@ export class BlogsRepository {
 
         updateBlogDto.authorId,
       ]);
-    return this.findOne(updateBlogDto.id);
+    return this.findOne(parseInt(updateBlogDto.id));
   }
 
   /**
@@ -121,11 +121,11 @@ export class BlogsRepository {
 
     for (const post of posts) {
       // Get tag IDs for this post
-      const tagRelations = await this.em.find(BlogPostTags, { blogPostId: post.id });
+      const tagRelations = await this.em.find(BlogPostTags, { blogPostId: post.blogPostId });
 
       // Get tag details
       const tagIds = tagRelations.map((relation: any) => relation.blogTagId);
-      const tags = tagIds.length > 0 ? await this.em.find(BlogTags, { id: { $in: tagIds } }) : [];
+      const tags = tagIds.length > 0 ? await this.em.find(BlogTags, { blogTagId: { $in: tagIds } }) : [];
 
       results.push({
         ...post,
@@ -141,16 +141,16 @@ export class BlogsRepository {
    * @param id ID of the blog post
    * @returns Aggregated data including blog post, tags, author, comments
    */
-  async findByIdWithFullAggregation(id: string): Promise<any> {
+  async findByIdWithFullAggregation(id: number): Promise<any> {
     // Get the blog post with basic relations
-    const post = await this.blogRepository.findOne(id);
+    const post = await this.blogRepository.findOne({ blogPostId: id });
 
     if (!post) return null;
 
     // Get tags for this post
     const tagRelations = await this.em.find(BlogPostTags, { blogPostId: id });
     const tagIds = tagRelations.map((relation: any) => relation.blogTagId);
-    const tags = tagIds.length > 0 ? await this.em.find(BlogTags, { id: { $in: tagIds } }) : [];
+    const tags = tagIds.length > 0 ? await this.em.find(BlogTags, { blogTagId: { $in: tagIds } }) : [];
 
     // Get comments for this post (approving comments using MikroORM)
     const comments = await this.em.find(BlogComments, { blogPostId: id, isApproved: true });

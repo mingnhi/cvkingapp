@@ -22,7 +22,7 @@ export class BlogsService {
    * @throws NotFoundException if the blog post does not exist
    */
   async getBlogPostById(id: string): Promise<BlogPosts> {
-    const blogPost = await this.blogsRepository.findOne(id);
+    const blogPost = await this.blogsRepository.findOne(parseInt(id));
     if (!blogPost) {
       throw new NotFoundException(`Blog post with ID ${id} not found`);
     }
@@ -50,7 +50,7 @@ export class BlogsService {
    * @throws NotFoundException if the blog post does not exist
    */
   async getBlogPostDetail(id: string): Promise<any> {
-    const detailedBlogPost = await this.blogsRepository.findByIdWithFullAggregation(id);
+    const detailedBlogPost = await this.blogsRepository.findByIdWithFullAggregation(parseInt(id));
     if (!detailedBlogPost) {
       throw new NotFoundException(`Blog post with ID ${id} not found`);
     }

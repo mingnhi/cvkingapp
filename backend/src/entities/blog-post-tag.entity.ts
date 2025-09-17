@@ -1,12 +1,13 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, Property, PrimaryKey } from '@mikro-orm/core';
 
 @Entity({ tableName: 'BlogPostTags' })
 export class BlogPostTags {
-  @PrimaryKey()
-  @Property({ type: 'string' })
-  blogPostId: string;
+  @PrimaryKey({ type: 'int', autoincrement: true })
+  blogPostTagId: number;
 
-  @PrimaryKey()
-  @Property({ type: 'string' })
-  blogTagId: string;
+  @Property({ type: 'int' })
+  blogPostId: number;
+
+  @Property({ type: 'int' })
+  blogTagId: number;
 }
