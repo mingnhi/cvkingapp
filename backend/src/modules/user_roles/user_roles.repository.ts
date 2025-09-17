@@ -10,8 +10,8 @@ import {
 @Injectable()
 export class UserRolesRepository {
   constructor(
-    // @InjectRepository(UserRole)
-    // private readonly userRoleRepository: EntityRepository<UserRole>,
+    @InjectRepository(UserRole)
+    private readonly userRoleRepository: EntityRepository<UserRole>,
     private readonly em: EntityManager
   ) {}
 

@@ -1,14 +1,14 @@
 import { EntityRepository, EntityManager } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
-// import { Users } from '@entities/user.entity';
+import { Users } from '@entities/user.entity';
 import { CreateUserDto, UpdateUserDto } from '@modules/users/dtos/user.dto';
 
 @Injectable()
 export class UsersRepository {
   constructor(
-    // @InjectRepository(Users)
-    // private readonly userRepository: EntityRepository<Users>,
+    @InjectRepository(Users)
+    private readonly userRepository: EntityRepository<Users>,
     private readonly em: EntityManager
   ) {}
 
@@ -48,10 +48,9 @@ export class UsersRepository {
    * @param updateuserDto Data to update the user
    * @returns Updated user or null if not found
    */
-  async update(id: string, data: Partial<Users>): Promise<Users | null> {
-    const user = await this.findOne(id);
-    if (!user) return null;
-    this.userRepository.assign(user, data);
+  async update(id: string, dto: Partial<Users>): Promise<Users> {
+    const user = await this.userRepository.findOneOrFail({ id });
+    this.userRepository.assign(user, dto);
     await this.em.flush();
     return user;
   }
@@ -67,10 +66,4 @@ export class UsersRepository {
     await this.em.removeAndFlush(user);
     return true;
   }
-
-  /**
-   * Find a user by email
-   * @param email Email of the user
-   * @returns user or null if not found
-   */
 }

@@ -1,4 +1,4 @@
-import { EntityManager } from '@mikro-orm/core';
+import { EntityManager, EntityRepository } from '@mikro-orm/core';
 import { RolesService } from '@modules/roles/roles.service';
 import { UserRolesService } from '@modules/user_roles/user_roles.service';
 import { UsersService } from '@modules/users/users.service';
@@ -9,21 +9,31 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterDto } from '../dtos/register.dto';
+import { RegisterDto, registerEmployeeDto } from '../dtos/register.dto';
 import * as bcrypt from 'bcrypt';
-import { UsersRepository } from '@modules/users/users.repository';
 import { loginDto } from '../dtos/login.dto';
-import { log } from 'util';
+import { JobSeekerProfile } from '@entities/job-seeker-profile.entity';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { Company } from '@entities/compoany.entity';
+import { EmployerProfile } from '@entities/employer-profile.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-    // private readonly usersrepo: UsersRepository,
     private readonly rolesService: RolesService,
     private readonly usersRoleService: UserRolesService,
     private readonly em: EntityManager,
-    private readonly jwt: JwtService
+    private readonly jwt: JwtService,
+
+    @InjectRepository(JobSeekerProfile)
+    private readonly jobSeekerRepo: EntityRepository<JobSeekerProfile>,
+
+    @InjectRepository(Company)
+    private readonly companyRepo: EntityRepository<Company>,
+
+    @InjectRepository(EmployerProfile)
+    private readonly employerRepo: EntityRepository<EmployerProfile>
   ) {}
   private async signTokens(userId: string, email: string) {
     const userRoleEntities = await this.usersRoleService.findByUser(userId);
@@ -57,10 +67,6 @@ export class AuthService {
     );
     return { accessToken, refreshToken };
   }
-  private async setRefreshToken(userId: string, token: string) {
-    const hash = await bcrypt.hash(token, 10);
-    await this.usersService.update(userId, { refreshToken: hash });
-  }
 
   async validateUser(userId: string) {
     console.log('validateUser id:', userId);
@@ -76,33 +82,76 @@ export class AuthService {
     const exist = await this.usersService.findByEmail(dto.email);
     if (exist) throw new ConflictException('Email đã tồn tại');
 
-    //mã hoá password
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-
     const user = await this.usersService.createUser({
       email: dto.email,
       password: hashedPassword,
+      displayName: dto.fullName,
     });
 
+    // gán role JobSeeker
     const jobSeekerRole = await this.rolesService.findByName('JobSeeker');
-    console.log('role' + jobSeekerRole.roleName);
-
     await this.usersRoleService.createUserRole({
       userId: user.id,
       roleId: jobSeekerRole.id,
     });
 
-    // const role = await this.rolesService.findByName('JobSeeker');
-    // if (!role) throw new NotFoundException('Role không tồn tại');
-    // await this.usersRoleService.createUserRole({
-    //   userId: user.userId,
-    //   roleId: role.RoleId,
-    // });
+    // tạo JobSeekerProfile
+    const profile = this.jobSeekerRepo.create({
+      userId: user.id,
+      fullName: dto.fullName,
+    });
+    await this.jobSeekerRepo.create(profile);
+
     const { accessToken, refreshToken } = await this.signTokens(
       user.id,
       user.email
     );
-    await this.setRefreshToken(user.id, refreshToken);
+
+    await this.usersService.update(user.id, {
+      refreshToken: refreshToken,
+    });
+
+    return { user, profile, accessToken, refreshToken };
+  }
+
+  async registerEmployee(dto: registerEmployeeDto) {
+    const exist = await this.usersService.findByEmail(dto.email);
+    if (exist) throw new ConflictException('Email đã tồn tại');
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const user = await this.usersService.createUser({
+      email: dto.email,
+      password: hashedPassword,
+      displayName: dto.contactName,
+    });
+
+    // gán role Employer
+    const EmployerRole = await this.rolesService.findByName('Employer');
+    await this.usersRoleService.createUserRole({
+      userId: user.id,
+      roleId: EmployerRole.id,
+    });
+
+    // tạo Company
+    const company = this.companyRepo.create({ name: dto.companyName });
+    await this.companyRepo.create(company);
+
+    // tạo EmployerProfile
+    const profile = this.employerRepo.create({
+      userId: user.id,
+      company: dto.companyName,
+    });
+    await this.jobSeekerRepo.create(profile);
+
+    const { accessToken, refreshToken } = await this.signTokens(
+      user.id,
+      user.email
+    );
+
+    await this.usersService.update(user.id, {
+      refreshToken: refreshToken,
+    });
 
     return { user, accessToken, refreshToken };
   }
@@ -119,7 +168,7 @@ export class AuthService {
       user.id,
       user.email
     );
-    await this.setRefreshToken(user.id, refreshToken);
+    await this.usersService.update(user.id, { refreshToken });
 
     return { user, accessToken, refreshToken };
   }
@@ -135,7 +184,7 @@ export class AuthService {
       user.id,
       user.email
     );
-    await this.setRefreshToken(user.id, newRefresh);
+    await this.usersService.update(user.id, { refreshToken: newRefresh });
     return { accessToken, refreshToken: newRefresh };
   }
 

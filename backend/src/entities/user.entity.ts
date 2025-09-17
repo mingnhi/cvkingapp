@@ -1,8 +1,14 @@
-import { Collection, Entity, OneToMany, PrimaryKey, Property, Unique } from '@mikro-orm/core';
+import {
+  Collection,
+  Entity,
+  OneToMany,
+  PrimaryKey,
+  Property,
+  Unique,
+} from '@mikro-orm/core';
 import { AuditableEntity } from './base/auditable_entity';
 @Entity({ tableName: 'Users' })
 export class Users extends AuditableEntity {
-
   @Property({ type: 'string' })
   @Unique()
   email: string;
@@ -37,6 +43,6 @@ export class Users extends AuditableEntity {
   @Property({ type: 'string', nullable: true })
   linkedInId?: string;
 
-  @Property({ type: 'string', nullable: true })
+  @Property({ type: 'string', length: 1000, nullable: true })
   refreshToken?: string;
 }

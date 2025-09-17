@@ -4,7 +4,7 @@ import {
   CreateUserRoleDto,
   UpdateUserRoleDto,
 } from '@modules/user_roles/dtos/user_role.dto';
-// import { UserRole } from '@entities/user_role.entity';
+import { UserRole } from '@entities/user_role.entity';
 
 @Injectable()
 export class UserRolesService {

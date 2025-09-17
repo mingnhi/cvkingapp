@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from '@modules/users/dtos/user.dto';
-// import { Users } from '@entities/user.entity';
+import { Users } from '@entities/user.entity';
 import { ApiResponse } from '@common/interfaces/api-response.interface';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
@@ -48,8 +48,15 @@ export class UsersController {
    * @returns User wrapped in ApiResponse
    */
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: string): Promise<Users> {
-    return this.usersService.getUserById(id);
+  async findOne(
+    @Param('id', ParseIntPipe) id: string
+  ): Promise<ApiResponse<Users>> {
+    const user = await this.usersService.getUserById(id);
+    return {
+      status: 'success',
+      message: 'Successfully retrieved user',
+      data: user,
+    };
   }
 
   /**
@@ -80,8 +87,13 @@ export class UsersController {
   async update(
     @Param('id', ParseIntPipe) id: string,
     @Body() dto: UpdateUserDto
-  ): Promise<Users> {
-    return this.usersService.update(id, dto);
+  ): Promise<ApiResponse<Users>> {
+    const user = await this.usersService.update(id, dto);
+    return {
+      status: 'success',
+      message: 'User updated successfully',
+      data: user,
+    };
   }
 
   /**
@@ -92,7 +104,14 @@ export class UsersController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('Admin')
-  async remove(@Param('id', ParseIntPipe) id: string): Promise<boolean> {
-    return this.usersService.delete(id);
+  async remove(
+    @Param('id', ParseIntPipe) id: string
+  ): Promise<ApiResponse<boolean>> {
+    await this.usersService.delete(id);
+    return {
+      status: 'success',
+      message: 'User deleted successfully',
+      data: true,
+    };
   }
 }

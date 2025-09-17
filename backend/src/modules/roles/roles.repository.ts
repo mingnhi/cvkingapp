@@ -1,14 +1,14 @@
 import { EntityRepository, EntityManager } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
-// import { Roles } from '@entities/role.entity';
+import { Roles } from '@entities/role.entity';
 import { CreateRoleDto, UpdateRoleDto } from '@modules/roles/dtos/role.dto';
 
 @Injectable()
 export class RolesRepository {
   constructor(
-    // @InjectRepository(Roles)
-    // private readonly roleRepository: EntityRepository<Roles>,
+    @InjectRepository(Roles)
+    private readonly roleRepository: EntityRepository<Roles>,
     private readonly em: EntityManager
   ) {}
 
@@ -17,7 +17,7 @@ export class RolesRepository {
    * @returns List of all roles
    */
   async findAll(): Promise<any> {
-    const results = await this.em.getConnection().execute('EXEC SP_GetAllRole');
+    const results = this.roleRepository.findAll();
     return results ?? [];
   }
 

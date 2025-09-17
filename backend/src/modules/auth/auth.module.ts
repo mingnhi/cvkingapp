@@ -16,13 +16,21 @@ import { RolesGuard } from './guards/roles.guard';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { Users } from '@entities/user.entity';
+import { JobSeekerProfile } from '@entities/job-seeker-profile.entity';
+import { Company } from '@entities/compoany.entity';
+import { EmployerProfile } from '@entities/employer-profile.entity';
 
 @Module({
   imports: [
     UsersModule,
     RolesModule,
     UserRolesModule,
-    MikroOrmModule.forFeature([Users]),
+    MikroOrmModule.forFeature([
+      Users,
+      JobSeekerProfile,
+      Company,
+      EmployerProfile,
+    ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
