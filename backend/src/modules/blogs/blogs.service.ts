@@ -8,11 +8,11 @@ export class BlogsService {
   constructor(private readonly blogsRepository: BlogsRepository) {}
 
   /**
-   * Retrieve all blog posts
-   * @returns List of all blog posts
+   * Retrieve all blog posts with tags and category info
+   * @returns List of all blog posts with combined data
    */
-  async getAllBlogPosts(): Promise<BlogPosts[]> {
-    return this.blogsRepository.findAll();
+  async getAllBlogPosts(): Promise<any[]> {
+    return this.blogsRepository.findAllWithAggregation();
   }
 
   /**
@@ -27,6 +27,37 @@ export class BlogsService {
       throw new NotFoundException(`Blog post with ID ${id} not found`);
     }
     return blogPost;
+  }
+
+  /**
+   * Find a blog post by slug
+   * @param slug Slug of the blog post
+   * @returns Blog post
+   * @throws NotFoundException if the blog post does not exist
+   */
+  async getBlogPostBySlug(slug: string): Promise<BlogPosts> {
+    const blogPost = await this.blogsRepository.findBySlug(slug);
+    if (!blogPost) {
+      throw new NotFoundException(`Blog post with slug "${slug}" not found`);
+    }
+    return blogPost;
+  }
+
+  /**
+   * Get detailed blog post with all related data
+   * @param id ID of the blog post
+   * @returns Aggregated data including blog post, tags, category, author, comments
+   * @throws NotFoundException if the blog post does not exist
+   */
+  async getBlogPostDetail(id: string): Promise<any> {
+    const detailedBlogPost = await this.blogsRepository.findByIdWithFullAggregation(id);
+    if (!detailedBlogPost) {
+      throw new NotFoundException(`Blog post with ID ${id} not found`);
+    }
+    // Aggregate all related data in one query/response
+    // This includes tags, category, author, comments based on user requirements
+    // The method returns combined data with all relations
+    return detailedBlogPost;
   }
 
   /**

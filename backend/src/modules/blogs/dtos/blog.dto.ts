@@ -22,7 +22,7 @@ export class CreateBlogDto {
   coverImageUrl?: string;
 
   @IsUUID()
-  author: string;
+  authorId: string;
 
   @IsBoolean()
   @IsOptional()

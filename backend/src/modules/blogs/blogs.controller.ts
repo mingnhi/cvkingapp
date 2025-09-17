@@ -14,12 +14,12 @@ import { CreateBlogDto, UpdateBlogDto } from './dtos/blog.dto';
 import { BlogPosts } from '@entities/blog-post.entity';
 import { ApiResponse } from '@common/interfaces/api-response.interface';
 import { ApiTags } from '@nestjs/swagger';
-import { BlogsRepository } from './blogs.repository';
+import { BlogsService } from './blogs.service';
 
 @ApiTags('blogs')
 @Controller('blogs')
 export class BlogsController {
-  constructor(private readonly blogsRepository: BlogsRepository) {}
+  constructor(private readonly blogsService: BlogsService) {}
 
   /**
    * Retrieve all blog posts or search by title
@@ -29,10 +29,10 @@ export class BlogsController {
   @Get()
   async findAll(
     @Query('title') title?: string
-  ): Promise<ApiResponse<BlogPosts[]>> {
+  ): Promise<ApiResponse<any[]>> {
     const blogs = title
-      ? await this.blogsRepository.searchByTitle(title)
-      : await this.blogsRepository.findAll();
+      ? await this.blogsService.searchPostsByTitle(title)
+      : await this.blogsService.getAllBlogPosts();
     return {
       status: 'success',
       message: title
@@ -44,18 +44,33 @@ export class BlogsController {
   }
 
   /**
-   * Find a blog post by ID
-   * @param id ID of the blog post
+   * Find a blog post by slug
+   * @param slug Slug of the blog post
    * @returns Blog post wrapped in ApiResponse
+   */
+  @Get('slug/:slug')
+  async findBySlug(@Param('slug') slug: string): Promise<ApiResponse<any>> {
+    const blog = await this.blogsService.getBlogPostBySlug(slug);
+    return {
+      status: 'success',
+      message: `Successfully retrieved blog post with slug "${slug}"`,
+      data: blog,
+    };
+  }
+
+  /**
+   * Find a blog post by ID with detailed aggregated data
+   * @param id ID of the blog post
+   * @returns Detailed blog post data wrapped in ApiResponse
    */
   @Get(':id')
   async findOne(
     @Param('id', ParseUUIDPipe) id: string
-  ): Promise<ApiResponse<BlogPosts>> {
-    const blog = await this.blogsRepository.findOne(id);
+  ): Promise<ApiResponse<any>> {
+    const blog = await this.blogsService.getBlogPostDetail(id); // Using aggregated detail method
     return {
       status: 'success',
-      message: `Successfully retrieved blog post with ID ${id}`,
+      message: `Successfully retrieved detailed blog post with ID ${id}`,
       data: blog,
     };
   }
@@ -69,7 +84,7 @@ export class BlogsController {
   async create(
     @Body(ValidationPipe) createBlogDto: CreateBlogDto
   ): Promise<ApiResponse<BlogPosts>> {
-    const blog = await this.blogsRepository.create(createBlogDto);
+    const blog = await this.blogsService.createBlogPost(createBlogDto);
     return {
       status: 'success',
       message: 'Blog post created successfully',
@@ -86,7 +101,7 @@ export class BlogsController {
   async update(
     @Body(ValidationPipe) updateBlogDto: UpdateBlogDto
   ): Promise<ApiResponse<BlogPosts>> {
-    const blog = await this.blogsRepository.update(updateBlogDto);
+    const blog = await this.blogsService.updateBlogPost(updateBlogDto);
     return {
       status: 'success',
       message: `Blog post with ID ${updateBlogDto.id} updated successfully`,
@@ -103,7 +118,7 @@ export class BlogsController {
   async delete(
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<ApiResponse<null>> {
-    await this.blogsRepository.delete(id);
+    await this.blogsService.deleteBlogPost(id);
     return {
       status: 'success',
       message: `Blog post with ID ${id} deleted successfully`,
@@ -112,9 +127,9 @@ export class BlogsController {
   }
   //gộp chung
   @Get('posts')
-  async findAllBlogPosts(@Query('title') title?: string): Promise<BlogPosts[]> {
+  async findAllBlogPosts(@Query('title') title?: string): Promise<any[]> {
     return title
-      ? await this.blogsRepository.searchByTitle(title)
-      : await this.blogsRepository.findAll();
+      ? await this.blogsService.searchPostsByTitle(title)
+      : await this.blogsService.getAllBlogPosts();
   }
 }

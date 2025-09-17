@@ -1,9 +1,9 @@
 use JOB_PORTAL
 go
 
-create procedure [dbo].[SP_GetBlogById]
+create procedure [dbo].[SP_GetBlogBySlug]
 (
-    @id varchar(36)
+    @slug varchar(500)
 )
 as
 begin
@@ -28,7 +28,7 @@ begin
                 for json path
             ) as comments
         from BlogPosts bp
-        where bp.id = @id
+        where bp.slug = @slug
         for json path, without_array_wrapper
     ) as blogDetail
 end
