@@ -15,9 +15,11 @@ export class AccessTokenStrategy extends PassportStrategy(
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.JWT_ACCESS_SECRET || 'access_secret',
+      secretOrKey: configService.get<string>('JWT_ACCESS_SECRET') || 'access_secret',
       ignoreExpiration: false,
     });
+    console.log('verify secret', process.env.JWT_ACCESS_SECRET || 'access_secret');
+
   }
 
   async validate(payload: any) {
@@ -28,6 +30,6 @@ export class AccessTokenStrategy extends PassportStrategy(
     if (!user) {
       throw new UnauthorizedException('Người dùng không hợp lệ');
     }
-    return user;
+    return { ...user, roles: payload.roles };
   }
 }

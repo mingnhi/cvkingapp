@@ -21,15 +21,33 @@ export class AuthService {
     private readonly jwt: JwtService
   ) { }
   private async signTokens(userId: string, email: string) {
-    const payload = { sub: userId, email };
+    const userRoleEntities = await this.usersRoleService.findByUser(userId);
+
+    // Lấy tên role từ bảng Roles bằng RolesService
+    const roleNames = await Promise.all(
+      userRoleEntities.map(async ur => {
+        const role = await this.rolesService.findOne(ur.roleId); 
+        return role.roleName;                                    
+      }),
+    );
+
+    const payload = { sub: userId, email, roles: roleNames, type: 'access' };
+
     const accessToken = await this.jwt.signAsync(payload, {
       secret: process.env.JWT_ACCESS_SECRET || 'access_secret',
       expiresIn: process.env.JWT_ACCESS_EXPIRATION_TIME,
     });
-    const refreshToken = await this.jwt.signAsync(payload, {
-      secret: process.env.JWT_REFRESH_SECRET || 'refresh_secret',
-      expiresIn: process.env.JWT_REFRESH_EXPIRATION_TIME,
-    });
+    console.log('ACCESS_EXPIRE', process.env.JWT_ACCESS_EXPIRATION_TIME);
+    console.log('sign secret', process.env.JWT_ACCESS_SECRET || 'access_secret');
+
+
+    const refreshToken = await this.jwt.signAsync(
+      { ...payload, type: 'refresh' },
+      {
+        secret: process.env.JWT_REFRESH_SECRET || 'refresh_secret',
+        expiresIn: process.env.JWT_REFRESH_EXPIRATION_TIME,
+      },
+    );
     return { accessToken, refreshToken };
   }
   private async setRefreshToken(userId: string, token: string) {
@@ -38,8 +56,9 @@ export class AuthService {
   }
 
   async validateUser(userId: string) {
-    // ví dụ: tìm user theo id
+    console.log('validateUser id:', userId);
     const user = await this.usersService.getUserById(userId);
+    console.log('found user:', user);
     if (!user) {
       throw new NotFoundException(`User with id ${userId} not found`);
     }
@@ -59,7 +78,7 @@ export class AuthService {
       password: hashedPassword
     });
 
-    const jobSeekerRole = await this.rolesService.findByName('Admin');
+    const jobSeekerRole = await this.rolesService.findByName('JobSeeker');
     console.log("role" + jobSeekerRole.roleName)
 
     await this.usersRoleService.createUserRole({

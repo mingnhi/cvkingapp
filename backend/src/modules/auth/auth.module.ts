@@ -10,6 +10,11 @@ import { UsersModule } from '@modules/users/users.module';
 import { RolesModule } from '@modules/roles/roles.module';
 import { UserRolesModule } from '@modules/user_roles/user_roles.module';
 import { JwtService } from './services/jwt.service';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RolesGuard } from './guards/roles.guard';
+import { AccessTokenStrategy } from './strategies/access-token.strategy';
+import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 
 @Module({
   imports: [
@@ -17,7 +22,7 @@ import { JwtService } from './services/jwt.service';
     RolesModule,
     UserRolesModule,
     MikroOrmModule.forFeature([Users]),
-    PassportModule.register({ defaultStrategy: 'jwt-access' }),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -29,7 +34,12 @@ import { JwtService } from './services/jwt.service';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, JwtService],
+  providers: [
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+    AuthService,
+    JwtService,
+  ],
   controllers: [AuthController],
   exports:[AuthService, JwtService]
 })

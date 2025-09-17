@@ -9,12 +9,16 @@ import {
   ParseUUIDPipe,
   Put,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from '@modules/users/dtos/user.dto';
 import { Users } from '@entities/user.entity';
 import { ApiResponse } from '@common/interfaces/api-response.interface';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '@modules/auth/guards/roles.guard';
+import { Roles } from '@modules/auth/guards/roles.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -26,6 +30,8 @@ export class UsersController {
    * @returns List of all users wrapped in ApiResponse
    */
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin')
   async findAll(): Promise<ApiResponse<Users[]>> {
     const users = await this.usersService.getAllUsers();
     return {
@@ -69,6 +75,8 @@ export class UsersController {
    * @returns Updated user wrapped in ApiResponse
    */
   @Put()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin, JobSeeker')
   async update(
     @Param('id', ParseIntPipe) id: string,
     @Body() dto: UpdateUserDto,
@@ -82,6 +90,8 @@ export class UsersController {
    * @returns Success message wrapped in ApiResponse
    */
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin')
   async remove(@Param('id', ParseIntPipe) id: string): Promise<boolean> {
     return this.usersService.delete(id);
   }
