@@ -26,8 +26,8 @@ export class SavedJobsService {
 
     // Check if already saved
     const existingSavedJob = await this.savedJobsRepository.findOne({
-      job: parseInt(jobId),
-      jobSeeker: user.id,
+      jobId,
+      jobSeekerId: user.id,
     });
 
     if (existingSavedJob) {
@@ -35,8 +35,8 @@ export class SavedJobsService {
     }
 
     const savedJob = this.savedJobsRepository.create({
-      job,
-      jobSeeker: user,
+      jobId,
+      jobSeekerId: user.id,
     });
 
     await this.savedJobsRepository.persistAndFlush(savedJob);
@@ -51,15 +51,8 @@ export class SavedJobsService {
     const offset = (page - 1) * limit;
 
     const [savedJobs, total] = await this.savedJobsRepository.findAndCount(
-      { jobSeeker: user.id },
+      { jobSeekerId: user.id },
       {
-        populate: [
-          'job',
-          'job.company',
-          'job.category',
-          'job.skills',
-          'job.tags',
-        ],
         limit,
         offset,
         orderBy: { savedAt: 'DESC' },
@@ -70,21 +63,13 @@ export class SavedJobsService {
   }
 
   async findOne(id: string, user: Users): Promise<SavedJob> {
-    const savedJob = await this.savedJobsRepository.findOne(id, {
-      populate: [
-        'job',
-        'job.company',
-        'job.category',
-        'job.skills',
-        'job.tags',
-      ],
-    });
+    const savedJob = await this.savedJobsRepository.findOne(id);
 
     if (!savedJob) {
       throw new NotFoundException('Saved job not found');
     }
 
-    if (savedJob.jobSeeker.id !== user.id) {
+    if (savedJob.jobSeekerId !== user.id) {
       throw new NotFoundException('Saved job not found');
     }
 
@@ -98,8 +83,8 @@ export class SavedJobsService {
 
   async removeByJobId(jobId: string, user: Users): Promise<void> {
     const savedJob = await this.savedJobsRepository.findOne({
-      job: parseInt(jobId),
-      jobSeeker: user.id,
+      jobId,
+      jobSeekerId: user.id,
     });
 
     if (!savedJob) {
@@ -111,8 +96,8 @@ export class SavedJobsService {
 
   async isJobSaved(jobId: string, user: Users): Promise<boolean> {
     const savedJob = await this.savedJobsRepository.findOne({
-      job: parseInt(jobId),
-      jobSeeker: user.id,
+      jobId,
+      jobSeekerId: user.id,
     });
 
     return !!savedJob;

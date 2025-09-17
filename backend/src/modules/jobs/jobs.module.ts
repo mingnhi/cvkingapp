@@ -4,6 +4,8 @@ import { Job } from '../../entities/job.entity';
 import { JobCategory } from '../../entities/job-category.entity';
 import { Skill } from '../../entities/skill.entity';
 import { JobTag } from '../../entities/job-tag.entity';
+import { JobSkills } from '../../entities/job-skills.entity';
+import { JobJobTags } from '../../entities/job-job-tags.entity';
 import { Company } from '../../entities/company.entity';
 import { Users } from '../../entities/user.entity';
 import { JobsController } from './jobs.controller';
@@ -18,6 +20,8 @@ import { JobsRepository } from './jobs.repository';
       JobCategory,
       Skill,
       JobTag,
+      JobSkills,
+      JobJobTags,
       Company,
       Users,
     ]),

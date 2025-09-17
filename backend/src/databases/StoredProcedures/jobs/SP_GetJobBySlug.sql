@@ -1,9 +1,9 @@
 use JOB_PORTAL
 go
 
-create procedure [dbo].[SP_GetJobById]
+create procedure [dbo].[SP_GetJobBySlug]
 (
-    @JobId int
+    @slug nvarchar(300)
 )
 as
 begin
@@ -32,7 +32,7 @@ begin
                 for json path
             ) as skills
         from Jobs j
-        where j.JobId = @JobId
+        where j.Slug = @slug
         for json path, without_array_wrapper
     ) as jobDetail
 end

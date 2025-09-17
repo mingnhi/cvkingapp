@@ -2,6 +2,10 @@ import { EntityRepository, EntityManager } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
 import { Job } from '../../entities/job.entity';
+import { Skill } from '../../entities/skill.entity';
+import { JobTag } from '../../entities/job-tag.entity';
+import { JobSkills } from '../../entities/job-skills.entity';
+import { JobJobTags } from '../../entities/job-job-tags.entity';
 import { CreateJobDto } from './dtos/create-job.dto';
 
 interface UpdateJobDto {
@@ -47,20 +51,42 @@ export class JobsRepository {
    * @returns Created job
    */
   async create(createJobDto: CreateJobDto): Promise<Job> {
-    const result = await this.em
-      .getConnection()
-      .execute('EXEC SP_PostJob ?, ?, ?, ?, ?, ?, ?', [
-        createJobDto.title,
-        createJobDto.slug,
-        createJobDto.shortDescription,
-        createJobDto.description,
-        createJobDto.location,
-        createJobDto.salaryMin,
-        createJobDto.salaryMax,
-      ]);
+    const { skills, tags, ...jobData } = createJobDto;
 
-    const newJob = result?.[0] ?? result;
-    return newJob as Job;
+    const job = new Job();
+    Object.assign(job, jobData);
+
+    await this.em.persistAndFlush(job);
+
+    // Handle skills if provided
+    if (skills && skills.length > 0) {
+      for (const skillName of skills) {
+        const skill = await this.em.findOne(Skill, { Name: skillName });
+        if (skill) {
+          const jobSkill = new JobSkills();
+          jobSkill.JobId = job.JobId;
+          jobSkill.SkillId = (skill as Skill).SkillId;
+          await this.em.persist(jobSkill);
+        }
+      }
+    }
+
+    // Handle tags if provided
+    if (tags && tags.length > 0) {
+      for (const tagName of tags) {
+        const tag = await this.em.findOne(JobTag, { Name: tagName });
+        if (tag) {
+          const jobTag = new JobJobTags();
+          jobTag.JobId = job.JobId;
+          jobTag.JobTagId = (tag as JobTag).JobTagId;
+          await this.em.persist(jobTag);
+        }
+      }
+    }
+
+    await this.em.flush();
+
+    return job;
   }
 
   /**
@@ -120,5 +146,18 @@ export class JobsRepository {
    */
   async removeAndFlush(entity: any): Promise<void> {
     await this.em.removeAndFlush(entity);
+  }
+
+  /**
+   * Find a job by slug
+   * @param slug Slug of the job
+   * @returns Job or null if not found
+   */
+  async findBySlug(slug: string): Promise<Job | null> {
+    const result = await this.em
+      .getConnection()
+      .execute('EXEC SP_GetJobBySlug ?', [slug]);
+    const job = result?.[0] ?? result;
+    return job ?? null;
   }
 }

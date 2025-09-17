@@ -86,4 +86,19 @@ export class JobsController {
       data: null,
     };
   }
+
+  @Get('slug/:slug')
+  async findBySlug(
+    @Param('slug') slug: string
+  ): Promise<ApiResponse<Job>> {
+    const job = await this.jobsRepository.findBySlug(slug);
+    if (!job) {
+      throw new NotFoundException('Job not found');
+    }
+    return {
+      status: 'success',
+      message: 'Successfully retrieved job',
+      data: job,
+    };
+  }
 }

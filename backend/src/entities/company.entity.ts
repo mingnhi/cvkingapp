@@ -1,6 +1,5 @@
-import { Entity, ManyToOne, Property } from '@mikro-orm/core';
+import { Entity, Property } from '@mikro-orm/core';
 import { AuditableEntity } from './base/auditable_entity';
-import { Users } from './user.entity';
 
 @Entity({ tableName: 'Company' })
 export class Company extends AuditableEntity {
@@ -43,6 +42,6 @@ export class Company extends AuditableEntity {
   @Property({ type: 'string' })
   contactPhone: string;
 
-  @ManyToOne(() => Users, { nullable: true })
-  postedBy?: Users;
+  @Property({ type: 'string', nullable: true })
+  postedById?: string;
 }

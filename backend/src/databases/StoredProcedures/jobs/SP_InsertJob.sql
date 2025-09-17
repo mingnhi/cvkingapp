@@ -4,30 +4,30 @@ go
 create procedure [dbo].[SP_InsertJob]
 (
     @CompanyId int,
-    @PostedByUserId int,
-    @Title NVARCHAR(300),
-    @Slug NVARCHAR(300),
-    @ShortDescription NVARCHAR(1000),
-    @Description NVARCHAR(MAX),
-    @Requirements NVARCHAR(MAX),
-    @Benefits NVARCHAR(MAX),
-    @SalaryMin int,
-    @SalaryMax int,
-    @Currency NVARCHAR(10),
-    @JobType NVARCHAR(50),
-    @Location NVARCHAR(300),
-    @CategoryId int,
-    @Status NVARCHAR(50),
-    @ExpiresAt DATETIME2
+    @PostedByUserId int = null,
+    @Title nvarchar(300),
+    @Slug nvarchar(300),
+    @ShortDescription nvarchar(1000) = null,
+    @Description nvarchar(max) = null,
+    @Requirements nvarchar(max) = null,
+    @Benefits nvarchar(max) = null,
+    @SalaryMin int = null,
+    @SalaryMax int = null,
+    @Currency nvarchar(10) = null,
+    @JobType nvarchar(50) = null,
+    @Location nvarchar(300) = null,
+    @CategoryId int = null,
+    @Status nvarchar(50) = 'Active',
+    @ViewsCount int = 0,
+    @PostedAt datetime2 = null,
+    @ExpiresAt datetime2 = null
 )
 as
 begin
-    insert into Jobs 
-        (CompanyId, PostedByUserId, Title, Slug, ShortDescription, Description, Requirements, Benefits,
-         SalaryMin, SalaryMax, Currency, JobType, Location, CategoryId, Status, ViewsCount, PostedAt, ExpiresAt, CreatedAt)
-    values 
-        (@CompanyId, @PostedByUserId, @Title, @Slug, @ShortDescription, @Description, @Requirements, @Benefits,
-         @SalaryMin, @SalaryMax, @Currency, @JobType, @Location, @CategoryId, @Status, 0, SYSDATETIMEOFFSET(), @ExpiresAt, SYSDATETIMEOFFSET());
+    insert into Jobs(CompanyId, PostedByUserId, Title, Slug, ShortDescription, Description, Requirements, Benefits, SalaryMin, SalaryMax, Currency, JobType, Location, CategoryId, Status, ViewsCount, PostedAt, ExpiresAt)
+    values (@CompanyId, @PostedByUserId, @Title, @Slug, @ShortDescription, @Description, @Requirements, @Benefits, @SalaryMin, @SalaryMax, @Currency, @JobType, @Location, @CategoryId, @Status, @ViewsCount, ISNULL(@PostedAt, SYSUTCDATETIME()), @ExpiresAt)
 
-    SELECT * FROM Jobs WHERE JobId = SCOPE_IDENTITY();
+    declare @JobId int = SCOPE_IDENTITY()
+
+    select * from Jobs where JobId = @JobId
 end

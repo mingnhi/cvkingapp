@@ -28,8 +28,8 @@ export class JobApplicationsService {
 
     const jobApplication = this.jobApplicationsRepository.create({
       ...createJobApplicationDto,
-      job,
-      jobSeeker: user,
+      jobId: createJobApplicationDto.jobId,
+      jobSeekerId: user.id,
     });
 
     await this.jobApplicationsRepository.persistAndFlush(jobApplication);
