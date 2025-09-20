@@ -1,139 +1,70 @@
-"use-client";
-import { Card, CardContent, CardHeader, CardTitle } from '../../common/card/card';
+"use client";
 import {
     MapPin,
     DollarSign,
-   Search,
-    Clock,
     Trash2,
-    Building2,
-    Route,
+    Bookmark
 } from 'lucide-react';
-import { Button } from '../../common/button/button';
+import {
+    Card,
+    CardContent,
+    Typography,
+    Button,
+    Box,
+    Chip
+} from '@mui/material';
+import { mockSavedJobs } from '@/faker/user-data';
 import { useRouter } from 'next/navigation';
-import { Badge } from '@mui/material';
-
 const SavedJobs = () => {
-    const router = useRouter();
-    const mockSavedJobs = [
-        {
-            id: 1,
-            title: 'UI/UX Designer',
-            company: 'DesignHub',
-            location: 'Ho Chi Minh City',
-            salary: '$1200 - $2000',
-            postedDate: '2024-01-20',
-            tags: ['UI/UX', 'Figma', 'Adobe XD'],
-            description: 'Creative design role focusing on user experience...',
-            urgent: false
-        },
-        {
-            id: 2,
-            title: 'Backend Developer',
-            company: 'DataTech',
-            location: 'Hanoi',
-            salary: '$2000 - $3500',
-            postedDate: '2024-01-18',
-            tags: ['Node.js', 'MongoDB', 'AWS'],
-            description: 'Backend development for scalable applications...',
-            urgent: true
-        }
-    ];
-
-    const handleApplyToJob = (job: any) => {
-        // Create a mock job object and navigate to job detail
-        const jobDetail = {
-            id: job.id,
-            title: job.title,
-            company: job.company,
-            location: job.location,
-            salary: job.salary,
-            description: job.description,
-            tags: job.tags,
-            posted: job.postedDate,
-            type: 'Full-time',
-            experience: '2-5 years'
-        };
-        router.push('user/a/job-detail')
-    };
-
-                return (
-                    <div className="space-y-6 ">
-                        <div className="flex items-center justify-between">
-                            <h1>Việc đã lưu ({mockSavedJobs.length})</h1>
-                            <Button variant="outline" onClick={() => navigateTo('jobs')}>
-                                <Search className="w-4 h-4 mr-2" />
-                                Tìm việc                             </Button>
-                        </div>
-
-                        <div className="space-y-4 mb-8">
-                            {mockSavedJobs.map((job) => (
-                                <Card key={job.id} className="hover:shadow-md transition-shadow mt-8">
-                                    <CardContent className="p-6 mt-8">
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex-1">
-                                                <div className="flex items-center space-x-2 mb-2">
-                                                    <h3 className="cursor-pointer hover:text-primary" onClick={() => handleApplyToJob(job)}>
-                                                        {job.title}
-                                                    </h3>
-                                                    {job.urgent && <Badge className="bg-red-100 text-red-700">URGENT</Badge>}
-                                                </div>
-                                                <div className="flex items-center text-sm text-gray-600 space-x-4 mb-3">
-                                                    <div className="flex items-center">
-                                                        <Building2 className="w-4 h-4 mr-1" />
-                                                        {job.company}
-                                                    </div>
-                                                    <div className="flex items-center">
-                                                        <MapPin className="w-4 h-4 mr-1" />
-                                                        {job.location}
-                                                    </div>
-                                                    <div className="flex items-center">
-                                                        <DollarSign className="w-4 h-4 mr-1" />
-                                                        {job.salary}
-                                                    </div>
-                                                    <div className="flex items-center">
-                                                        <Clock className="w-4 h-4 mr-1" />
-                                                        {job.postedDate}
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-wrap gap-2 mb-4">
-                                                    {job.tags.map((tag) => (
-                                                        <Badge key={tag} variant="secondary">{tag}</Badge>
-                                                    ))}
-                                                </div>
-                                                <p className="text-sm text-gray-600 mb-4">{job.description}</p>
-                                            </div>
-                                            <div className="flex flex-col space-y-2 ml-4">
-                                                <Button size="sm" onClick={() => handleApplyToJob(job)} className="bg-primary hover:bg-primary/90">
-                                                 Ứng tuyển ngay
-                                                </Button>
-                                                <Button variant="outline" size="sm" onClick={() => handleRemoveSavedJob(job.id)}>
-                                                    <Trash2 className="w-4 h-4 mr-2" />
-                                                    Loại bỏ 
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-
-                        {mockSavedJobs.length === 0 && (
-                            <Card>
-                                <CardContent className="p-12 text-center">
-                                    <Bookmark className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                    <h3 className="mb-2">No saved jobs yet</h3>
-                                    <p className="text-gray-600 mb-4">
-                                        Start saving jobs you're interested in to keep track of opportunities.
-                                    </p>
-                                    <Button variant="outline" onClick={() => navigateTo('jobs')}>
-                                        Browse Jobs
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        )}
-                    </div>
-                );
-
+const route = useRouter();
+    return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Typography variant="h4" component="h1" fontWeight="bold">Việc làm đã lưu</Typography>
+            {mockSavedJobs.length > 0 ? (
+                mockSavedJobs.map((job) => (
+                    <Card key={job.id} sx={{ borderRadius: "12px", border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+                        <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <div>
+                                    {job.urgent && <Chip label="Gấp" color="error" size="small" sx={{ mb: 1 }} />}
+                                    <Typography variant="h6" component="h2" fontWeight="600">{job.title}</Typography>
+                                    <Typography variant="body2" color="text.secondary">{job.company}</Typography>
+                                    <Box sx={{ display: 'flex', gap: 2, mt: 0.5, color: 'text.secondary' }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><MapPin size={14} />{job.location}</Box>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><DollarSign size={14} />{job.salary}</Box>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
+                                        {job.tags.map(tag => <Chip key={tag} label={tag} size="small" variant="outlined" />)}
+                                    </Box>
+                                </div>
+                                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1, alignItems: 'flex-end' }}>
+                                    <Button size="small" variant="contained" sx={{ textTransform: 'none', bgcolor: "#000000", "&:hover": { bgcolor: "#333333" } }}>Ứng tuyển</Button>
+                                    <Button size="small" startIcon={<Trash2 size={16} />} sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary" }}>Bỏ lưu</Button>
+                                </Box>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                ))
+            ) : (
+                <Card sx={{ borderRadius: "12px", border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+                    <CardContent sx={{ p: 6, textAlign: 'center' }}>
+                        <Bookmark size={48} style={{ margin: '0 auto 16px', color: '#9e9e9e' }} />
+                        <Typography variant="h6" component="h3" sx={{ mb: 1 }}>Chưa có việc làm nào được lưu</Typography>
+                        <Typography color="text.secondary" sx={{ mb: 2 }}>
+                            Bắt đầu lưu các công việc bạn quan tâm để theo dõi cơ hội.
+                        </Typography>
+                        <Button
+                            variant="outlined"
+                            onClick={() => navigateTo('jobs')}
+                            sx={{ textTransform: 'none', color: "text.primary", borderColor: 'divider' }}
+                        >
+                            Xem danh sách việc làm
+                        </Button>
+                    </CardContent>
+                </Card>
+            )}
+        </Box>
+    );
 };
+
 export default SavedJobs;

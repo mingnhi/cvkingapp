@@ -8,121 +8,189 @@ import {
     Send,
     Settings,
     Menu,
-    ArrowLeft,
+    LogOut
 } from 'lucide-react';
-import { Button } from '../../common/button/button';
+import {
+    Box,
+    Drawer,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Toolbar,
+    AppBar,
+    IconButton,
+    Typography,
+    CssBaseline,
+    Divider,
+    useTheme,
+    useMediaQuery
+} from '@mui/material';
 import MyProfile from './MyProfile';
 import MyCv from './MyCv';
 import SavedJobs from './SavedJobs';
-import MyApplycation from './MyApplycation';
+import MyApplication from './MyApplycation';
 import MySettings from './Settings';
+
+const drawerWidth = 240; // Chiều rộng của thanh sidebar
+
 const JobSeekerDashboard = () => {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('profile');
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const theme = useTheme();
+    const isLgUp = useMediaQuery(theme.breakpoints.up('lg'));
+
+    const handleDrawerToggle = () => {
+        setMobileOpen(!mobileOpen);
+    };
 
     const navigationItems = [
         { id: 'profile', label: 'Thông tin cá nhân', icon: User },
-        { id: 'cv', label: 'Hồ sơ của tôi', icon: FileText },
-        { id: 'saved', label: 'Công việc đã lưu', icon: Bookmark },
-        { id: 'application', label: 'Ứng dụng', icon: Send },
+        { id: 'cv', label: 'Quản lý CV', icon: FileText },
+        { id: 'saved', label: 'Việc làm đã lưu', icon: Bookmark },
+        { id: 'application', label: 'Việc đã ứng tuyển', icon: Send },
         { id: 'settings', label: 'Cài đặt', icon: Settings },
     ];
+
+    // Nội dung của thanh sidebar
+    const drawerContent = (
+        <div className="mt-15">
+
+            <Toolbar sx={{ justifyContent: 'center', py: 2  }}>
+                <Typography variant="h5" fontWeight="bold" color="primary">
+                    Dashboard
+                </Typography>
+            </Toolbar>
+            <Divider />
+            <List>
+                {navigationItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                        <ListItem key={item.id} disablePadding>
+                            <ListItemButton
+                                selected={activeTab === item.id}
+                                onClick={() => {
+                                    setActiveTab(item.id);
+                                    if (!isLgUp) setMobileOpen(false); // Đóng sidebar trên mobile sau khi chọn
+                                }}
+                                sx={{ my: 0.5, mx: 1, borderRadius: 1 }}
+                            >
+                                <ListItemIcon>
+                                    <Icon size={20} />
+                                </ListItemIcon>
+                                <ListItemText primary={item.label} />
+                            </ListItemButton>
+                        </ListItem>
+                    );
+                })}
+            </List>
+            <Box sx={{ position: 'absolute', bottom: 0, width: '100%' }}>
+                <Divider />
+                <List>
+                    <ListItem disablePadding>
+                        <ListItemButton sx={{ my: 0.5, mx: 1, borderRadius: 1 }}>
+                            <ListItemIcon>
+                                <LogOut size={20} />
+                            </ListItemIcon>
+                            <ListItemText primary="Đăng xuất" />
+                        </ListItemButton>
+                    </ListItem>
+                </List>
+            </Box>
+        </div>
+    );
+
     const renderContent = () => {
         switch (activeTab) {
-            case 'profile':
-                return (<MyProfile />);
-            case 'cv':
-                return (<MyCv />);
-            case 'saved':
-                return (<SavedJobs />);
-            case 'application':
-                return (<MyApplycation />);
-            case 'settings':
-                return (<MySettings />);
-            default:
-                return <div>Page not found</div>;
+            case 'profile': return <MyProfile />;
+            case 'cv': return <MyCv />;
+            case 'saved': return <SavedJobs />;
+            case 'application': return <MyApplication />;
+            case 'settings': return <MySettings />;
+            default: return <div>Trang không tồn tại</div>;
         }
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Mobile sidebar overlay */}
-            {sidebarOpen && (
-                <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-                    onClick={() => setSidebarOpen(false)}
-                />
-            )}
-            <div className='flex'>
-                {/* Sidebar */}
-                <div className={`fixed inset-y-0 mt-8 ml-4 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                    }
-sx={{ maxHeight: 'none', overflow: 'visible' }}
+        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'grey.50', marginTop: '5vh' }}>
+            <CssBaseline />
 
-`}
+            {/* Header trên mobile */}
+            <AppBar
+                position="fixed"
+                sx={{
+                    width: { lg: `calc(100% - ${drawerWidth}px)` },
+                    ml: { lg: `${drawerWidth}px` },
+                    display: { lg: 'none' }, // Chỉ hiển thị trên mobile
+                    bgcolor: 'background.paper',
+                    color: 'text.primary'
+                }}
+            >
+                <Toolbar>
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        edge="start"
+                        onClick={handleDrawerToggle}
+                        sx={{ mr: 2 }}
+                    >
+                        <Menu />
+                    </IconButton>
+                    <Typography variant="h6" noWrap component="div">
+                        {navigationItems.find(item => item.id === activeTab)?.label}
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+
+            {/* Thanh Sidebar */}
+            <Box
+                component="nav"
+                sx={{ width: { lg: drawerWidth }, flexShrink: { lg: 0 } }}
+            >
+                {/* Sidebar cho mobile (hiện ra khi bấm nút) */}
+                <Drawer
+                    variant="temporary"
+                    open={mobileOpen}
+                    onClose={handleDrawerToggle}
+                    ModalProps={{ keepMounted: true }}
+                    sx={{
+                        display: { xs: 'block', lg: 'none' },
+                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+                    }}
                 >
-                    <div className="flex items-center justify-between p-6 border-b">
-                        <div className="flex items-center space-x-2">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => router.back('')}
-                                className="mr-2">
-                                <ArrowLeft className="w-4 h-4" />
-                            </Button>
-                            <h2>Dashboard</h2>
-                        </div>
-                                          </div>
-                    <nav sx={{ position: "fixed", top: 20, left: 20, width: 256, p: 2 }}>
-                        {navigationItems.map((item) => {
-                            const Icon = item.icon;
-                            return (
-                                <button
-                                    key={item.id}
-                                    onClick={() => {
-                                        setActiveTab(item.id);
-                                        setSidebarOpen(false);
-                                    }}
-                                    className={`w-full flex items-center px-6 py-3 text-left hover:bg-gray-100 transition-colors ${activeTab === item.id ? 'bg-orange-50 text-primary border-r-2 border-primary' : 'text-gray-700'
-                                        }`}
-                                >
-                                    <Icon className="w-5 h-5 mr-3" />
-                                    {item.label}
-                                </button>
-                            );
-                        })}
-                    </nav>
-                </div>
+                    {drawerContent}
+                </Drawer>
+                {/* Sidebar cho desktop (luôn hiển thị) */}
+                <Drawer
+                    variant="permanent"
+                    sx={{
+                        display: { xs: 'none', lg: 'block' },
+                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+                    }}
+                    open
+                >
+                    {drawerContent}
+                </Drawer>
+            </Box>
 
-                {/* Main content */}
-                <div className="lg:ml-20 w-full ">
-                    {/* Mobile header */}
-                    <div className=" lg:hidden flex items-center justify-between p-4 bg-white border-b">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSidebarOpen(true)}
-                        >
-                            <Menu className="w-5 h-5" />
-                        </Button>
-                        <h1>Dashboard</h1>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => router.back('home')}
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </Button>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6 w-full">
-                        {renderContent()}
-                    </div>
-                </div>
-            </div>
-        </div>
+            {/* Nội dung chính (có thể cuộn) */}
+            <Box
+                component="main"
+                sx={{
+                    flexGrow: 1,
+                    p: 3,
+                    width: { lg: `calc(100% - ${drawerWidth}px)` },
+                    mt: { xs: '64px', lg: 0 }, 
+                    height: '100vh',
+                    overflow: 'auto'
+                }}
+            >
+                {renderContent()}
+            </Box>
+        </Box>
     );
 };
+
 export default JobSeekerDashboard;
