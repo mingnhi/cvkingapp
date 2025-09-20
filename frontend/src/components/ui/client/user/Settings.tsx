@@ -1,99 +1,82 @@
-"use-client";
-import { Card, CardContent, CardHeader, CardTitle } from '../../common/card/card';
-import { Separator } from '../../common/separator/separator';
-import { Button } from '../../common/button/button';
+"use client";
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    Typography,
+    Button,
+    Box,
+    Divider,
+    FormControlLabel,
+    Switch
+} from '@mui/material';
+//t
 const MySettings = () => {
-                return (
-                    <div className="space-y-6">
-                        <div className="grid gap-6">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Cấu hình tài khoản</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div>
-                                        <label className="text-sm font-medium">
-                                </label>
-                                        <p className="text-sm text-gray-600">nguyen.van.a@email.com</p>
-                                        <Button variant="outline" size="sm" className="mt-2">Thay đổi Email</Button>
-                                    </div>
-                                    <Separator />
-                                    <div>
-                                        <label className="text-sm font-medium">
-                            Mật khẩu</label>
-                                        <p className="text-sm text-gray-600">••••••••</p>
-                                        <Button variant="outline" size="sm" className="mt-2">
-                                Thay đổi mật khẩu</Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
+    return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Typography variant="h4" component="h1" fontWeight="bold">Cài đặt</Typography>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle> Cấu hình thông báo</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="font-medium">Gợi ý việc làm</p>
-                                            <p className="text-sm text-gray-600">Nhận đề xuất công việc</p>
-                                        </div>
-                                        <Button variant="outline" size="sm">Cấu hình</Button>
-                                    </div>
-                                    <Separator />
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="font-medium">Application Updates</p>
-                                            <p className="text-sm text-gray-600">Get notified about application status changes</p>
-                                        </div>
-                                        <Button variant="outline" size="sm">Cấu hình</Button>
-                                    </div>
-                                    <Separator />
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="font-medium">Interview Reminders</p>
-                                            <p className="text-sm text-gray-600">Receive reminders for upcoming interviews</p>
-                                        </div>
-                                        <Button variant="outline" size="sm">Cấu hình</Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Privacy Settings</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="font-medium">Profile Visibility</p>
-                                            <p className="text-sm text-gray-600">Control who can see your profile</p>
-                                        </div>
-                                        <Button variant="outline" size="sm">Manage</Button>
-                                    </div>
-                                    <Separator />
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="font-medium">Data Export</p>
-                                            <p className="text-sm text-gray-600">Download a copy of your data</p>
-                                        </div>
-                                        <Button variant="outline" size="sm">Export</Button>
-                                    </div>
-                                    <Separator />
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="font-medium">Xóa tài khoản</p>
-                                            <p className="text-sm text-gray-600">Toàn bộ dữ liệu về tài khoản bạn sẽ bị xóa</p>
-                                        </div>
-                                        <Button variant="outline" size="sm" className="text-red-600 hover:bg-red-50">
-                                            
-                                Xóa
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
+            <Card sx={{ borderRadius: "12px", border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+                <CardHeader title="Cài đặt tài khoản" />
+                <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {/* Email Setting */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <Typography fontWeight="medium">Email</Typography>
+                            <Typography variant="body2" color="text.secondary">nguyen.van.a@email.com</Typography>
                         </div>
-                    </div>
-                );
-}
+                        <Button size="small" sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary" }}>Thay đổi Email</Button>
+                    </Box>
+                    <Divider />
+                    {/* Password Setting */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <Typography fontWeight="medium">Mật khẩu</Typography>
+                            <Typography variant="body2" color="text.secondary">••••••••</Typography>
+                        </div>
+                        <Button size="small" sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary" }}>Đổi mật khẩu</Button>
+                    </Box>
+                </CardContent>
+            </Card>
+
+            <Card sx={{ borderRadius: "12px", border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+                <CardHeader title="Thông báo" />
+                <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <FormControlLabel control={<Switch defaultChecked />} label="Thông báo việc làm mới" />
+                    <FormControlLabel control={<Switch />} label="Thông báo từ nhà tuyển dụng" />
+                    <FormControlLabel control={<Switch defaultChecked />} label="Bản tin hàng tuần" />
+                </CardContent>
+            </Card>
+
+            <Card sx={{ borderRadius: "12px", border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+                <CardHeader title="Dữ liệu & Quyền riêng tư" />
+                <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <Typography fontWeight="medium">Xuất dữ liệu</Typography>
+                            <Typography variant="body2" color="text.secondary">Tải xuống bản sao dữ liệu của bạn</Typography>
+                        </div>
+                        <Button size="small" sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary" }}>Xuất file</Button>
+                    </Box>
+                    <Divider />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <Typography fontWeight="medium" color="error">Xóa tài khoản</Typography>
+                            <Typography variant="body2" color="text.secondary">Toàn bộ dữ liệu về tài khoản sẽ bị xóa vĩnh viễn.</Typography>
+                        </div>
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            color="error"
+                            sx={{ textTransform: 'none' }}
+                        >
+                            Xóa
+                        </Button>
+                    </Box>
+                </CardContent>
+            </Card>
+        </Box>
+    );
+};
+
 export default MySettings;
