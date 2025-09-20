@@ -1,135 +1,80 @@
-"use-client";
+"use client";
 import {
     Download,
     Edit,
     Trash2,
     Eye,
     Plus,
-    Share2
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../common/card/card';
-import { Button } from '../../common/button/button';
-import { Badge } from '@mui/material';
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    Typography,
+    Button,
+    Box,
+    Chip
+} from '@mui/material';
 import { useApp } from '@/components/AppContext';
+//a
 const MyCv = () => {
-
     const { navigateTo } = useApp();
-    const handleCreateCV = () => {
-        navigateTo('cv');
-    };
+    const handleCreateCV = () => navigateTo('cv-builder');
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h1>Hồ sơ của tôi</h1>
-                <Button onClick={handleCreateCV} className="bg-primary hover:bg-primary/90">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Tạo hồ sơ mới 
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h4" component="h1" fontWeight="bold">Quản lý CV</Typography>
+                <Button
+                    onClick={handleCreateCV}
+                    variant="contained"
+                    startIcon={<Plus size={16} />}
+                    sx={{ textTransform: 'none', bgcolor: "#000000", "&:hover": { bgcolor: "#333333" } }}
+                >
+                    Tạo CV mới
                 </Button>
-            </div>
+            </Box>
 
-            <div className="grid md:grid-cols-2 gap-6">
-                <Card className="hover:shadow-md transition-shadow">
-                    <CardHeader>
-                        <CardTitle className="flex items-center justify-between">
-                            <span>Frontend Developer CV</span>
-                            <Badge variant="secondary" className="bg-green-100 text-green-800">Đang hoạt động </Badge>
-                        </CardTitle>
-                    </CardHeader>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
+                <Card sx={{ borderRadius: "12px", border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+                    <CardHeader
+                        title="CV Lập trình viên Frontend"
+                        action={<Chip label="Đang hoạt động" color="success" size="small" />}
+                        sx={{ pb: 0 }}
+                    />
                     <CardContent>
-                        <p className="text-sm text-gray-600 mb-4">Cập nhật lần cuối : 10/10/2025</p>
-                        <div className="flex flex-wrap gap-2">
-                            <Button variant="outline" size="sm">
-                                <Eye className="w-4 h-4 mr-2" />
-                                Xem trước
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                <Download className="w-4 h-4 mr-2" />
-                                Tải xuống
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={handleCreateCV}>
-                                <Edit className="w-4 h-4 mr-2" />
-                                Chỉnh sửa
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                <Share2 className="w-4 h-4 mr-2" />
-                                Chia sẻ
-                            </Button>
-                        </div>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                            Cập nhật lần cuối: 10/10/2025
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                            <Button size="small" startIcon={<Eye size={16} />} sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary" }}>Xem</Button>
+                            <Button size="small" startIcon={<Edit size={16} />} sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary" }}>Sửa</Button>
+                            <Button size="small" startIcon={<Download size={16} />} sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary" }}>Tải xuống</Button>
+                            <Button size="small" startIcon={<Trash2 size={16} />} sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "error.main" }}>Xóa</Button>
+                        </Box>
                     </CardContent>
                 </Card>
 
-                <Card className="hover:shadow-md transition-shadow">
-                    <CardHeader>
-                        <CardTitle className="flex items-center justify-between">
-                            <span>Full Stack Developer CV</span>
-                            <Badge variant="secondary">Draft</Badge>
-                        </CardTitle>
-                    </CardHeader>
+                <Card sx={{ borderRadius: "12px", border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+                    <CardHeader
+                        title="CV Fullstack Developer (Tiếng Anh)"
+                        action={<Chip label="Bản nháp" color="default" size="small" />}
+                        sx={{ pb: 0 }}
+                    />
                     <CardContent>
-                        <p className="text-sm text-gray-600 mb-4">Last updated: January 15, 2024</p>
-                        <div className="flex space-x-2">
-                            <Button variant="outline" size="sm" onClick={handleCreateCV}>
-                                <Edit className="w-4 h-4 mr-2" />
-                                Continue Editing
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                Delete
-                            </Button>
-                        </div>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                            Cập nhật lần cuối: 05/09/2025
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                            <Button size="small" startIcon={<Eye size={16} />} sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary" }}>Xem</Button>
+                            <Button size="small" startIcon={<Edit size={16} />} sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary" }}>Sửa</Button>
+                            <Button size="small" startIcon={<Download size={16} />} sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary" }}>Tải xuống</Button>
+                            <Button size="small" startIcon={<Trash2 size={16} />} sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "error.main" }}>Xóa</Button>
+                        </Box>
                     </CardContent>
                 </Card>
-            </div>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>CV Templates</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-gray-600 mb-4">Choose from our professional CV templates to create a standout resume.</p>
-                    <Button variant="outline" onClick={handleCreateCV}>
-                        Browse Templates
-                    </Button>
-                </CardContent>
-            </Card>
-
-            {/* CV Tips */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>CV Tips & Tricks</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <h4 className="font-medium">Essential Sections</h4>
-                            <ul className="text-sm text-gray-600 space-y-1">
-                                <li>• Professional summary</li>
-                                <li>• Work experience</li>
-                                <li>• Skills and competencies</li>
-                                <li>• Education background</li>
-                            </ul>
-                        </div>
-                        <div className="space-y-2">
-                            <h4 className="font-medium">Best Practices</h4>
-                            <ul className="text-sm text-gray-600 space-y-1">
-                                <li>• Keep it concise (1-2 pages)</li>
-                                <li>• Use action verbs</li>
-                                <li>• Quantify achievements</li>
-                                <li>• Proofread carefully</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="mt-4">
-                        <Button variant="outline" onClick={() => navigateTo('blog')}>
-                            Read More CV Tips
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
+            </Box>
+        </Box>
     );
-    ;
-
 };
 export default MyCv;
