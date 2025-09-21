@@ -22,16 +22,12 @@ import {
     CircularProgress
 } from '@mui/material';
 
-// Giả lập hàm toast để thông báo
 const toast = (message: string) => alert(message);
 
 const EditProfilePage = () => {
     const router = useRouter();
 
-    // 1. LOẠI BỎ useApp:
-    // Thay vì dùng context, ta dùng state cục bộ để quyết định giao diện.
-    // Bạn có thể dễ dàng thay đổi giá trị này dựa trên dữ liệu người dùng thực tế.
-    const [isEmployer, setIsEmployer] = useState(false); // true: Giao diện Nhà tuyển dụng, false: Giao diện Người tìm việc
+   const [isEmployer, setIsEmployer] = useState(false); // true: Giao diện Nhà tuyển dụng, false: Giao diện Người tìm việc
 
     // 2. STATE DỮ LIỆU VÀ GIAO DIỆN (Đã Việt hóa và giữ lại)
     const [jobSeekerData, setJobSeekerData] = useState({ name: 'Nguyễn Văn An', email: 'nguyen.van.a@email.com', phone: '0987 654 321', title: 'Lập trình viên Frontend Senior', summary: 'Lập trình viên Frontend chuyên nghiệp...', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' });
@@ -57,7 +53,7 @@ const EditProfilePage = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                         <Button onClick={handleCancel} sx={{ textTransform: 'none', color: "text.primary", "&:hover": { bgcolor: "action.hover" }, mr: 2 }}>
-                            <ArrowLeft size={16} style={{ marginRight: '8px' }}/>
+                            <ArrowLeft size={16} style={{ marginRight: '8px' }} />
                             Quay lại
                         </Button>
                         <Box>
@@ -81,7 +77,7 @@ const EditProfilePage = () => {
                             "&.Mui-disabled": { bgcolor: "grey.300", color: "grey.500" }
                         }}
                     >
-                        {isLoading ? <CircularProgress size={24} color="inherit" /> : <><Save size={16} style={{ marginRight: '8px' }}/> Lưu thay đổi</>}
+                        {isLoading ? <CircularProgress size={24} color="inherit" /> : <><Save size={16} style={{ marginRight: '8px' }} /> Lưu thay đổi</>}
                     </Button>
                 </Box>
 
@@ -98,7 +94,7 @@ const EditProfilePage = () => {
                             </Box>
                         </Box>
                         <Box>
-                             <Button component="label" htmlFor="avatar-upload" startIcon={<Upload size={16}/>} sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary", "&:hover": { bgcolor: "action.hover" } }}>
+                            <Button component="label" htmlFor="avatar-upload" startIcon={<Upload size={16} />} sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary", "&:hover": { bgcolor: "action.hover" } }}>
                                 Tải ảnh lên
                             </Button>
                             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
@@ -112,7 +108,7 @@ const EditProfilePage = () => {
                     // Form cho Nhà Tuyển Dụng
                     <Card sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
                         <CardHeader title="Thông tin công ty" />
-                        <CardContent sx={{ display: 'grid', gridTemplateColumns: {xs: '1fr', sm: '1fr 1fr'}, gap: 2 }}>
+                        <CardContent sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
                             <Box><FormLabel sx={{ display: 'block', mb: 1 }}>Tên công ty</FormLabel><TextField fullWidth value={employerData.companyName} onChange={(e) => handleEmployerChange('companyName', e.target.value)} /></Box>
                             <Box><FormLabel sx={{ display: 'block', mb: 1 }}>Người liên hệ</FormLabel><TextField fullWidth value={employerData.contactName} onChange={(e) => handleEmployerChange('contactName', e.target.value)} /></Box>
                             <Box><FormLabel sx={{ display: 'block', mb: 1 }}>Email</FormLabel><TextField fullWidth type="email" value={employerData.email} onChange={(e) => handleEmployerChange('email', e.target.value)} /></Box>
@@ -125,7 +121,7 @@ const EditProfilePage = () => {
                     <>
                         <Card sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', boxShadow: 'none', mb: 3 }}>
                             <CardHeader title="Thông tin cá nhân" />
-                            <CardContent sx={{ display: 'grid', gridTemplateColumns: {xs: '1fr', sm: '1fr 1fr'}, gap: 2 }}>
+                            <CardContent sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
                                 <Box><FormLabel sx={{ display: 'block', mb: 1 }}>Họ và Tên</FormLabel><TextField fullWidth value={jobSeekerData.name} onChange={(e) => handleJobSeekerChange('name', e.target.value)} /></Box>
                                 <Box><FormLabel sx={{ display: 'block', mb: 1 }}>Chức danh</FormLabel><TextField fullWidth value={jobSeekerData.title} onChange={(e) => handleJobSeekerChange('title', e.target.value)} /></Box>
                                 <Box><FormLabel sx={{ display: 'block', mb: 1 }}>Email</FormLabel><TextField fullWidth type="email" value={jobSeekerData.email} onChange={(e) => handleJobSeekerChange('email', e.target.value)} /></Box>
@@ -134,14 +130,14 @@ const EditProfilePage = () => {
                             </CardContent>
                         </Card>
                         <Card sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
-                           <CardHeader title="Kỹ năng" />
-                           <CardContent>
+                            <CardHeader title="Kỹ năng" />
+                            <CardContent>
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>{skills.map(skill => <Chip key={skill} label={skill} onDelete={() => removeSkill(skill)} />)}</Box>
                                 <Box sx={{ display: 'flex', gap: 2 }}>
                                     <TextField fullWidth placeholder="Thêm một kỹ năng" value={newSkill} onChange={e => setNewSkill(e.target.value)} onKeyPress={e => e.key === 'Enter' && addSkill()} />
-                                    <Button onClick={addSkill} sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary", minWidth: 'auto', px: 2 }}><Plus size={16}/></Button>
+                                    <Button onClick={addSkill} sx={{ textTransform: 'none', border: '1px solid', borderColor: 'divider', color: "text.primary", minWidth: 'auto', px: 2 }}><Plus size={16} /></Button>
                                 </Box>
-                           </CardContent>
+                            </CardContent>
                         </Card>
                     </>
                 )}
