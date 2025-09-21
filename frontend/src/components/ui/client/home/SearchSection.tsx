@@ -3,23 +3,8 @@
 import { ArrowRight } from "lucide-react";
 
 import React, { useState, useRef } from "react";
-import { Box, ClickAwayListener, Portal, Paper } from "@mui/material";
-import { Button } from "@/components/ui/button"
-import {
-    BriefcaseBusiness,
-    ChartNoAxesCombined,
-    ChevronsRight,
-    List,
-    Search,
-} from "lucide-react";
-import HeroSlider from "@/components/ui/common/HeroSlider";
-
-import ImageBanner1 from "@/assets/images/banner5.png";
-import ImageBanner2 from "@/assets/images/banner6.png";
-import ImageBanner3 from "@/assets/images/banner7.png";
-import image from "@/assets/images/banner11.png";
 import Link from "next/link";
-
+import { Button } from "@mui/material";
 const SearchSection: React.FC = () => {
     const [statsData, setStatsData] = useState([
         {
@@ -64,7 +49,7 @@ const SearchSection: React.FC = () => {
         },
 
     ]);
-    const StatsCard = ({ card }: { card: any }) => {
+    const StatsCard = ({ card }) => {
         return (
             <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6 border border-gray-100 w-[200px] h-[200px] ml-[15px] mr-[15px]">
                 <div className="flex flex-col items-center text-center h-full justify-center">
@@ -84,74 +69,43 @@ const SearchSection: React.FC = () => {
     };
 
     return (
-        <div className="w-full mx-auto py-16 bg-[#FBE4B2] min-h-[700px]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Banner */}
-                <div className="flex justify-center mb-6">
-                    <div className="bg-[#FFD09B] rounded-full px-8 py-3">
-                        <p className="text-lg font-bold text-gray-800">
-                            Tìm việc làm nhanh, việc làm mới trên toàn quốc
-                        </p>
-                    </div>
-                </div>
+        <div
+            className="w-full mx-auto py-5 px-6 h-[708px] bg-[#FBE4B2]"
 
-                {/* Main Heading */}
-                <div className="text-center mb-6">
-                    <h1 className="text-5xl font-bold text-gray-800 leading-tight">
+        >
+            <div className="ml-[389px] mt-[64px] w-[754px] h-[54px] rounded-[50px] bg-[#FFD09B] flex items-center justify-center">
+
+                <p className="text-[20] font-bold">Tim viec lam nhanh , viec lam moi tren toan quoc </p>
+            </div>
+            <div className="mt-[21px] ml-[267px] w-[998px] h-[100px]">
+                <div className="text-center">
+                    <p className="text-[50px] font-bold text-gray-800" style={{ letterSpacing: "0.1px", lineHeight: "50px", }}>
                         Tiếp cận{' '}
-                        <span className="text-5xl font-bold bg-gradient-to-r from-[#CD6D00] via-[#CD6D00] to-[#FF0000] bg-clip-text text-transparent">
-                            60,000+
-                        </span>{' '}
+                        <span className="text-[50px] font-bold" style={{
+                            background: 'linear-gradient(90deg, #CD6D00 0%, #CD6D00 85%, #FF0000 91%, #FF0000 100%)',
+                            WebkitBackgroundClip: 'text',
+                            color: 'transparent'
+                        }}>60,000+</span>{' '}
                         cơ hội việc làm từ hàng nghìn doanh nghiệp tại Việt Nam
-                    </h1>
-                </div>
-
-                {/* Subtitle */}
-                <div className="text-center mb-8">
-                    <p className="text-xl text-gray-700 max-w-4xl mx-auto">
-                        Tìm việc làm nhanh, việc làm mới nhất từ hàng nghìn doanh nghiệp uy tín tại Việt Nam
                     </p>
                 </div>
 
-                {/* CTA Buttons */}
-                <div className="flex justify-center gap-8 mb-12">
-                    <Button
-                        size="lg"
-                        className="bg-[#DA5D1A] hover:bg-[#C54A0F] text-white px-12 py-5 text-2xl font-black h-16 min-w-[400px]"
-                        style={{
-                            backgroundColor: '#DA5D1A',
-                            borderRadius: '999px',
-                            fontWeight: 900,
-                            textShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                        }}
-                    >
-                        <Link href="/login" className="flex items-center gap-3">
-                            KHAM PHA NGAY TAI CV KING
-                            <ArrowRight className="w-6 h-6" />
-                        </Link>
-                    </Button>
-                    <Button
-                        size="lg"
-                        className="bg-white text-black hover:bg-gray-100 hover:text-black px-8 py-5 text-2xl font-black h-16 min-w-[250px] border-2 border-gray-200"
-                        style={{
-                            borderRadius: '999px',
-                            backgroundColor: 'white',
-                            color: 'black',
-                            fontWeight: 900,
-                            textShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                        }}
-                    >
-                        <Link href="#">
-                            TAO CV MIEN PHI
-                        </Link>
-                    </Button>
-                </div>
+            </div>
+            <div className="w-[1010px] h-[29px] mt-[25px] ml-[255px] flex items-center justify-center text-[24px]">
 
-                {/* Stats Cards */}
-                <div className="flex flex-wrap justify-center gap-4">
-                    {statsData.map((card) => (
-                        <StatsCard key={card.id} card={card} />
-                    ))}
+                <p>Tim viec lam nhanh , viec lam moi nhat tu hang nghin doanh nghiep uy tin tai Viet Nam</p>
+            </div>
+            <div className="w-full h-[71px] mt-[25px] ml-[403px]  inline-flex items-center gap-1" >
+                <Button className="w-[402px] h-[71px] bg-[#DA5D1A] flex items-center justify-center rounded-[50px]" variant={"link"}><Link className="inline-flex items-center gap-1 text-[24px] font-bold text-[#FFFFFF]" href={"/login"}>Kham Pha ngay tai CVKING <ArrowRight className="w-4 h-4" /> </Link></Button>
+                <Button variant={"outline"} className="w-[244px] h-full ml-[30px] rounded-[50px]"  ><Link href={"#"} className="font-bold text-[24px]">Tao CV mien phi</Link></Button>
+            </div>
+            <div className=" p-8 min-h-screen">
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-wrap justify-center mb-8">
+                        {statsData.map((card) => (
+                            <StatsCard key={card.id} card={card} />
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
