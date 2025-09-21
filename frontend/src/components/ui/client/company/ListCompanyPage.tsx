@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import SearchBar from './SearchBar';
 import SidebarFilters from './SidebarFilters';
-import NoResult from './NoResult';
+import SearchBar from '../../common/SearchBar';
+import NoResult from '../../common/NoResult';
 import CompanyList from './CompanyList';
 import { Box } from '@mui/material';
 import { allCompanies } from '@/faker/company-data';

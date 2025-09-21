@@ -8,7 +8,7 @@ import {
     Pagination,
 } from '@mui/material';
 import CompanyCard from './CompanyCard';
-import NoResult from './NoResult';
+import NoResult from '../../common/NoResult';
 interface CompanyListProps {
     companies: any[];
     viewMode: 'grid' | 'list';

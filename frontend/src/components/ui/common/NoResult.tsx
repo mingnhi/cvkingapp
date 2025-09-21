@@ -5,7 +5,7 @@ export default function NoResult() {
         <Card sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
             <Typography 
                 variant="h6">
-                Không tìm thấy công ty phù hợp
+                Không tìm thấy kết quả phù hợp
             </Typography>
             <Typography
                 color="text.secondary">
