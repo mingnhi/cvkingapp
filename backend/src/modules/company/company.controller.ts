@@ -12,7 +12,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { ApiResponse } from '@common/interfaces/api-response.interface';
 import { CompaniesRepository } from './companies.repository';
-import { Company } from '@entities/compoany.entity';
+import { Company } from '@entities/company.entity';
 import { CreateCompanyDto, UpdateCompanyDto } from './dtos/company.dto';
 
 @ApiTags('companies')

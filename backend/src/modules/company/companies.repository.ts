@@ -1,4 +1,4 @@
-import { Company } from '@entities/compoany.entity';
+import { Company } from '@entities/company.entity';
 import { EntityManager, EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable, NotFoundException } from '@nestjs/common';
