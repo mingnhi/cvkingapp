@@ -29,6 +29,8 @@
     "clsx": "^2.1.1",
     "currency-formatter": "^1.5.9",
     "date-fns": "^4.1.0",
+    "lodash": "^4.17.21",
+    "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.522.0",
     "next": "15.3.4",
     "nprogress": "^0.2.0",
