@@ -8,12 +8,17 @@ import {
   ValidationPipe,
   ParseUUIDPipe,
   Put,
+  ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from '@modules/users/dtos/user.dto';
-// import { Users } from '@entities/user.entity';
+import { Users } from '@entities/user.entity';
 import { ApiResponse } from '@common/interfaces/api-response.interface';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '@modules/auth/guards/roles.guard';
+import { Roles } from '@modules/auth/guards/roles.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -25,7 +30,9 @@ export class UsersController {
    * @returns List of all users wrapped in ApiResponse
    */
   @Get()
-  async findAll(): Promise<ApiResponse<any>> {
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin')
+  async findAll(): Promise<ApiResponse<Users[]>> {
     const users = await this.usersService.getAllUsers();
     return {
       status: 'success',
@@ -42,12 +49,12 @@ export class UsersController {
    */
   @Get(':id')
   async findOne(
-    @Param('id', ParseUUIDPipe) id: string
-  ): Promise<ApiResponse<any>> {
+    @Param('id', ParseIntPipe) id: string
+  ): Promise<ApiResponse<Users>> {
     const user = await this.usersService.getUserById(id);
     return {
       status: 'success',
-      message: `Successfully retrieved user with ID ${id}`,
+      message: 'Successfully retrieved user',
       data: user,
     };
   }
@@ -75,13 +82,16 @@ export class UsersController {
    * @returns Updated user wrapped in ApiResponse
    */
   @Put()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin, JobSeeker')
   async update(
-    @Body(ValidationPipe) updateUserDto: UpdateUserDto
-  ): Promise<ApiResponse<any>> {
-    const user = await this.usersService.updateUser(updateUserDto);
+    @Param('id', ParseIntPipe) id: string,
+    @Body() dto: UpdateUserDto
+  ): Promise<ApiResponse<Users>> {
+    const user = await this.usersService.update(id, dto);
     return {
       status: 'success',
-      message: `User with ID ${updateUserDto.id} updated successfully`,
+      message: 'User updated successfully',
       data: user,
     };
   }
@@ -92,14 +102,16 @@ export class UsersController {
    * @returns Success message wrapped in ApiResponse
    */
   @Delete(':id')
-  async delete(
-    @Param('id', ParseUUIDPipe) id: string
-  ): Promise<ApiResponse<null>> {
-    await this.usersService.deleteUser(id);
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin')
+  async remove(
+    @Param('id', ParseIntPipe) id: string
+  ): Promise<ApiResponse<boolean>> {
+    await this.usersService.delete(id);
     return {
       status: 'success',
-      message: `User with ID ${id} deleted successfully`,
-      data: null,
+      message: 'User deleted successfully',
+      data: true,
     };
   }
 }

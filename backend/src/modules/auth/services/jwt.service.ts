@@ -29,7 +29,7 @@ export class JwtService {
         secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
       });
       if (payload.type !== 'access') {
-        throw new UnauthorizedException('Token không phải là access token');
+        throw new UnauthorizedException('Not access token');
       }
       return payload;
     } catch (error) {
@@ -42,7 +42,7 @@ export class JwtService {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       });
       if (payload.type !== 'refresh') {
-        throw new UnauthorizedException('Token không phải là refresh token');
+        throw new UnauthorizedException('Not refresh token');
       }
       return payload;
     } catch (error) {

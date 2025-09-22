@@ -1,25 +1,21 @@
-use JOB_PORTAL
+use JOB_DB
 go
 
-create procedure [dbo].[SP_UpdateApplication]
-(
-    @ApplicationId int,
-    @JobId int,
-    @JobSeekerProfileId int,
-    @CVId int = null,
-    @CoverLetter nvarchar(max) = null,
-    @Status nvarchar(50)
-)
-as
-begin
-    update JobApplications set
-        JobId = @JobId,
-        JobSeekerProfileId = @JobSeekerProfileId,
-        CVId = @CVId,
-        CoverLetter = @CoverLetter,
-        Status = @Status,
-        UpdatedAt = SYSUTCDATETIME()
-    where ApplicationId = @ApplicationId
+-- 📌 Cập nhật application
+CREATE OR ALTER PROCEDURE SP_UpdateJobApplication
+  @Id UNIQUEIDENTIFIER,
+  @CoverLetter NVARCHAR(MAX),
+  @Status NVARCHAR(50)
+AS
+BEGIN
+  SET NOCOUNT ON;
 
-    select * from JobApplications where ApplicationId = @ApplicationId
-end
+  UPDATE job_applications
+  SET cover_letter = @CoverLetter,
+      status = @Status,
+      updated_at = GETDATE()
+  WHERE id = @Id;
+
+  EXEC SP_GetJobApplicationById @Id;
+END
+GO

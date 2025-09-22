@@ -2,7 +2,7 @@ import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { CreateJobDto } from './dtos/create-job.dto';
 import { UpdateJobDto } from './dtos/update-job.dto';
-import extractJson from 'src/utils/extractJson';
+import extractJson, { extractJsonArray } from 'src/utils/extractJson';
 
 @Injectable()
 export class JobsRepository {
@@ -10,7 +10,7 @@ export class JobsRepository {
 
   async findAll(): Promise<any[]> {
     const raw = await this.em.getConnection().execute('EXEC SP_GetAllJobs');
-    return extractJson(raw);
+    return extractJsonArray(raw);
   }
 
   async findOne(id: string): Promise<any | null> {
