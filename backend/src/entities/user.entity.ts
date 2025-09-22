@@ -8,6 +8,9 @@ export class Users extends AuditableEntity {
   email: string;
 
   @Property({ type: 'string' })
+  username: string;
+
+  @Property({ type: 'string' })
   password: string;
 
   @Property({ type: 'boolean', default: false })
