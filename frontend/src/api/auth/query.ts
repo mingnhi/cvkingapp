@@ -1,6 +1,6 @@
 import { type UseMutationOptions, useMutation } from '@tanstack/react-query';
-import { loginRequest, logoutRequest, registerRequest, socialLoginRequest } from './request';
-import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, SocialLoginRequest } from './type';
+import { loginRequest, logoutRequest, registerRequest } from './request';
+import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse} from './type';
 
 export const useLoginMutation = (options?: UseMutationOptions<LoginResponse, Error, LoginRequest, unknown>) =>
   useMutation({
@@ -8,13 +8,13 @@ export const useLoginMutation = (options?: UseMutationOptions<LoginResponse, Err
     ...options,
   });
 
-export const useSocialLoginMutation = (
-  options?: UseMutationOptions<LoginResponse, Error, SocialLoginRequest, unknown>
-) =>
-  useMutation({
-    mutationFn: (params: SocialLoginRequest) => socialLoginRequest(params),
-    ...options,
-  });
+// export const useSocialLoginMutation = (
+//   options?: UseMutationOptions<LoginResponse, Error, SocialLoginRequest, unknown>
+// ) =>
+//   useMutation({
+//     mutationFn: (params: SocialLoginRequest) => socialLoginRequest(params),
+//     ...options,
+//   });
 
 export const useRegisterMutation = (options?: UseMutationOptions<RegisterResponse, Error, RegisterRequest, unknown>) =>
   useMutation({

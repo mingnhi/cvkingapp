@@ -7,11 +7,11 @@ import type {
   RegisterResponseSchema,
   ResetPasswordRequestSchema,
   ResetPasswordTokenParamSchema,
-  SocialLoginRequestSchema,
+  // SocialLoginRequestSchema,
 } from './schema';
 
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
-export type SocialLoginRequest = z.infer<typeof SocialLoginRequestSchema>;
+// export type SocialLoginRequest = z.infer<typeof SocialLoginRequestSchema>;
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
 export type RegisterResponse = z.infer<typeof RegisterResponseSchema>;
 export type ForgotPasswordRequest = z.infer<typeof ForgotPasswordRequestSchema>;
