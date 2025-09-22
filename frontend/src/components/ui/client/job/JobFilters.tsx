@@ -1,8 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
-
-import { JobFilters as JobFiltersType, JobCategory } from "@/types/job.type";
 import { Search, Filter, X } from "lucide-react";
 import {
   Badge,
@@ -15,6 +13,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
+import { JobFilters as JobFiltersType, JobCategory } from "@/types/job.type";
 
 interface JobFiltersProps {
   filters: JobFiltersType;
@@ -23,14 +22,9 @@ interface JobFiltersProps {
   onSearch: (query: string) => void;
 }
 
-const jobTypes = ["Full-time", "Part-time", "Contract", "Freelance"];
-const experienceLevels = [
-  "Entry Level",
-  "Mid Level",
-  "Senior Level",
-  "Executive",
-];
-const salaryRanges = [
+const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Freelance"];
+const EXP_LEVELS = ["Entry Level", "Mid Level", "Senior Level", "Executive"];
+const SALARY_RANGES = [
   "Under $50K",
   "$50K - $75K",
   "$75K - $100K",
@@ -51,42 +45,37 @@ export function JobFilters({
   useEffect(() => setMounted(true), []);
 
   const show = isExpanded || isDesktop;
+  const hasActiveFilters = useMemo(
+    () => Object.values(filters).some((a) => a.length > 0),
+    [filters]
+  );
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch(searchQuery);
-  };
-
+  // helpers
   const addFilter = (
     type: keyof JobFiltersType,
     value: string | JobCategory
   ) => {
-    const newFilters = { ...filters };
+    const next = { ...filters };
     if (type === "category") {
-      const categoryValue = value as JobCategory;
-      if (!newFilters.category.find((c) => c.id === categoryValue.id)) {
-        newFilters.category = [...newFilters.category, categoryValue];
-      }
+      const v = value as JobCategory;
+      if (!next.category.some((c) => c.id === v.id))
+        next.category = [...next.category, v];
     } else {
-      const stringValue = value as string;
-      if (!newFilters[type].includes(stringValue)) {
-        newFilters[type] = [...newFilters[type], stringValue];
-      }
+      const v = String(value);
+      if (!next[type].includes(v)) next[type] = [...next[type], v];
     }
-    onFiltersChange(newFilters);
+    onFiltersChange(next);
   };
 
   const removeFilter = (type: keyof JobFiltersType, value: string) => {
-    const newFilters = { ...filters };
-    if (type === "category") {
-      newFilters.category = newFilters.category.filter((c) => c.id !== value);
-    } else {
-      newFilters[type] = newFilters[type].filter((item) => item !== value);
-    }
-    onFiltersChange(newFilters);
+    const next = { ...filters };
+    if (type === "category")
+      next.category = next.category.filter((c) => c.id !== value);
+    else next[type] = next[type].filter((v) => v !== value);
+    onFiltersChange(next);
   };
 
-  const clearAllFilters = () => {
+  const clearAll = () =>
     onFiltersChange({
       type: [],
       location: [],
@@ -94,9 +83,54 @@ export function JobFilters({
       salaryRange: [],
       category: [],
     });
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(searchQuery);
   };
 
-  const hasActiveFilters = Object.values(filters).some((arr) => arr.length > 0);
+  // small, reusable Select
+  const SelectFilter = ({
+    label,
+    placeholder,
+    items,
+    onPick,
+  }: {
+    label: string;
+    placeholder: string;
+    items: { value: string; label: string }[];
+    onPick: (val: string) => void;
+  }) => (
+    <div>
+      <label className="text-sm mb-2 block">{label}</label>
+      <Select
+        value=""
+        className="w-full"
+        displayEmpty
+        renderValue={(selected) =>
+          selected ? (
+            items.find((i) => i.value === selected)?.label ?? ""
+          ) : (
+            <span style={{ color: "#9e9e9e" }}>{placeholder}</span>
+          )
+        }
+        onChange={(e: SelectChangeEvent<string>) => {
+          const v = e.target.value as string;
+          if (v) onPick(v);
+        }}
+        MenuProps={{ disableScrollLock: true }}
+      >
+        <MenuItem value="" disabled sx={{ display: "none" }}>
+          {placeholder}
+        </MenuItem>
+        {items.map((it) => (
+          <MenuItem key={it.value} value={it.value}>
+            {it.label}
+          </MenuItem>
+        ))}
+      </Select>
+    </div>
+  );
 
   return (
     <motion.div
@@ -118,9 +152,7 @@ export function JobFilters({
               size="small"
               color="warning"
               onClick={() => setIsExpanded(!isExpanded)}
-              sx={{
-                display: { xs: "inline-flex", md: "none" },
-              }}
+              sx={{ display: { xs: "inline-flex", md: "none" } }}
             >
               {isExpanded ? (
                 <X className="w-4 h-4" />
@@ -131,6 +163,7 @@ export function JobFilters({
           }
         />
 
+        {/* Search */}
         <CardContent>
           <form onSubmit={handleSearchSubmit} className="flex gap-2">
             <div className="relative flex-1">
@@ -150,12 +183,18 @@ export function JobFilters({
                 }}
               />
             </div>
-            <Button type="submit" size="small" variant="contained" color="warning">
+            <Button
+              type="submit"
+              size="small"
+              variant="contained"
+              color="warning"
+            >
               Tìm
             </Button>
           </form>
         </CardContent>
 
+        {/* Filters */}
         <motion.div
           initial={false}
           animate={{
@@ -177,51 +216,51 @@ export function JobFilters({
                   <Button
                     variant="outlined"
                     size="small"
-                    onClick={clearAllFilters}
+                    onClick={clearAll}
                     className="text-xs h-6 px-2"
                   >
                     Xóa tất cả
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-1">
-                  {filters.type.map((type) => (
-                    <Badge key={type} variant="standard" className="text-xs">
-                      {type}
+                  {filters.type.map((v) => (
+                    <Badge key={v} variant="standard" className="text-xs">
+                      {v}
                       <Button
-                        onClick={() => removeFilter("type", type)}
+                        onClick={() => removeFilter("type", v)}
                         className="ml-1 hover:text-destructive"
                       >
                         <X className="w-3 h-3" />
                       </Button>
                     </Badge>
                   ))}
-                  {filters.category.map((cat) => (
-                    <Badge key={cat.id} variant="standard" className="text-xs">
-                      {cat.name}
+                  {filters.category.map((c) => (
+                    <Badge key={c.id} variant="standard" className="text-xs">
+                      {c.name}
                       <Button
-                        onClick={() => removeFilter("category", cat.id)}
+                        onClick={() => removeFilter("category", c.id)}
                         className="ml-1 hover:text-destructive"
                       >
                         <X className="w-3 h-3" />
                       </Button>
                     </Badge>
                   ))}
-                  {filters.experience.map((exp) => (
-                    <Badge key={exp} variant="standard" className="text-xs">
-                      {exp}
+                  {filters.experience.map((v) => (
+                    <Badge key={v} variant="standard" className="text-xs">
+                      {v}
                       <Button
-                        onClick={() => removeFilter("experience", exp)}
+                        onClick={() => removeFilter("experience", v)}
                         className="ml-1 hover:text-destructive"
                       >
                         <X className="w-3 h-3" />
                       </Button>
                     </Badge>
                   ))}
-                  {filters.salaryRange.map((range) => (
-                    <Badge key={range} variant="standard" className="text-xs">
-                      {range}
+                  {filters.salaryRange.map((v) => (
+                    <Badge key={v} variant="standard" className="text-xs">
+                      {v}
                       <Button
-                        onClick={() => removeFilter("salaryRange", range)}
+                        onClick={() => removeFilter("salaryRange", v)}
                         className="ml-1 hover:text-destructive"
                       >
                         <X className="w-3 h-3" />
@@ -231,131 +270,40 @@ export function JobFilters({
                 </div>
               </motion.div>
             )}
-            <div>
-              <label className="text-sm mb-2 block">Loại công việc</label>
-              <Select
-                value=""
-                className="w-full"
-                displayEmpty
-                renderValue={(selected) =>
-                  selected ? (
-                    (selected as string)
-                  ) : (
-                    <span style={{ color: "#9e9e9e" }}>Chọn loại</span>
-                  )
-                }
-                onChange={(e: SelectChangeEvent<string>) => {
-                  const v = e.target.value as string;
-                  if (v) addFilter("type", v);
-                }}
-                MenuProps={{
-                  disableScrollLock: true,
-                }}
-              >
-                <MenuItem value="" disabled sx={{ display: "none" }}>
-                  Chọn loại
-                </MenuItem>
-                {jobTypes.map((type) => (
-                  <MenuItem key={type} value={type}>
-                    {type}
-                  </MenuItem>
-                ))}
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm mb-2 block">Danh mục</label>
-              <Select
-                value=""
-                className="w-full"
-                displayEmpty
-                renderValue={(selected) =>
-                  selected ? (
-                    categories.find((c) => c.id === selected)?.name ?? ""
-                  ) : (
-                    <span style={{ color: "#9e9e9e" }}>Chọn danh mục</span>
-                  )
-                }
-                onChange={(e: SelectChangeEvent<string>) => {
-                  const id = e.target.value as string;
-                  const cat = categories.find((c) => c.id === id);
-                  if (cat) addFilter("category", cat);
-                }}
-                MenuProps={{
-                  disableScrollLock: true,
-                }}
-              >
-                <MenuItem value="" disabled sx={{ display: "none" }}>
-                  Chọn danh mục
-                </MenuItem>
-                {categories.map((category) => (
-                  <MenuItem key={category.id} value={category.id}>
-                    {category.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm mb-2 block">Kinh nghiệm</label>
-              <Select
-                value=""
-                className="w-full"
-                displayEmpty
-                renderValue={(selected) =>
-                  selected ? (
-                    (selected as string)
-                  ) : (
-                    <span style={{ color: "#9e9e9e" }}>Chọn kinh nghiệm</span>
-                  )
-                }
-                onChange={(e: SelectChangeEvent<string>) => {
-                  const v = e.target.value as string;
-                  if (v) addFilter("experience", v);
-                }}
-                MenuProps={{
-                  disableScrollLock: true,
-                }}
-              >
-                <MenuItem value="" disabled sx={{ display: "none" }}>
-                  Chọn kinh nghiệm
-                </MenuItem>
-                {experienceLevels.map((level) => (
-                  <MenuItem key={level} value={level}>
-                    {level}
-                  </MenuItem>
-                ))}
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm mb-2 block">Mức lương</label>
-              <Select
-                value=""
-                className="w-full"
-                displayEmpty
-                renderValue={(selected) =>
-                  selected ? (
-                    (selected as string)
-                  ) : (
-                    <span style={{ color: "#9e9e9e" }}>Chọn mức lương</span>
-                  )
-                }
-                onChange={(e: SelectChangeEvent<string>) => {
-                  const v = e.target.value as string;
-                  if (v) addFilter("salaryRange", v);
-                }}
-                MenuProps={{
-                  disableScrollLock: true,
-                }}
-              >
-                <MenuItem value="" disabled sx={{ display: "none" }}>
-                  Chọn mức lương
-                </MenuItem>
-                {salaryRanges.map((range) => (
-                  <MenuItem key={range} value={range}>
-                    {range}
-                  </MenuItem>
-                ))}
-              </Select>
-            </div>
+
+            {/* Selects */}
+            <SelectFilter
+              label="Loại công việc"
+              placeholder="Chọn loại"
+              items={JOB_TYPES.map((v) => ({ value: v, label: v }))}
+              onPick={(v) => addFilter("type", v)}
+            />
+
+            <SelectFilter
+              label="Danh mục"
+              placeholder="Chọn danh mục"
+              items={categories.map((c) => ({ value: c.id, label: c.name }))}
+              onPick={(id) => {
+                const cat = categories.find((c) => c.id === id);
+                if (cat) addFilter("category", cat);
+              }}
+            />
+
+            <SelectFilter
+              label="Kinh nghiệm"
+              placeholder="Chọn kinh nghiệm"
+              items={EXP_LEVELS.map((v) => ({ value: v, label: v }))}
+              onPick={(v) => addFilter("experience", v)}
+            />
+
+            <SelectFilter
+              label="Mức lương"
+              placeholder="Chọn mức lương"
+              items={SALARY_RANGES.map((v) => ({ value: v, label: v }))}
+              onPick={(v) => addFilter("salaryRange", v)}
+            />
+
+            {/* Location */}
             <div>
               <label className="text-sm mb-2 block">Địa điểm</label>
               <Input
@@ -363,8 +311,11 @@ export function JobFilters({
                 className="w-full"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    const value = (e.target as HTMLInputElement).value.trim();
-                    addFilter("location", value);
+                    const v = (e.target as HTMLInputElement).value.trim();
+                    if (v) {
+                      addFilter("location", v);
+                      (e.target as HTMLInputElement).value = "";
+                    }
                   }
                 }}
               />
