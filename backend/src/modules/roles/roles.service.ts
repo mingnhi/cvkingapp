@@ -9,13 +9,13 @@ export class RolesService {
   constructor(
     private readonly rolesRepository: RolesRepository,
     private readonly em: EntityManager
-  ) { }
+  ) {}
 
   /**
    * Retrieve all roles
    * @returns List of all roles
    */
-  async getAllRoles(): Promise<Roles[]> {
+  async getAllRoles(): Promise<any> {
     return this.rolesRepository.findAll();
   }
 
@@ -30,7 +30,6 @@ export class RolesService {
     if (!role) throw new NotFoundException('Role not found');
     return role;
   }
-
 
   /**
    * Create a new role
@@ -65,11 +64,11 @@ export class RolesService {
   }
 
   /**
- * Find a role by its name (e.g., 'JobSeeker', 'Employer', 'Admin')
- * @param roleName Tên role
- * @returns Role entity
- * @throws NotFoundException nếu không tìm thấy
- */
+   * Find a role by its name (e.g., 'JobSeeker', 'Employer', 'Admin')
+   * @param roleName Tên role
+   * @returns Role entity
+   * @throws NotFoundException nếu không tìm thấy
+   */
   async findByName(roleName: string): Promise<Roles> {
     const role = await this.rolesRepository.findByName(roleName);
     if (!role) {

@@ -19,8 +19,8 @@ export class UserRolesRepository {
    * Retrieve all userRoles
    * @returns List of all userRoles
    */
-  async findAll(): Promise<UserRole[]> {
-    return this.userRoleRepository.findAll();
+  async findAll(): Promise<any> {
+    return true;
   }
 
   /**
@@ -33,7 +33,7 @@ export class UserRolesRepository {
   }
 
   findByUser(userId: string): Promise<UserRole[]> {
-    return this.userRoleRepository.find({ userId } )
+    return this.userRoleRepository.find({ userId });
   }
   /**
    * Create a new userRole
@@ -58,7 +58,7 @@ export class UserRolesRepository {
   async update(id: string, dto: UpdateUserRoleDto): Promise<UserRole> {
     const userRole = await this.userRoleRepository.findOne(id);
     if (!userRole) throw new NotFoundException('UserRole not found');
-    
+
     this.userRoleRepository.assign(userRole, dto);
     await this.em.flush();
     return userRole;
@@ -75,5 +75,4 @@ export class UserRolesRepository {
     await this.em.removeAndFlush(userRole);
     return true;
   }
-
 }

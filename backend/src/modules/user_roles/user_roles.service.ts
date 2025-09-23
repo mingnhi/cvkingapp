@@ -8,13 +8,13 @@ import { UserRole } from '@entities/user_role.entity';
 
 @Injectable()
 export class UserRolesService {
-  constructor(private readonly userRolesRepository: UserRolesRepository) { }
+  constructor(private readonly userRolesRepository: UserRolesRepository) {}
 
   /**
    * Retrieve all userRoles
    * @returns List of all userRoles
    */
-  async getAllUserRoles(): Promise<UserRole[]> {
+  async getAllUserRoles(): Promise<any> {
     return this.userRolesRepository.findAll();
   }
 
@@ -24,7 +24,7 @@ export class UserRolesService {
    * @returns UserRole
    * @throws NotFoundException if the userRole does not exist
    */
-  async getUserRoleById(id: string): Promise<UserRole> {
+  async getUserRoleById(id: string): Promise<any> {
     const userRole = await this.userRolesRepository.findOne(id);
     if (!userRole) {
       throw new NotFoundException(`UserRole with ID ${id} not found`);
@@ -40,9 +40,7 @@ export class UserRolesService {
    * @param createUserRoleDto Data to create the userRole
    * @returns Created userRole
    */
-  async createUserRole(
-    dto: CreateUserRoleDto
-  ): Promise<UserRole> {
+  async createUserRole(dto: CreateUserRoleDto): Promise<UserRole> {
     return this.userRolesRepository.create(dto);
   }
 
@@ -65,7 +63,8 @@ export class UserRolesService {
    */
   async deleteUserRole(id: string): Promise<boolean> {
     const deleted = await this.userRolesRepository.delete(id);
-    if (!deleted) throw new NotFoundException(`UserRole with ID ${id} not found`);
+    if (!deleted)
+      throw new NotFoundException(`UserRole with ID ${id} not found`);
     return true;
   }
 }

@@ -8,14 +8,14 @@ import { EntityManager } from '@mikro-orm/core';
 export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
-    private readonly em: EntityManager,
-  ) { }
+    private readonly em: EntityManager
+  ) {}
 
   /**
    * Retrieve all users
    * @returns List of all users
    */
-  async getAllUsers(): Promise<Users[]> {
+  async getAllUsers(): Promise<any> {
     return this.usersRepository.findAll();
   }
 
@@ -25,7 +25,7 @@ export class UsersService {
    * @returns User
    * @throws NotFoundException if the user does not exist
    */
-  async getUserById(id: string): Promise<Users> {
+  async getUserById(id: string): Promise<any> {
     const user = await this.usersRepository.findOne(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -34,10 +34,10 @@ export class UsersService {
   }
 
   /**
- * Find a user by email
- * @param email user's email
- * @returns Users | null
- */
+   * Find a user by email
+   * @param email user's email
+   * @returns Users | null
+   */
   async findByEmail(email: string): Promise<Users | null> {
     return this.usersRepository.findByEmail(email);
   }

@@ -23,7 +23,7 @@ import { Roles } from '@modules/auth/guards/roles.decorator';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   /**
    * Retrieve all users
@@ -48,8 +48,15 @@ export class UsersController {
    * @returns User wrapped in ApiResponse
    */
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: string): Promise<Users> {
-    return this.usersService.getUserById(id);
+  async findOne(
+    @Param('id', ParseIntPipe) id: string
+  ): Promise<ApiResponse<Users>> {
+    const user = await this.usersService.getUserById(id);
+    return {
+      status: 'success',
+      message: 'Successfully retrieved user',
+      data: user,
+    };
   }
 
   /**
@@ -60,7 +67,7 @@ export class UsersController {
   @Post()
   async create(
     @Body(ValidationPipe) createUserDto: CreateUserDto
-  ): Promise<ApiResponse<Users>> {
+  ): Promise<ApiResponse<any>> {
     const user = await this.usersService.createUser(createUserDto);
     return {
       status: 'success',
@@ -79,9 +86,14 @@ export class UsersController {
   @Roles('Admin, JobSeeker')
   async update(
     @Param('id', ParseIntPipe) id: string,
-    @Body() dto: UpdateUserDto,
-  ): Promise<Users> {
-    return this.usersService.update(id, dto);
+    @Body() dto: UpdateUserDto
+  ): Promise<ApiResponse<Users>> {
+    const user = await this.usersService.update(id, dto);
+    return {
+      status: 'success',
+      message: 'User updated successfully',
+      data: user,
+    };
   }
 
   /**
@@ -92,8 +104,14 @@ export class UsersController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('Admin')
-  async remove(@Param('id', ParseIntPipe) id: string): Promise<boolean> {
-    return this.usersService.delete(id);
+  async remove(
+    @Param('id', ParseIntPipe) id: string
+  ): Promise<ApiResponse<boolean>> {
+    await this.usersService.delete(id);
+    return {
+      status: 'success',
+      message: 'User deleted successfully',
+      data: true,
+    };
   }
-
 }

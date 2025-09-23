@@ -10,14 +10,14 @@ export class UsersRepository {
     @InjectRepository(Users)
     private readonly userRepository: EntityRepository<Users>,
     private readonly em: EntityManager
-  ) { }
+  ) {}
 
   /**
    * Retrieve all users
    * @returns List of all users
    */
-  async findAll(): Promise<Users[]> {
-    return this.userRepository.findAll();
+  async findAll(): Promise<any> {
+    return true;
   }
 
   /**
@@ -25,8 +25,8 @@ export class UsersRepository {
    * @param id ID of the user
    * @returns user or null if not found
    */
-  async findOne(id: string): Promise<Users | null> {
-    return this.userRepository.findOne({ id });
+  async findOne(id: string): Promise<any | null> {
+    return true;
   }
 
   findByEmail(email: string): Promise<Users | null> {
@@ -48,10 +48,9 @@ export class UsersRepository {
    * @param updateuserDto Data to update the user
    * @returns Updated user or null if not found
    */
-  async update(id: string, data: Partial<Users>): Promise<Users | null> {
-    const user = await this.findOne(id);
-    if (!user) return null;
-    this.userRepository.assign(user, data);
+  async update(id: string, dto: Partial<Users>): Promise<Users> {
+    const user = await this.userRepository.findOneOrFail({ id });
+    this.userRepository.assign(user, dto);
     await this.em.flush();
     return user;
   }
@@ -67,10 +66,4 @@ export class UsersRepository {
     await this.em.removeAndFlush(user);
     return true;
   }
-
-  /**
- * Find a user by email
- * @param email Email of the user
- * @returns user or null if not found
- */
 }

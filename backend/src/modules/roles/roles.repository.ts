@@ -10,14 +10,15 @@ export class RolesRepository {
     @InjectRepository(Roles)
     private readonly roleRepository: EntityRepository<Roles>,
     private readonly em: EntityManager
-  ) { }
+  ) {}
 
   /**
    * Retrieve all roles
    * @returns List of all roles
    */
-  async findAll(): Promise<Roles[]> {
-    return this.roleRepository.findAll();
+  async findAll(): Promise<any> {
+    const results = this.roleRepository.findAll();
+    return results ?? [];
   }
 
   /**
@@ -30,10 +31,10 @@ export class RolesRepository {
   }
 
   /**
- * Find a role by its name
- * @param roleName tên role (ví dụ: 'JobSeeker', 'Employer', 'Admin')
- * @returns Role hoặc null nếu không tìm thấy
- */
+   * Find a role by its name
+   * @param roleName tên role (ví dụ: 'JobSeeker', 'Employer', 'Admin')
+   * @returns Role hoặc null nếu không tìm thấy
+   */
   async findByName(roleName: string): Promise<Roles | null> {
     return this.roleRepository.findOne({ roleName });
   }
@@ -62,7 +63,6 @@ export class RolesRepository {
     await this.em.flush();
     return role;
   }
-
 
   /**
    * Delete a role

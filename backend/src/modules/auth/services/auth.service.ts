@@ -1,24 +1,39 @@
-import { EntityManager } from '@mikro-orm/core';
+import { EntityManager, EntityRepository } from '@mikro-orm/core';
 import { RolesService } from '@modules/roles/roles.service';
 import { UserRolesService } from '@modules/user_roles/user_roles.service';
 import { UsersService } from '@modules/users/users.service';
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterDto } from '../dtos/register.dto';
+import { RegisterDto, registerEmployeeDto } from '../dtos/register.dto';
 import * as bcrypt from 'bcrypt';
-import { UsersRepository } from '@modules/users/users.repository';
 import { loginDto } from '../dtos/login.dto';
-import { log } from 'util';
+import { JobSeekerProfile } from '@entities/job-seeker-profile.entity';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { Company } from '@entities/compoany.entity';
+import { EmployerProfile } from '@entities/employer-profile.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-    // private readonly usersrepo: UsersRepository,
     private readonly rolesService: RolesService,
     private readonly usersRoleService: UserRolesService,
     private readonly em: EntityManager,
-    private readonly jwt: JwtService
+    private readonly jwt: JwtService,
+
+    @InjectRepository(JobSeekerProfile)
+    private readonly jobSeekerRepo: EntityRepository<JobSeekerProfile>,
+
+    @InjectRepository(Company)
+    private readonly companyRepo: EntityRepository<Company>,
+
+    @InjectRepository(EmployerProfile)
+    private readonly employerRepo: EntityRepository<EmployerProfile>
   ) { }
   private async signTokens(userId: string, email: string) {
     const userRoleEntities = await this.usersRoleService.findByUser(userId);
@@ -26,9 +41,9 @@ export class AuthService {
     // Lấy tên role từ bảng Roles bằng RolesService
     const roleNames = await Promise.all(
       userRoleEntities.map(async ur => {
-        const role = await this.rolesService.findOne(ur.roleId); 
-        return role.roleName;                                    
-      }),
+        const role = await this.rolesService.findOne(ur.roleId);
+        return role.roleName;
+      })
     );
 
     const payload = { sub: userId, email, roles: roleNames, type: 'access' };
@@ -38,21 +53,19 @@ export class AuthService {
       expiresIn: process.env.JWT_ACCESS_EXPIRATION_TIME,
     });
     console.log('ACCESS_EXPIRE', process.env.JWT_ACCESS_EXPIRATION_TIME);
-    console.log('sign secret', process.env.JWT_ACCESS_SECRET || 'access_secret');
-
+    console.log(
+      'sign secret',
+      process.env.JWT_ACCESS_SECRET || 'access_secret'
+    );
 
     const refreshToken = await this.jwt.signAsync(
       { ...payload, type: 'refresh' },
       {
         secret: process.env.JWT_REFRESH_SECRET || 'refresh_secret',
         expiresIn: process.env.JWT_REFRESH_EXPIRATION_TIME,
-      },
+      }
     );
     return { accessToken, refreshToken };
-  }
-  private async setRefreshToken(userId: string, token: string) {
-    const hash = await bcrypt.hash(token, 10);
-    await this.usersService.update(userId, { refreshToken: hash });
   }
 
   async validateUser(userId: string) {
@@ -69,48 +82,95 @@ export class AuthService {
     const exist = await this.usersService.findByEmail(dto.email);
     if (exist) throw new ConflictException('Email đã tồn tại');
 
-    //mã hoá password
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-
-
     const user = await this.usersService.createUser({
+
       email: dto.email,
-      username: dto.username,
-      password: hashedPassword
-    });
+      password: hashedPassword,
+      displayName: dto.fullName,
+    }
+    );
 
+    // gán role JobSeeker
     const jobSeekerRole = await this.rolesService.findByName('JobSeeker');
-    console.log("role" + jobSeekerRole.roleName)
-
     await this.usersRoleService.createUserRole({
       userId: user.id,
       roleId: jobSeekerRole.id,
     });
 
+    // tạo JobSeekerProfile
+    const profile = this.jobSeekerRepo.create({
+      userId: user.id,
+      fullName: dto.fullName,
+    });
+    await this.jobSeekerRepo.create(profile);
 
-    // const role = await this.rolesService.findByName('JobSeeker');
-    // if (!role) throw new NotFoundException('Role không tồn tại');
-    // await this.usersRoleService.createUserRole({
-    //   userId: user.userId,
-    //   roleId: role.RoleId,
-    // });
-    const { accessToken, refreshToken } =
-      await this.signTokens(user.id, user.email);
-    await this.setRefreshToken(user.id, refreshToken);
+    const { accessToken, refreshToken } = await this.signTokens(
+      user.id,
+      user.email
+    );
+
+    await this.usersService.update(user.id, {
+      refreshToken: refreshToken,
+    });
+
+    return { user, profile, accessToken, refreshToken };
+  }
+
+  async registerEmployee(dto: registerEmployeeDto) {
+    const exist = await this.usersService.findByEmail(dto.email);
+    if (exist) throw new ConflictException('Email đã tồn tại');
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const user = await this.usersService.createUser({
+      email: dto.email,
+      password: hashedPassword,
+      displayName: dto.contactName,
+    });
+
+    // gán role Employer
+    const EmployerRole = await this.rolesService.findByName('Employer');
+    await this.usersRoleService.createUserRole({
+      userId: user.id,
+      roleId: EmployerRole.id,
+    });
+
+    // tạo Company
+    const company = this.companyRepo.create({ name: dto.companyName });
+    await this.companyRepo.create(company);
+
+    // tạo EmployerProfile
+    const profile = this.employerRepo.create({
+      userId: user.id,
+      company: dto.companyName,
+    });
+    await this.jobSeekerRepo.create(profile);
+
+    const { accessToken, refreshToken } = await this.signTokens(
+      user.id,
+      user.email
+    );
+
+    await this.usersService.update(user.id, {
+      refreshToken: refreshToken,
+    });
 
     return { user, accessToken, refreshToken };
   }
 
   async login(dto: loginDto) {
     const user = await this.usersService.findByEmail(dto.email);
-    if (!user || !user.password) throw new UnauthorizedException('Sai email hoặc mật khẩu');
+    if (!user || !user.password)
+      throw new UnauthorizedException('Sai email hoặc mật khẩu');
 
     const ok = await bcrypt.compare(dto.password, user.password);
     if (!ok) throw new UnauthorizedException('Sai email hoặc mật khẩu');
 
-    const { accessToken, refreshToken } =
-      await this.signTokens(user.id, user.email);
-    await this.setRefreshToken(user.id, refreshToken);
+    const { accessToken, refreshToken } = await this.signTokens(
+      user.id,
+      user.email
+    );
+    await this.usersService.update(user.id, { refreshToken });
 
     return { user, accessToken, refreshToken };
   }
@@ -122,9 +182,11 @@ export class AuthService {
     const match = await bcrypt.compare(refreshToken, user.refreshToken);
     if (!match) throw new UnauthorizedException();
 
-    const { accessToken, refreshToken: newRefresh } =
-      await this.signTokens(user.id, user.email);
-    await this.setRefreshToken(user.id, newRefresh);
+    const { accessToken, refreshToken: newRefresh } = await this.signTokens(
+      user.id,
+      user.email
+    );
+    await this.usersService.update(user.id, { refreshToken: newRefresh });
     return { accessToken, refreshToken: newRefresh };
   }
 
