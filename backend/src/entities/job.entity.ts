@@ -1,19 +1,5 @@
-import {
-  Cascade,
-  Collection,
-  Entity,
-  Enum,
-  ManyToMany,
-  ManyToOne,
-  Property,
-  Unique,
-} from '@mikro-orm/core';
+import { Entity, Property, PrimaryKey } from '@mikro-orm/core';
 import { AuditableEntity } from './base/auditable_entity';
-import { Company } from './company.entity';
-import { Users } from './user.entity';
-import { JobCategory } from './job-category.entity';
-import { Skill } from './skill.entity';
-import { JobTag } from './job-tag.entity';
 
 export enum JobStatus {
   ACTIVE = 'Active',
@@ -22,74 +8,68 @@ export enum JobStatus {
   CLOSED = 'Closed',
 }
 
-@Entity({ tableName: 'jobs' })
+@Entity({ tableName: 'Jobs' })
 export class Job extends AuditableEntity {
-  @ManyToOne(() => Company)
-  company!: Company;
+  @Property({ type: 'string' })
+  CompanyId: string;
 
-  @ManyToOne(() => Users, { nullable: true })
-  postedBy?: Users;
+  @Property({ type: 'string', nullable: true })
+  PostedByUserId?: string;
 
-  @Property()
-  title!: string;
+  @Property({ type: 'string', length: 500, nullable: false })
+  Title: string;
 
-  @Property()
-  @Unique()
-  slug!: string;
+  @Property({ type: 'string', length: 500, nullable: false, unique: true })
+  Slug: string;
 
-  @Property({ type: 'text', nullable: true })
-  shortDescription?: string;
+  @Property({ type: 'string', length: 1000, nullable: true })
+  ShortDescription?: string;
 
-  @Property({ type: 'text', nullable: true })
-  description?: string;
+  @Property({ type: 'string', length: -1, nullable: true })
+  Description?: string;
 
-  @Property({ type: 'text', nullable: true })
-  requirements?: string;
+  @Property({ type: 'string', length: -1, nullable: true })
+  Requirements?: string;
 
-  @Property({ type: 'text', nullable: true })
-  benefits?: string;
+  @Property({ type: 'string', length: -1, nullable: true })
+  Benefits?: string;
 
-  @Property({ nullable: true })
-  salaryMin?: number;
+  @Property({ type: 'int', nullable: true })
+  SalaryMin?: number;
 
-  @Property({ nullable: true })
-  salaryMax?: number;
+  @Property({ type: 'int', nullable: true })
+  SalaryMax?: number;
 
-  @Property({ nullable: true })
-  currency?: string;
+  @Property({ type: 'nvarchar', length: 10, nullable: true })
+  Currency?: string;
 
-  @Property({ nullable: true })
-  jobType?: string; // Full-time, Part-time, Internship...
+  @Property({ type: 'nvarchar', length: 50, nullable: true })
+  JobType?: string;
 
-  @Property({ nullable: true })
-  location?: string;
+  @Property({ type: 'nvarchar', length: 300, nullable: true })
+  Location?: string;
 
-  @ManyToOne(() => JobCategory, { nullable: true })
-  category?: JobCategory;
+  @Property({ type: 'nvarchar', nullable: true })
+  CategoryId?: number;
 
-  @Enum(() => JobStatus)
-  status: JobStatus = JobStatus.ACTIVE;
-
-  @Property()
-  viewsCount: number = 0;
-
-  @Property()
-  postedAt: Date = new Date();
-
-  @Property({ nullable: true })
-  expiresAt?: Date;
-
-  @ManyToMany(() => Skill, 'jobs', {
-    owner: true,
-    pivotTable: 'job_skills',
-    cascade: [Cascade.ALL],
+  @Property({
+    type: 'nvarchar',
+    length: 50,
+    nullable: false,
+    default: 'Active',
   })
-  skills = new Collection<Skill>(this);
+  Status: string = JobStatus.ACTIVE;
 
-  @ManyToMany(() => JobTag, 'jobs', {
-    owner: true,
-    pivotTable: 'job_job_tags',
-    cascade: [Cascade.ALL],
+  @Property({ type: 'int', nullable: false, default: 0 })
+  ViewsCount: number = 0;
+
+  @Property({
+    type: 'datetime2',
+    nullable: false,
+    defaultRaw: 'SYSUTCDATETIME()',
   })
-  tags = new Collection<JobTag>(this);
+  PostedAt: Date = new Date();
+
+  @Property({ type: 'datetime2', nullable: true })
+  ExpiresAt?: Date;
 }

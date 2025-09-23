@@ -1,48 +1,35 @@
-import { Entity, ManyToOne, Property } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, Unique } from '@mikro-orm/core';
 import { AuditableEntity } from './base/auditable_entity';
-import { Users } from './user.entity';
 
-@Entity({ tableName: 'Company' })
+@Entity({ tableName: 'Companies' })
 export class Company extends AuditableEntity {
-  @Property({ type: 'string' })
-  userId: string;
+  @Property({ length: 300 })
+  name!: string;
 
-  @Property({ type: 'string' })
-  name: string;
+  @Property({ length: 300, nullable: true })
+  slug?: string;
 
-  @Property({ type: 'string' })
-  taxCode: string;
+  @Property({ length: 1000, nullable: true })
+  logoUrl?: string;
 
-  @Property({ type: 'string' })
-  address: string;
+  @Property({ length: 1000, nullable: true })
+  bannerUrl?: string;
 
-  @Property({ type: 'string' })
-  website: string;
+  @Property({ length: 200, nullable: true })
+  industry?: string;
 
-  @Property({ type: 'string' })
-  industryId: string;
+  @Property({ length: 50, nullable: true })
+  companySize?: string;
 
-  @Property({ type: 'string' })
-  size: string;
+  @Property({ length: 500, nullable: true })
+  website?: string;
 
-  @Property({ type: 'string' })
-  description: string;
+  @Property({ length: 300, nullable: true })
+  location?: string;
 
-  @Property({ type: 'string' })
-  logoUrl: string;
+  @Property({ type: 'text', nullable: true })
+  description?: string;
 
-  @Property({ type: 'string' })
-  bannerUrl: string;
-
-  @Property({ type: 'string' })
-  contactPerson: string;
-
-  @Property({ type: 'string' })
-  contactEmail: string;
-
-  @Property({ type: 'string' })
-  contactPhone: string;
-
-  @ManyToOne(() => Users, { nullable: true })
-  postedBy?: Users;
+  @Property({ default: false })
+  isVerified: boolean = false;
 }

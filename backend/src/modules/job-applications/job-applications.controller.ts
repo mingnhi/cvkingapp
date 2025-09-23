@@ -1,59 +1,69 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  Param,
   Post,
   Put,
-  Req,
-  UseGuards,
+  Delete,
+  Param,
+  Body,
+  ParseUUIDPipe,
+  ValidationPipe,
 } from '@nestjs/common';
-import { JobApplicationsService } from './job-applications.service';
+import { ApiTags } from '@nestjs/swagger';
+import { JobApplicationsRepository } from './job-applications.repository';
+import { ApiResponse } from '@common/interfaces/api-response.interface';
 import { CreateJobApplicationDto } from './dtos/create-job-application.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { Roles } from '@modules/auth/roles.decorator';
+import { UpdateJobApplicationDto } from './dtos/update-job-application.dto';
 
+@ApiTags('job-applications')
 @Controller('job-applications')
 export class JobApplicationsController {
-  constructor(
-    private readonly jobApplicationsService: JobApplicationsService
-  ) {}
-
-  @Post()
-  @UseGuards(AuthGuard('jwt'))
-  @Roles('JobSeeker')
-  create(@Body() createJobApplicationDto: CreateJobApplicationDto, @Req() req) {
-    return this.jobApplicationsService.create(
-      createJobApplicationDto,
-      req.user
-    );
-  }
+  constructor(private readonly repo: JobApplicationsRepository) {}
 
   @Get()
-  @UseGuards(AuthGuard('jwt'))
-  @Roles('Employer', 'Admin')
-  findAll() {
-    return this.jobApplicationsService.findAll();
+  async findAll(): Promise<ApiResponse<any>> {
+    const data = await this.repo.findAll();
+    return {
+      status: 'success',
+      message: 'All job applications',
+      data,
+      meta: { count: data.length },
+    };
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
-  findOne(@Param('id') id: string) {
-    return this.jobApplicationsService.findOne(id);
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: string
+  ): Promise<ApiResponse<any>> {
+    const data = await this.repo.findOne(id);
+    return { status: 'success', message: 'Found job application', data };
   }
 
-  @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
-  @Roles('Employer', 'Admin')
-  update(@Param('id') id: string, @Body() jobApplication) {
-    return this.jobApplicationsService.update(id, jobApplication);
+  @Post()
+  async create(
+    @Body(ValidationPipe) dto: CreateJobApplicationDto
+  ): Promise<ApiResponse<any>> {
+    const data = await this.repo.create(dto);
+    return { status: 'success', message: 'Created job application', data };
+  }
+
+  @Put()
+  async update(
+    @Body(ValidationPipe) dto: UpdateJobApplicationDto
+  ): Promise<ApiResponse<any>> {
+    const data = await this.repo.update(dto);
+    return { status: 'success', message: 'Updated job application', data };
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
-  @Roles('Employer', 'Admin', 'JobSeeker')
-  remove(@Param('id') id: string) {
-    return this.jobApplicationsService.remove(id);
+  async delete(
+    @Param('id', ParseUUIDPipe) id: string
+  ): Promise<ApiResponse<null>> {
+    await this.repo.delete(id);
+    return {
+      status: 'success',
+      message: 'Deleted job application',
+      data: null,
+    };
   }
 }

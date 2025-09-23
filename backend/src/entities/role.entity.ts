@@ -1,16 +1,13 @@
-import { Collection, Entity, ManyToMany, Property } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, Unique } from '@mikro-orm/core';
 import { AuditableEntity } from './base/auditable_entity';
-import { Users } from './user.entity';
 
 @Entity({ tableName: 'Roles' })
 export class Roles extends AuditableEntity {
-  [x: string]: any;
-  @Property({ type: 'string' })
-  name: string;
 
-  @Property({ type: 'string' })
+  @Property({ type: 'string', fieldName: 'role_name' })
+  @Unique()
+  roleName: string;
+
+  @Property({ type: 'string', nullable: true })
   description: string;
-
-  @ManyToMany(() => Users, users => users.roles)
-  users = new Collection<Users>(this);
 }

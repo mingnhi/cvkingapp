@@ -1,7 +1,5 @@
-import { Entity, Enum, ManyToOne, Property } from '@mikro-orm/core';
+import { Entity, Enum, Property } from '@mikro-orm/core';
 import { AuditableEntity } from './base/auditable_entity';
-import { Job } from './job.entity';
-import { Users } from './user.entity';
 
 export enum ApplicationStatus {
   PENDING = 'Pending',
@@ -13,11 +11,11 @@ export enum ApplicationStatus {
 
 @Entity({ tableName: 'job_applications' })
 export class JobApplication extends AuditableEntity {
-  @ManyToOne(() => Job)
-  job!: Job;
+  @Property({ type: 'string' })
+  jobId: string;
 
-  @ManyToOne(() => Users)
-  jobSeeker!: Users;
+  @Property({ type: 'string' })
+  jobSeekerId: string;
 
   @Property({ type: 'text', nullable: true })
   coverLetter?: string;
@@ -28,11 +26,6 @@ export class JobApplication extends AuditableEntity {
   @Property()
   appliedAt: Date = new Date();
 
-  @Property({ nullable: true })
-  updatedAt?: Date;
-
   @Property()
   isDeleted: boolean = false;
 }
-
-

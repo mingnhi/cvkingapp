@@ -14,7 +14,7 @@ export class UserRolesService {
    * Retrieve all userRoles
    * @returns List of all userRoles
    */
-  async getAllUserRoles(): Promise<UserRole[]> {
+  async getAllUserRoles(): Promise<any> {
     return this.userRolesRepository.findAll();
   }
 
@@ -24,7 +24,7 @@ export class UserRolesService {
    * @returns UserRole
    * @throws NotFoundException if the userRole does not exist
    */
-  async getUserRoleById(id: string): Promise<UserRole> {
+  async getUserRoleById(id: string): Promise<any> {
     const userRole = await this.userRolesRepository.findOne(id);
     if (!userRole) {
       throw new NotFoundException(`UserRole with ID ${id} not found`);
@@ -32,15 +32,16 @@ export class UserRolesService {
     return userRole;
   }
 
+  findByUser(userId: string): Promise<UserRole[]> {
+    return this.userRolesRepository.findByUser(userId);
+  }
   /**
    * Create a new userRole
    * @param createUserRoleDto Data to create the userRole
    * @returns Created userRole
    */
-  async createUserRole(
-    createUserRoleDto: CreateUserRoleDto
-  ): Promise<UserRole> {
-    return this.userRolesRepository.create(createUserRoleDto);
+  async createUserRole(dto: CreateUserRoleDto): Promise<UserRole> {
+    return this.userRolesRepository.create(dto);
   }
 
   /**
@@ -49,16 +50,10 @@ export class UserRolesService {
    * @returns Updated userRole
    * @throws NotFoundException if the userRole does not exist
    */
-  async updateUserRole(
-    updateUserRoleDto: UpdateUserRoleDto
-  ): Promise<UserRole> {
-    const userRole = await this.userRolesRepository.update(updateUserRoleDto);
-    if (!userRole) {
-      throw new NotFoundException(
-        `UserRole with ID ${updateUserRoleDto.id} not found`
-      );
-    }
-    return userRole;
+  async update(id: string, dto: UpdateUserRoleDto): Promise<UserRole> {
+    const updated = await this.userRolesRepository.update(id, dto);
+    if (!updated) throw new NotFoundException('UserRole not found');
+    return updated;
   }
 
   /**
@@ -66,10 +61,10 @@ export class UserRolesService {
    * @param id ID of the userRole to delete
    * @throws NotFoundException if the userRole does not exist
    */
-  async deleteUserRole(id: string): Promise<void> {
+  async deleteUserRole(id: string): Promise<boolean> {
     const deleted = await this.userRolesRepository.delete(id);
-    if (!deleted) {
+    if (!deleted)
       throw new NotFoundException(`UserRole with ID ${id} not found`);
-    }
+    return true;
   }
 }

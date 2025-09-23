@@ -1,212 +1,198 @@
 "use client";
-import React from "react";
-import {
-  ArrowUpDown,
-  ChevronLeft,
-  ChevronRight,
-  Grid,
-  List,
-} from "lucide-react";
-import { Job } from "@/types/job.type";
-import JobCard from "./JobCard";
-import {
-  Box,
-  Button,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  Typography,
-} from "@mui/material";
+import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Job, JobFilters } from "@/types/job.type";
+import { ArrowUpDown, Grid3X3, List } from "lucide-react";
+import { Button, MenuItem, Select } from "@mui/material";
+import { JobCard } from "./JobCard";
 
 interface JobListProps {
   jobs: Job[];
-  sortBy: string;
-  setSortBy: (sort: string) => void;
-  viewMode: "grid" | "list";
-  setViewMode: (mode: "grid" | "list") => void;
-  currentPage: number;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-  jobsPerPage: number;
-  onJobClick: (job: Job) => void;
+  filters: JobFilters;
+  searchQuery: string;
+  onApply: (jobId: string) => void;
+  onSave: (jobId: string) => void;
 }
 
-const JobList = ({
+type ViewMode = "grid" | "list";
+
+const sortOptions = [
+  { value: "newest", label: "Mới nhất" },
+  { value: "oldest", label: "Cũ nhất" },
+  { value: "salary-high", label: "Lương cao nhất" },
+  { value: "salary-low", label: "Lương thấp nhất" },
+  { value: "views", label: "Nhiều lượt xem" },
+];
+
+export function JobList({
   jobs,
-  sortBy,
-  setSortBy,
-  viewMode,
-  setViewMode,
-  currentPage,
-  setCurrentPage,
-  jobsPerPage,
-  onJobClick,
-}: JobListProps) => {
-  const totalPages = Math.ceil(jobs.length / jobsPerPage);
-  const startIndex = (currentPage - 1) * jobsPerPage;
-  const currentJobs = jobs.slice(startIndex, startIndex + jobsPerPage);
+  filters,
+  searchQuery,
+  onApply,
+  onSave,
+}: JobListProps) {
+  // ✅ mặc định sắp xếp "Mới nhất"
+  const [sortBy, setSortBy] = useState("newest");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
-  const getPageNumbers = () => {
-    const pageNumbers = [];
-    const maxPagesToShow = 5;
-    const half = Math.floor(maxPagesToShow / 2);
+  const filteredAndSortedJobs = useMemo(() => {
+    let filtered = jobs;
 
-    let start = Math.max(1, currentPage - half);
-    let end = Math.min(totalPages, currentPage + half);
-
-    if (currentPage <= half) {
-      end = Math.min(totalPages, maxPagesToShow);
-      start = 1;
-    } else if (currentPage + half >= totalPages) {
-      start = Math.max(1, totalPages - maxPagesToShow + 1);
-      end = totalPages;
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (job) =>
+          job.title.toLowerCase().includes(query) ||
+          job.shortDescription.toLowerCase().includes(query) ||
+          job.location.toLowerCase().includes(query) ||
+          job.skills.some((skill) => skill.name.toLowerCase().includes(query))
+      );
     }
 
-    for (let i = start; i <= end; i++) {
-      pageNumbers.push(i);
+    if (filters.type.length > 0) {
+      filtered = filtered.filter((job) => filters.type.includes(job.jobType));
     }
-    return pageNumbers;
-  };
 
-  const sortOptions = [
-    { value: "newest", label: "Mới nhất" },
-    { value: "salary-high", label: "Lương: Cao đến thấp" },
-    { value: "salary-low", label: "Lương: Thấp đến cao" },
-    { value: "relevant", label: "Liên quan nhất" },
-  ];
+    if (filters.category.length > 0) {
+      filtered = filtered.filter((job) =>
+        filters.category.some((cat) => cat.id === job.categoryId)
+      );
+    }
 
-  const currentSortLabel =
-    sortOptions.find((opt) => opt.value === sortBy)?.label || "Mới nhất";
+    if (filters.location.length > 0) {
+      filtered = filtered.filter((job) =>
+        filters.location.some((loc) =>
+          job.location.toLowerCase().includes(loc.toLowerCase())
+        )
+      );
+    }
+
+    // ✅ sắp xếp theo sortBy
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "newest":
+          return (
+            new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
+          );
+        case "oldest":
+          return (
+            new Date(a.postedAt).getTime() - new Date(b.postedAt).getTime()
+          );
+        case "salary-high":
+          return (b.salaryMax ?? 0) - (a.salaryMax ?? 0);
+        case "salary-low":
+          return (a.salaryMax ?? 0) - (b.salaryMax ?? 0);
+        case "views":
+          return (b.viewsCount ?? 0) - (a.viewsCount ?? 0);
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [jobs, filters, searchQuery, sortBy]);
 
   return (
-    <Box className="lg:col-span-3">
-      <Box className="flex items-center justify-between mb-6">
-        <Box>
-          <Typography variant="h5" component="h2" className="font-bold text-gray-900 mb-1">
-            Việc Làm
-            <Box
-              component="span"
-              sx={{
-                backgroundColor: "#FFE8D9",
-                color: "#f26b38",
-                fontSize: 14,
-                fontWeight: 500,
-                px: 1.5,
-                py: 0.5,
-                ml: 2,
-                borderRadius: 2,
-              }}
-            >
-              {currentSortLabel}
-            </Box>
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            Tìm thấy {jobs.length} công việc phù hợp
-          </Typography>
-        </Box>
-        <Box className="flex items-center space-x-4">
-          <Box className="flex items-center gap-2">
-            <ArrowUpDown className="h-4 w-4 text-gray-500" />
-            <Typography variant="body2" color="textSecondary">
-              Sắp xếp:
-            </Typography>
-            <Select
-              size="small"
-              value={sortBy}
-              onChange={(e: SelectChangeEvent) => {
-                setSortBy(e.target.value);
-                setCurrentPage(1);
-              }}
-              sx={{ minWidth: 160 }}
-            >
-              {sortOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </Box>
-
-          <Box className="flex border rounded-lg overflow-hidden">
+    <div className="space-y-6">
+      {/* Header with controls */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card/50 backdrop-blur-sm rounded-lg p-4 border"
+      >
+        <div className="flex items-center gap-4">
+          <h2>{filteredAndSortedJobs.length} việc làm được tìm thấy</h2>
+          <div className="flex items-center gap-2">
             <Button
-              className={`p-2 min-w-0 ${
-                viewMode === "grid"
-                  ? "bg-[#f26b38] text-white"
-                  : "text-gray-600 hover:bg-gray-100"
-              } transition-colors`}
+              variant={viewMode === "grid" ? "contained" : "outlined"}
+              color="warning"
+              size="small"
               onClick={() => setViewMode("grid")}
             >
-              <Grid className="h-4 w-4" />
+              <Grid3X3 className="w-4 h-4" />
             </Button>
             <Button
-              className={`p-2 min-w-0 ${
-                viewMode === "list"
-                  ? "bg-[#f26b38] text-white"
-                  : "text-gray-600 hover:bg-gray-100"
-              } transition-colors`}
+              variant={viewMode === "list" ? "contained" : "outlined"}
+              color="warning"
+              size="small"
               onClick={() => setViewMode("list")}
             >
-              <List className="h-4 w-4" />
+              <List className="w-4 h-4" />
             </Button>
-          </Box>
-        </Box>
-      </Box>
+          </div>
+        </div>
 
-      <Box
-        className={
-          viewMode === "grid"
-            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr"
-            : "space-y-4"
-        }
-      >
-        {currentJobs.map((job) => (
-          <JobCard
-            key={job.id}
-            job={job}
-            mode={viewMode}
-            onJobClick={onJobClick}
-          />
-        ))}
-      </Box>
+        <div className="flex items-center gap-2">
+          <ArrowUpDown className="w-4 h-4 text-muted-foreground" />
+          <Select
+            value={sortBy}
+            size="small"
+            displayEmpty
+            renderValue={(selected) =>
+              selected ? (
+                sortOptions.find((o) => o.value === selected)?.label
+              ) : (
+                <span style={{ color: "#9e9e9e" }}>Mới nhất</span>
+              )
+            }
+            onChange={(e) => setSortBy(e.target.value)}
+            MenuProps={{ disableScrollLock: true }}
+          >
+            {sortOptions.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
+      </motion.div>
 
-      <Box className="flex items-center justify-between mt-8">
-        <Typography variant="body2" color="textSecondary">
-          Hiển thị {startIndex + 1}-
-          {Math.min(startIndex + jobsPerPage, jobs.length)} của {jobs.length} công việc
-        </Typography>
-        <Box className="flex items-center space-x-2">
-          <Button
-            className="flex items-center px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
+      {/* Job Grid/List */}
+      <AnimatePresence mode="wait">
+        {filteredAndSortedJobs.length > 0 ? (
+          <motion.div
+            key={viewMode}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+                : "space-y-4"
+            }
           >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Trước
-          </Button>
-          {getPageNumbers().map((page) => (
-            <Button
-              key={page}
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                page === currentPage
-                  ? "bg-[#f26b38] text-white"
-                  : "text-gray-700 hover:bg-gray-100 border border-gray-300"
-              }`}
-              onClick={() => setCurrentPage(page)}
-            >
-              {page}
-            </Button>
-          ))}
-          <Button
-            className="flex items-center px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
+            {filteredAndSortedJobs.map((job, index) => (
+              <JobCard
+                key={job.id}
+                job={job}
+                index={index}
+                onApply={onApply}
+                onSave={onSave}
+              />
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="text-center py-12"
           >
-            Sau
-            <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
-        </Box>
-      </Box>
-    </Box>
+            <div className="max-w-md mx-auto">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+                <List className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <h3 className="mb-2">Không tìm thấy việc làm phù hợp</h3>
+              <p className="text-muted-foreground">
+                Hãy thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm để tìm thấy
+                nhiều cơ hội việc làm hơn.
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
-};
-
-export default JobList;
+}

@@ -1,13 +1,7 @@
-import { Collection, Entity, ManyToMany, Property, Unique } from '@mikro-orm/core';
+import { Entity, Property, PrimaryKey } from '@mikro-orm/core';
 import { AuditableEntity } from './base/auditable_entity';
-import { Job } from './job.entity';
-
-@Entity({ tableName: 'job_tags' })
+@Entity({ tableName: 'JobTags' })
 export class JobTag extends AuditableEntity {
-  @Property()
-  @Unique()
-  name!: string;
-
-  @ManyToMany(() => Job, (job) => job.tags)
-  jobs = new Collection<Job>(this);
+  @Property({ type: 'nvarchar', length: 200, nullable: false, unique: true })
+  Name: string;
 }
