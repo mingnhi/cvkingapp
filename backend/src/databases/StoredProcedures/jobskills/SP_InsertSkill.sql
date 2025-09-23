@@ -7,9 +7,10 @@ AS
 BEGIN
     DECLARE @NewId UNIQUEIDENTIFIER = NEWID();
 
-    insert into Skills(id,name,created_at, updated_at)
-    values (@NewId, @Name, SYSDATETIMEOFFSET(),null)
+    INSERT INTO Skills(id, name, created_at, updated_at)
+    VALUES (@NewId, @Name, SYSDATETIMEOFFSET(), NULL);
 
+    -- Trả về bản ghi vừa thêm
     SELECT * FROM Skills WHERE id = @NewId;
 END;
 GO

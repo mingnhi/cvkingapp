@@ -12,6 +12,5 @@ DECLARE @NewId UNIQUEIDENTIFIER = NEWID();
     values (@NewId, @Name, SYSDATETIMEOFFSET(),null)
 
     SELECT * FROM JobTags WHERE id = @NewId;
-   
 END;
 GO
