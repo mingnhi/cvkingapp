@@ -4,11 +4,11 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import employee from "@/assets/images/employee.png";
 import { Bookmark, Briefcase, Clock, DollarSign, Eye, MapPin, Search, Upload } from "lucide-react";
-import { Button } from "../../common/button/button";
-import { Card, CardContent } from "../../common/card/card";
+import {Button,Card} from "@mui/material";
 import { useRouter } from "next/navigation";
 import Link from "next/link"; // Thêm để tối ưu SEO
-import { Badge } from "@mui/material";
+import { Badge , CardContent } from "@mui/material";
+import { mockJobs } from "@/faker/home-data";
 // Định nghĩa giao diện Job
 interface Job {
   id: number;
@@ -36,99 +36,7 @@ const JobsSection = () => {
     const fetchJobs = async () => {
       try {
         // Giả lập dữ liệu (thay bằng API call thực tế)
-        const mockJobs: Job[] = [
-          {
-            id: 1,
-            title: "Chuyên viên Backend Python",
-            company: "Công ty DevPro1",
-            logo: employee,
-            location: "Hà Nội",
-            salary: "40.000.000 - 60.000.000 VND",
-            type: "Toàn thời gian",
-            posted: "1 ngày trước",
-            tags: ["Python", "Django", "API"],
-            featured: true,
-            description: "Tuyển dụng chuyên viên Backend để phát triển hệ thống quản lý doanh nghiệp...",
-            requirements: ["3+ năm kinh nghiệm Python", "Thành thạo Django", "Kinh nghiệm với REST API"],
-            benefits: ["Lương cạnh tranh", "Bảo hiểm y tế", "Hỗ trợ đào tạo"],
-          },
-          {
-            id: 2,
-            title: "Nhân viên Thiết kế UI/UX",
-            company: "CreativeHub",
-            logo: employee,
-            location: "Thành phố Hồ Chí Minh",
-            salary: "30.000.000 - 50.000.000 VND",
-            type: "Làm việc từ xa",
-            posted: "3 ngày trước",
-            tags: ["Figma", "Adobe XD", "UI/UX"],
-            featured: false,
-            description: "Cần tuyển nhân viên thiết kế giao diện người dùng cho các dự án ứng dụng di động...",
-            requirements: ["2+ năm kinh nghiệm thiết kế", "Thành thạo Figma", "Hiểu biết UX research"],
-            benefits: ["Lương linh hoạt", "Hỗ trợ thiết bị", "Thưởng dự án"],
-          },
-          {
-            id: 3,
-            title: "Kỹ sư DevOps",
-            company: "CloudMaster",
-            logo: employee,
-            location: "Đà Nẵng",
-            salary: "50.000.000 - 70.000.000 VND",
-            type: "Toàn thời gian",
-            posted: "5 ngày trước",
-            tags: ["AWS", "Docker", "CI/CD"],
-            featured: true,
-            description: "Tuyển dụng kỹ sư DevOps để quản lý hạ tầng và triển khai tự động...",
-            requirements: ["3+ năm kinh nghiệm DevOps", "Thành thạo AWS", "Kinh nghiệm với Docker"],
-            benefits: ["Lương cao", "Bảo hiểm y tế", "Làm việc từ xa"],
-          },
-          {
-            id: 4,
-            title: "Nhân viên Marketing Số",
-            company: "DigitalWave",
-            logo: employee,
-            location: "Cần Thơ",
-            salary: "25.000.000 - 40.000.000 VND",
-            type: "Bán thời gian",
-            posted: "2 ngày trước",
-            tags: ["SEO", "Google Ads", "Content"],
-            featured: false,
-            description: "Tuyển nhân viên marketing số để quản lý chiến dịch quảng cáo trực tuyến...",
-            requirements: ["2+ năm kinh nghiệm marketing", "Thành thạo SEO", "Kỹ năng sáng tạo nội dung"],
-            benefits: ["Thưởng hiệu suất", "Hỗ trợ chi phí", "Đào tạo chuyên môn"],
-          },
-          {
-            id: 5,
-            title: "Chuyên viên Phân tích Dữ liệu",
-            company: "DataInsight",
-            logo: employee,
-            location: "Hải Phòng",
-            salary: "45.000.000 - 65.000.000 VND",
-            type: "Toàn thời gian",
-            posted: "4 ngày trước",
-            tags: ["SQL", "Python", "Data Analysis"],
-            featured: true,
-            description: "Cần tuyển chuyên viên phân tích dữ liệu để hỗ trợ ra quyết định kinh doanh...",
-            requirements: ["3+ năm kinh nghiệm phân tích", "Thành thạo SQL", "Kinh nghiệm với Python"],
-            benefits: ["Lương cạnh tranh", "Bảo hiểm y tế", "Hỗ trợ nghiên cứu"],
-          },
-          {
-            id: 6,
-            title: "Lập trình viên Mobile",
-            company: "MobileTech",
-            logo: employee,
-            location: "Huế",
-            salary: "35.000.000 - 55.000.000 VND",
-            type: "Làm việc từ xa",
-            posted: "6 ngày trước",
-            tags: ["Flutter", "Dart", "Android"],
-            featured: false,
-            description: "Tuyển dụng lập trình viên mobile để phát triển ứng dụng cho iOS và Android...",
-            requirements: ["2+ năm kinh nghiệm với Flutter", "Thành thạo Dart", "Hiểu biết về Android"],
-            benefits: ["Lương linh hoạt", "Hỗ trợ thiết bị", "Thưởng dự án"],
-          },
-        ];
-        setJobs(mockJobs);
+          setJobs(mockJobs);
       } catch (error) {
         console.error("Error fetching jobs:", error);
       } finally {

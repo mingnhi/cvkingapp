@@ -517,16 +517,18 @@ const JobsPage = () => {
             <div className="md:col-span-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  type="text"
-                  placeholder="Tên công việc, kỹ năng hoặc công ty"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f26b38] focus:border-[#f26b38] outline-none"
-                  value={filters.keyword}
-                  onChange={(e) =>
-                    setFilters({ ...filters, keyword: e.target.value })
-                  }
-                />
-              </div>
+               <input
+  type="text"
+  placeholder="Tên công việc, kỹ năng hoặc công ty"
+  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f26b38] focus:border-[#f26b38] outline-none"
+  value={filters.keyword}
+  onChange={(e) => {
+    console.log(`[Input] onChange triggered - new value: ${e.target.value}`);
+    console.log(`[Input] Current filters before update:`, filters);
+    setFilters({ ...filters, keyword: e.target.value });
+    console.log(`[Input] Filters after update:`, { ...filters, keyword: e.target.value });
+  }}
+/>              </div>
             </div>
             <div>
               <select

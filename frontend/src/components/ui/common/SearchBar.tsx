@@ -1,3 +1,5 @@
+"use client";
+import { useState } from 'react';
 import { Search } from 'lucide-react';
 import {
     Box,
@@ -10,91 +12,99 @@ import {
     InputAdornment,
     Card,
 } from '@mui/material';
-import { industryOptions , Locations } from '@/faker/company-data';
+import {allCompanies, industryOptions, Locations } from '@/faker/company-data';
+
 interface SearchBarProps {
-    mainFilterInputs: { keyword: string; location: string; industry: string };
-    onMainFilterChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-    onSearchClick: () => void;
+    allCompanies: any[]; // Danh sách công ty gốc
+    onSearchResult: (result: any[]) => void; // Callback truyền kết quả lọc
 }
 
-export default function SearchBar({ mainFilterInputs, onMainFilterChange, onSearchClick }: SearchBarProps) {
+export default function SearchBar({ allCompanies, onSearchResult }: SearchBarProps) {
+    const [filters, setFilters] = useState<allCompanies|"name">("TechCom");
+const [query,setQuery] = useState();    
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        console.log(`[SearchBar] Changing filter: ${name} to ${value}`);
+        setFilters(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSearchClick = () => {
+        console.log(`[SearchBar] Search clicked with filters:`, filters);
+        let result = [...allCompanies]; // Sao chép để tránh mutate trực tiếp
+        if (filters.keyword) {
+            const keywordLower = filters.keyword.toLowerCase();
+            result = result.filter(company =>
+                company.name.toLowerCase().includes(keywordLower) ||
+                company.industry.toLowerCase().includes(keywordLower)
+            );
+            console.log(`[SearchBar] Filtered by keyword "${filters.keyword}", result length: ${result.length}`);
+        }
+        if (filters.location) {
+            result = result.filter(company => company.location === filters.location);
+            console.log(`[SearchBar] Filtered by location "${filters.location}", result length: ${result.length}`);
+        }
+        if (filters.industry) {
+            result = result.filter(company => company.industry === filters.industry);
+            console.log(`[SearchBar] Filtered by industry "${filters.industry}", result length: ${result.length}`);
+        }
+        console.log(`[SearchBar] Final search result length: ${result.length}`);
+        onSearchResult(result); // Truyền kết quả lọc ra ngoài
+    };
+
     return (
-        <Card 
-            sx={{ p: 2, 
-                mb: 3,
-                borderRadius: 2 }}>
+        <Card sx={{ p: 2, mb: 3, borderRadius: 2 }}>
             <Box 
-                sx={{
+                sx={{ 
                     display: 'grid', 
-                    gridTemplateColumns:
-                    { xs: '1fr',
-                        md: '2fr 1fr 1fr auto' },
-                    gap: 2,
-                    alignItems: 'center' }}>
-                <TextField 
+                    gridTemplateColumns: 
+                    { xs: '1fr', md: '2fr 1fr 1fr auto' }, 
+                    gap: 2, alignItems: 'center' }}>
+                <TextField
                     name="keyword"
-                    value={mainFilterInputs.keyword}
-                    onChange={onMainFilterChange}
-                    placeholder="Tìm theo tên công ty, ngành nghề..." 
-                    InputProps={
-                        { startAdornment:
-                            <InputAdornment 
-                                position="start">
-                                <Search size={20} />
-                            </InputAdornment> }} />
-                <FormControl
-                    fullWidth>
+                    value={filters.keyword}
+                    onChange={handleFilterChange}
+                    placeholder="Tìm theo tên công ty, ngành nghề..."
+                />
+              
+                <FormControl fullWidth>
                     <InputLabel>
                         Địa điểm
                     </InputLabel>
-                    <Select
+                    <Select 
                         name="location" 
-                        value={mainFilterInputs.location}
-                        onChange={onMainFilterChange}
+                        value={filters.location}
+                        onChange={handleFilterChange}
                         label="Địa điểm">
                         <MenuItem 
                             value="">
-                            <em>
-                                Tất cả địa điểm
+                            <em>Tất cả địa điểm
                             </em>
                         </MenuItem>
-                        {Locations.map((location) => <MenuItem
-                            key={location} 
-                            value={location}>
-                            {location}
-                        </MenuItem>)}
+                        {Locations.map((location) => 
+                            <MenuItem 
+                                key={location}
+                                value={location}>{location}
+                            </MenuItem>)}
                     </Select>
                 </FormControl>
-                <FormControl
-                    fullWidth>
-                    <InputLabel>
-                        Ngành nghề
-                    </InputLabel>
+                <FormControl fullWidth>
+                    <InputLabel>Ngành nghề</InputLabel>
                     <Select
                         name="industry" 
-                        value={mainFilterInputs.industry}
-                        onChange={onMainFilterChange}
+                        value={filters.industry} 
+                        onChange={handleFilterChange} 
                         label="Ngành nghề">
                         <MenuItem
-                            value="">
-                            <em>
-                                Tất cả ngành nghề
-                            </em>
+                            value=""><em>Tất cả ngành nghề</em>
                         </MenuItem>
-                        {industryOptions.map((option) => <MenuItem 
-                            key={option.value}
-                            value={option.value}>
-                            {option.label}
-                        </MenuItem>)}
+                        {industryOptions.map((option) => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
                     </Select>
                 </FormControl>
                 <Button
-                    onClick={onSearchClick}
+                    onClick={handleSearchClick}
                     variant="contained"
-                    sx={{ height: '56px',
-                        textTransform: 'none', 
-                        bgcolor: '#000',
-                        '&:hover': { bgcolor: '#333' } }}>
+                    sx={{ height: '56px', textTransform: 'none', bgcolor: '#000', '&:hover': { bgcolor: '#333' } }}
+                >
                     Tìm kiếm
                 </Button>
             </Box>

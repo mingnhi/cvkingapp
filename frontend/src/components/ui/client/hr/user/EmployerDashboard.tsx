@@ -3,16 +3,17 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import { ArrowLeft, Menu, Briefcase, Building2, Settings, Star, TrendingUp, Users } from 'lucide-react';
 import { useState } from 'react';
-import { useApp } from '@/components/AppContext';
 import Setting from './Setting';
 import CompanyProfile from './CompanyProfile';
 import JobPostings from './JobPostings';
 import CandidateManagement from './CandidateManagement';
 import SavedCandidates from './SavedCandidates';
 import Overview from './Overview';
+import { useRouter } from 'next/navigation';
 
 const EmployerDashboard = () => {
-  const { navigateTo } = useApp();
+    const router = useRouter();
+  
   const [activeTab, setActiveTab] = useState<'overview'|'company'|'jobs'|'candidates'|'saved'|'settings'>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isEditingCompany, setIsEditingCompany] = useState(false);
@@ -60,7 +61,6 @@ const EmployerDashboard = () => {
           />
         )}
 
-        {/* Sidebar: NẰM TRONG MAIN, không dùng fixed; không cuộn */}
         <aside
           className={[
             "relative lg:static z-20 w-64 h-full bg-white shadow-lg px-[5px]",
@@ -74,7 +74,7 @@ const EmployerDashboard = () => {
               <Button
                 variant="text"
                 size="small"
-                onClick={() => navigateTo('home')}
+                onClick={() => router.back('/home')}
                 className="mr-2"
               >
                 <ArrowLeft className="w-4 h-4" />

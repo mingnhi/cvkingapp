@@ -1,4 +1,3 @@
-import { useApp } from "@/components/AppContext";
 import {
     Card,
     CardContent,
@@ -7,9 +6,9 @@ import {
     Typography,
 } from "@mui/material";
 import { CheckCircle, Edit } from "lucide-react";
-
+import { useRouter } from "next/navigation";
 const CompanyProfile = () => {
-    const { navigateTo } = useApp();
+    const router = useRouter();
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -17,7 +16,7 @@ const CompanyProfile = () => {
                 <Typography variant="h5">Thông tin công ty</Typography>
                 <Button
                     variant="contained"
-                    onClick={() => navigateTo("edit-profile")}
+                    onClick={() => router.push("edit-profile")}
                     startIcon={<Edit className="w-4 h-4" />}
                     sx={{
                         backgroundColor: "black",

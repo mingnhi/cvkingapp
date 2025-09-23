@@ -15,18 +15,15 @@ import {
     Box,
     Chip
 } from '@mui/material';
-import { useApp } from '@/components/AppContext';
 //a
 const MyCv = () => {
-    const { navigateTo } = useApp();
-    const handleCreateCV = () => navigateTo('cv-builder');
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h4" component="h1" fontWeight="bold">Quản lý CV</Typography>
                 <Button
-                    onClick={handleCreateCV}
+                    
                     variant="contained"
                     startIcon={<Plus size={16} />}
                     sx={{ textTransform: 'none', bgcolor: "#000000", "&:hover": { bgcolor: "#333333" } }}

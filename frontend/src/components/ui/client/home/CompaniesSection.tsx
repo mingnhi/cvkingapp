@@ -1,13 +1,11 @@
 "use client";
 import { Button } from "@/lib/button";
-import { Card , CardContent } from "../../common/card/card";
 import { Badge } from "@mui/material";
 import { MapPin , Users , Star} from "lucide-react";
-import { AppProvider, useApp } from "@/components/AppContext";
+import {Card , CardContent} from "@mui/material";
 import Image from "next/image";
 import company from "@/assets/images/employee.png";
 const CompaniesSection = () => {
-    const {navigateTo} = useApp(); 
 
  
 
