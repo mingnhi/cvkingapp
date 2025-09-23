@@ -4,6 +4,8 @@ import type {
   ForgotPasswordRequest,
   LoginRequest,
   LoginResponse,
+  RegisterEmployerRequest,
+  RegisterEmployerResponse,
   RegisterRequest,
   RegisterResponse,
   ResetPasswordRequest,
@@ -26,6 +28,10 @@ export const registerRequest = async (data: RegisterRequest) => {
   return getSuccessResponse<RegisterResponse>(response);
 };
 
+export const registerEmployerRequest = async (data: RegisterEmployerRequest) => {
+  const response = await instance.post('/auth/register-employer', data);
+  return getSuccessResponse<RegisterEmployerResponse>(response);
+}
 export const logoutRequest = async ({ refreshToken }: { refreshToken: string }) => {
   const response = await instance.post('/auth/logout', { refreshToken });
   return getSuccessResponse<null>(response);

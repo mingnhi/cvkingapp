@@ -23,10 +23,16 @@ export const LoginRequestSchema = z
 //     message: 'Invalid login credentials',
 //   }
 // );
-
+export const RegisterEmployerRequestSchema = z
+  .object({
+    email: z.string().email({ message: MESSAGES.INVALID_EMAIL }),
+    password: z.string().min(6, { message: MESSAGES.PASSWORD_TOO_SHORT }).optional(),
+    contactName: z.string().min(3, { message: MESSAGES.USERNAME_TOO_SHORT }).optional(),
+    companyName: z.string().min(3, { message: MESSAGES.USERNAME_TOO_SHORT }).optional(),
+  })
 export const RegisterRequestSchema = z
   .object({
-    username: z.string().min(3, { message: MESSAGES.USERNAME_TOO_SHORT }).optional(),
+    fullName: z.string().min(3, { message: MESSAGES.USERNAME_TOO_SHORT }).optional(),
     email: z.string().email({ message: MESSAGES.INVALID_EMAIL }),
     password: z.string().min(6, { message: MESSAGES.PASSWORD_TOO_SHORT }).optional(),
     // fullName: z.string().optional(),
@@ -69,6 +75,11 @@ export const LoginResponseSchema = z.object({
 });
 
 export const RegisterResponseSchema = z.object({
+  accessToken: z.string().optional(),
+  refreshToken: z.string().optional(),
+});
+
+export const RegisterEmployerResponseSchema = z.object({
   accessToken: z.string().optional(),
   refreshToken: z.string().optional(),
 });

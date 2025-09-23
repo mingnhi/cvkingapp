@@ -13,7 +13,7 @@ import {
 import { Lock, Mail, User, Eye, EyeOff, Building2 } from "lucide-react";
 import AuthSidebar from "@/components/layout/Sidebar/AuthSidebar";
 import Link from "next/link";
-import { useRegisterMutation } from "@/api/auth/query";
+import { useRegisterEmployerMutation, useRegisterMutation } from "@/api/auth/query";
 import { useRouter } from "next/navigation";
 
 const Register: React.FC = () => {
@@ -27,31 +27,50 @@ const Register: React.FC = () => {
   const [agreeTerms, setAgreeTerms] = useState(false);
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
-  
-  const [username, setUsername] = useState("");
+   const [companyName, setCompanyName] = useState("");
+  const [fullName, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { mutate: register, isPending } = useRegisterMutation({
-    onSuccess: (data) => {
-      localStorage.setItem("accessToken", data.accessToken ?? "");
-      localStorage.setItem("refreshToken", data.refreshToken ?? "");
-      alert("Đăng ký thành công! Hãy đăng nhập.");
-      router.push("/login");
-    },
-    onError: (err) => alert("Đăng ký thất bại"),
-  });
+
+  const { mutate: registerJobSeeker, isPending: isRegisteringJobSeeker } =
+    useRegisterMutation({
+      onSuccess: (data) => {
+        localStorage.setItem("accessToken", data.accessToken ?? "");
+        localStorage.setItem("refreshToken", data.refreshToken ?? "");
+        alert("Đăng ký thành công! Hãy đăng nhập.");
+        router.push("/login");
+      },
+      onError: () => alert("Đăng ký thất bại"),
+    });
+
+  const { mutate: registerEmployer, isPending: isRegisteringEmployer } =
+    useRegisterEmployerMutation({
+      onSuccess: (data) => {
+        localStorage.setItem("accessToken", data.accessToken ?? "");
+        localStorage.setItem("refreshToken", data.refreshToken ?? "");
+        alert("Đăng ký nhà tuyển dụng thành công! Hãy đăng nhập.");
+        router.push("/login");
+      },
+      onError: () => alert("Đăng ký thất bại"),
+    });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (accountType !== "job-seeker") {
-      alert("Hiện chỉ hỗ trợ đăng ký tài khoản Job-Seeker.");
-      return;
-    }
     if (!agreeTerms) return alert("Bạn phải đồng ý điều khoản");
     if (password !== confirmPassword) return alert("Mật khẩu không khớp");
-    register({email, username, password});
-  };
 
+    if (accountType === "job-seeker") {
+      registerJobSeeker({ email, fullName, password });
+    } else {
+      if (!companyName.trim()) return alert("Vui lòng nhập tên công ty");
+      registerEmployer({
+        email,
+        password,
+        contactName: fullName,
+        companyName,
+      });
+    }
+  };
   return (
     <Box className="flex flex-col md:grid md:grid-cols-12 min-h-screen">
       <AuthSidebar />
@@ -119,7 +138,7 @@ const Register: React.FC = () => {
                 id="fullname"
                 label={accountType === "employer" ? "Tên liên hệ" : "Họ và tên"}
                 type="text"
-                value={username}
+                value={fullName}
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
                 variant="outlined"
@@ -146,6 +165,9 @@ const Register: React.FC = () => {
                   type="text"
                   variant="outlined"
                   placeholder="Nhập tên công ty"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  autoComplete="company"
                   className="hover:border focus:border [&_.MuiInputBase-root]:h-12 [&_.MuiInputBase-root]:!rounded-lg"
                   InputProps={{
                     startAdornment: (
@@ -272,7 +294,7 @@ const Register: React.FC = () => {
             <Button
               type="submit"
               fullWidth
-              disabled={isPending}
+              disabled={isRegisteringJobSeeker || isRegisteringEmployer}
               sx={{
                 py: 1.5,
                 backgroundColor: "orange",
