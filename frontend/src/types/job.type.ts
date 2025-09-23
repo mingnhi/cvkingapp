@@ -1,3 +1,5 @@
+import { Company } from "./company.type";
+
   // types/job.type.ts
   export type JobStatus = "active" | "draft" | "expired";
   export type Currency = "USD" | "VND";
@@ -62,13 +64,7 @@ export interface Job {
   category: JobCategory;
   skills: JobSkill[];
   tags: JobTag[];
-  company?: {
-    id: string;
-    name: string;
-    logo: string;
-    rating: number;
-    reviewCount: number;
-  };
+  company?: Company;
 }
 
 export interface JobCategory {
@@ -79,6 +75,11 @@ export interface JobCategory {
 export interface JobSkill {
   id: string;
   jobId: string;
+  name: string;
+}
+
+export interface Skill {
+  id: string;
   name: string;
 }
 
