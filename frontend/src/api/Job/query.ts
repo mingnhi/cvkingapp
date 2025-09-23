@@ -6,11 +6,11 @@ import {
 //   useQuery,
 //   useQueryClient,
 } from '@tanstack/react-query';
-import { CreateJobInput, JobApiResponse } from './type';
+import { CreateJobFormData, JobApiResponse } from './type';
 import { createJobRequest } from './request';
 import { onMutateError } from '@/lib/utils';
 
-export const useCreateJobMutation = (options?: UseMutationOptions<JobApiResponse, Error, CreateJobInput, unknown>) =>
+export const useCreateJobMutation = (options?: UseMutationOptions<JobApiResponse, Error, CreateJobFormData, unknown>) =>
   useMutation({
     mutationFn: createJobRequest,
     onError: onMutateError,

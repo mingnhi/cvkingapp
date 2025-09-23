@@ -2,23 +2,15 @@ import { z } from "zod";
 
 export const CreateJobSchema = z
   .object({
-    CompanyId: z.string().uuid("ID phải là UUID hợp lệ"),
-    PostedByUserId: z.string().uuid("ID không hợp lệ").optional(),
-
+    CompanyId: z.string().optional(),
+    PostedByUserId: z.string().optional(),
     Title: z
       .string()
       .trim()
       .min(3, "Tiêu đề quá ngắn")
       .max(120, "Tiêu đề quá dài"),
     Slug: z
-      .string()
-      .min(3, "Slug quá ngắn")
-      .max(140, "Slug quá dài")
-      .regex(
-        /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-        "Slug chỉ gồm a-z, 0-9, dấu gạch ngang"
-      ),
-
+      .string().optional(),
     ShortDescription: z
       .string()
       .trim()
@@ -59,14 +51,8 @@ export const CreateJobSchema = z
       .date()
       .min(new Date(), "Ngày hết hạn phải ở tương lai")
       .optional(),
-
-    skillIds: z
-      .array(z.string().uuid("SkillId phải là UUID"))
-      .min(1, "Cần ít nhất 1 kỹ năng"),
-    tagIds: z
-      .array(z.string().uuid("TagId phải là UUID"))
-      .optional()
-      .default([]),
+    skillIds: z.array(z.string()).default([]),
+    tagIds: z.array(z.string()).default([]),
   })
   .superRefine((data, ctx) => {
     const hasSalary = data.SalaryMin != null || data.SalaryMax != null;
