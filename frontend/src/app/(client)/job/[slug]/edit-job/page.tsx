@@ -4,10 +4,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { notFound, useParams } from "next/navigation";
-import BasicDetailsSection from "@/components/ui/client/job/post-job/sections/BasicDetailsSection";
-import JobContentSection from "@/components/ui/client/job/post-job/sections/JobDetailsSection";
-import SkillsSection from "@/components/ui/client/job/post-job/sections/SkillsSection";
-import ApplicationSection from "@/components/ui/client/job/post-job/sections/ApplicationSection";
+import BasicDetailsSection from "@/components/ui/client/job/post-job/BasicDetailsSection";
+import JobContentSection from "@/components/ui/client/job/post-job/JobDetailsSection";
+import SkillsSection from "@/components/ui/client/job/post-job/SkillsSection";
+import ApplicationSection from "@/components/ui/client/job/post-job/ApplicationSection";
 import RightSidebarPanel from "@/components/ui/client/job/post-job/SidebarPanel";
 import { Job } from "@/types/job.type";
 import { jobs } from "@/faker/jobposting-data";
