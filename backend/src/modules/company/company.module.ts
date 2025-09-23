@@ -1,4 +1,4 @@
-import { Company } from '@entities/compoany.entity';
+import { Company } from '@entities/company.entity';
 import { Module } from '@nestjs/common';
 import { CompaniesRepository } from './companies.repository';
 import { CompaniesController } from './company.controller';

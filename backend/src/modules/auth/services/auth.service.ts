@@ -14,7 +14,7 @@ import * as bcrypt from 'bcrypt';
 import { loginDto } from '../dtos/login.dto';
 import { JobSeekerProfile } from '@entities/job-seeker-profile.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Company } from '@entities/compoany.entity';
+import { Company } from '@entities/company.entity';
 import { EmployerProfile } from '@entities/employer-profile.entity';
 
 @Injectable()
