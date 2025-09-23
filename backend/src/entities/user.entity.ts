@@ -13,8 +13,8 @@ export class Users extends AuditableEntity {
   @Unique()
   email: string;
 
-  @Property({ type: 'string' })
-  username: string;
+  @Property({ type: 'string', nullable: true })
+  username?: string;
 
   @Property({ type: 'string' })
   password: string;

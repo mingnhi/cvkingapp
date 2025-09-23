@@ -4,7 +4,6 @@ export class RegisterDto {
   email: string;
   @MinLength(6)
   password: string;
-
   @IsString()
   fullName: string;
 }
