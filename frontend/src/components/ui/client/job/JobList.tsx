@@ -1,96 +1,85 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Job, JobFilters } from "@/types/job.type";
 import { ArrowUpDown, Grid3X3, List } from "lucide-react";
-import { Button, MenuItem, Select } from "@mui/material";
+import { Button, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { JobCard } from "./JobCard";
+import { Job, JobFilter } from "@/api/Job/type";
 
 interface JobListProps {
   jobs: Job[];
-  filters: JobFilters;
+  filters: Partial<JobFilter>;
   searchQuery: string;
+  onFiltersChange: (newFilters: Partial<JobFilter>) => void;
   onApply: (jobId: string) => void;
   onSave: (jobId: string) => void;
 }
 
 type ViewMode = "grid" | "list";
 
-const sortOptions = [
-  { value: "newest", label: "Mới nhất" },
-  { value: "oldest", label: "Cũ nhất" },
-  { value: "salary-high", label: "Lương cao nhất" },
-  { value: "salary-low", label: "Lương thấp nhất" },
-  { value: "views", label: "Nhiều lượt xem" },
+/** ===== Sort typing khớp BE ===== */
+type SortBy = "title" | "salary_min" | "created_at" | "views_count";
+
+type SortOrder = "ASC" | "DESC";
+
+type SortValue =
+  | "newest"
+  | "oldest"
+  | "salary-high"
+  | "salary-low"
+  | "views"
+  | "title-az"
+  | "title-za";
+
+type SortOption = {
+  value: SortValue;
+  label: string;
+  apiField: SortBy;
+  order: SortOrder;
+};
+
+const sortOptions: SortOption[] = [
+  { value: "newest",     label: "Mới nhất",        apiField: "created_at", order: "DESC" },
+  { value: "oldest",     label: "Cũ nhất",         apiField: "created_at", order: "ASC"  },
+  // Removed salary_max as it's not supported by backend
+  { value: "salary-low", label: "Lương thấp nhất", apiField: "salary_min", order: "ASC"  },
+  { value: "views",      label: "Nhiều lượt xem",  apiField: "views_count",order: "DESC" },
+  { value: "title-az",   label: "Tiêu đề A→Z",     apiField: "title",      order: "ASC"  },
+  { value: "title-za",   label: "Tiêu đề Z→A",     apiField: "title",      order: "DESC" },
 ];
+const toSortOrder = (v: unknown): SortOrder | undefined =>
+  v === "ASC" || v === "DESC" ? v : undefined;
 
 export function JobList({
   jobs,
   filters,
-  searchQuery,
+  onFiltersChange,
   onApply,
   onSave,
 }: JobListProps) {
-  // ✅ mặc định sắp xếp "Mới nhất"
-  const [sortBy, setSortBy] = useState("newest");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
-  const filteredAndSortedJobs = useMemo(() => {
-    let filtered = jobs;
+  const handleSortChange = useCallback(
+    (value: SortValue) => {
+      const sortOption = sortOptions.find((opt) => opt.value === value);
+      if (!sortOption) return;
 
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (job) =>
-          job.title.toLowerCase().includes(query) ||
-          job.shortDescription.toLowerCase().includes(query) ||
-          job.location.toLowerCase().includes(query) ||
-          job.skills.some((skill) => skill.name.toLowerCase().includes(query))
-      );
-    }
+      onFiltersChange({
+        ...filters,
+        sortBy: sortOption.apiField, // SortBy literal
+        sortOrder: sortOption.order, // SortOrder literal
+      });
+    },
+    [filters, onFiltersChange]
+  );
 
-    if (filters.type.length > 0) {
-      filtered = filtered.filter((job) => filters.type.includes(job.jobType));
-    }
-
-    if (filters.category.length > 0) {
-      filtered = filtered.filter((job) =>
-        filters.category.some((cat) => cat.id === job.categoryId)
-      );
-    }
-
-    if (filters.location.length > 0) {
-      filtered = filtered.filter((job) =>
-        filters.location.some((loc) =>
-          job.location.toLowerCase().includes(loc.toLowerCase())
-        )
-      );
-    }
-
-    // ✅ sắp xếp theo sortBy
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "newest":
-          return (
-            new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
-          );
-        case "oldest":
-          return (
-            new Date(a.postedAt).getTime() - new Date(b.postedAt).getTime()
-          );
-        case "salary-high":
-          return (b.salaryMax ?? 0) - (a.salaryMax ?? 0);
-        case "salary-low":
-          return (a.salaryMax ?? 0) - (b.salaryMax ?? 0);
-        case "views":
-          return (b.viewsCount ?? 0) - (a.viewsCount ?? 0);
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [jobs, filters, searchQuery, sortBy]);
+  // Tính giá trị hiện tại của Select dựa vào filters từ props (đã có từ server/query string)
+  const currentSortValue: SortValue =
+    sortOptions.find(
+      (o) =>
+        o.apiField === (filters.sortBy as SortBy | undefined) &&
+        o.order === toSortOrder(filters.sortOrder)
+    )?.value ?? "newest";
 
   return (
     <div className="space-y-6">
@@ -102,7 +91,7 @@ export function JobList({
         className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card/50 backdrop-blur-sm rounded-lg p-4 border"
       >
         <div className="flex items-center gap-4">
-          <h2>{filteredAndSortedJobs.length} việc làm được tìm thấy</h2>
+          <h2>{jobs.length} việc làm được tìm thấy</h2>
           <div className="flex items-center gap-2">
             <Button
               variant={viewMode === "grid" ? "contained" : "outlined"}
@@ -126,17 +115,17 @@ export function JobList({
         <div className="flex items-center gap-2">
           <ArrowUpDown className="w-4 h-4 text-muted-foreground" />
           <Select
-            value={sortBy}
+            value={currentSortValue}
             size="small"
             displayEmpty
             renderValue={(selected) =>
-              selected ? (
-                sortOptions.find((o) => o.value === selected)?.label
-              ) : (
-                <span style={{ color: "#9e9e9e" }}>Mới nhất</span>
-              )
+              selected
+                ? sortOptions.find((o) => o.value === (selected as SortValue))?.label
+                : <span style={{ color: "#9e9e9e" }}>Mới nhất</span>
             }
-            onChange={(e) => setSortBy(e.target.value)}
+            onChange={(e: SelectChangeEvent<string>) =>
+              handleSortChange(e.target.value as SortValue)
+            }
             MenuProps={{ disableScrollLock: true }}
           >
             {sortOptions.map((option) => (
@@ -150,7 +139,7 @@ export function JobList({
 
       {/* Job Grid/List */}
       <AnimatePresence mode="wait">
-        {filteredAndSortedJobs.length > 0 ? (
+        {jobs.length > 0 ? (
           <motion.div
             key={viewMode}
             initial={{ opacity: 0 }}
@@ -163,7 +152,7 @@ export function JobList({
                 : "space-y-4"
             }
           >
-            {filteredAndSortedJobs.map((job, index) => (
+            {jobs.map((job, index) => (
               <JobCard
                 key={job.id}
                 job={job}
