@@ -14,7 +14,9 @@ export class JobsRepository {
     return extractJsonArray(raw);
   }
 
-  async findFiltered(filter: FilterJobsDto): Promise<{ data: any[]; total: number }> {
+  async findFiltered(
+    filter: FilterJobsDto
+  ): Promise<{ data: any[]; total: number }> {
     const {
       keyword,
       location,
@@ -31,32 +33,40 @@ export class JobsRepository {
       limit = 10,
     } = filter;
 
-    const offset = (page - 1) * limit;
+    const safePage = Math.max(Number(page || 1), 1);
+    const safeLimit = Math.max(Math.min(Number(limit || 10), 100), 1);
+    const offset = (safePage - 1) * safeLimit;
+
+    // ✅ ĐÚNG 13 phần tử theo thứ tự thủ tục
     const params = [
-      keyword || null,
-      location || null,
-      categoryId || null,
-      salaryMin || null,
-      salaryMax || null,
-      jobType || null,
-      companyId || null,
-      skillIds || null,
-      tagIds || null,
-      sortBy,
-      sortOrder,
-      offset,
-      limit,
+      keyword ?? null, // 1 @Keyword
+      location ?? null, // 2 @Location
+      categoryId ?? null, // 3 @CategoryId
+      salaryMin ?? null, // 4 @SalaryMin
+      salaryMax ?? null, // 5 @SalaryMax
+      jobType ?? null, // 6 @JobType
+      companyId ?? null, // 7 @CompanyId
+      skillIds ?? null, // 8 @SkillIds
+      tagIds ?? null, // 9 @TagIds
+      sortBy, // 10 @SortBy
+      sortOrder, // 11 @SortOrder
+      offset, // 12 @Offset
+      safeLimit, // 13 @Limit
     ];
 
-    const raw = await this.em.getConnection().execute('EXEC SP_GetFilteredJobs ?,?,?,?,?,?,?,?,?,?,?,?,?,?', params);
+    // ✅ ĐÚNG 13 "?" placeholders
+    const raw = await this.em
+      .getConnection()
+      .execute('EXEC SP_GetFilteredJobs ?,?,?,?,?,?,?,?,?,?,?,?,?', params);
 
-    if (!raw?.[0]) return { data: [], total: 0 };
+    const row = Array.isArray(raw) ? raw[0] : null;
+    const jsonText = row?.json_result ?? null;
 
-    const result = extractJson(raw);
-    return {
-      data: result.data || [],
-      total: result.total || 0,
-    };
+    if (!jsonText) return { data: [], total: 0 };
+    const list = JSON.parse(jsonText) as any[];
+    const total = list?.[0]?.total ?? 0;
+
+    return { data: list ?? [], total };
   }
 
   async findOne(id: string): Promise<any | null> {
