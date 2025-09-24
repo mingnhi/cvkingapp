@@ -9,7 +9,7 @@ export class EmployerProfilesRepository {
     @InjectRepository(EmployerProfile)
     private readonly repo: EntityRepository<EmployerProfile>,
     private readonly em: EntityManager
-  ) {}
+  ) { }
 
   async findAll(): Promise<EmployerProfile[]> {
     return this.repo.findAll();

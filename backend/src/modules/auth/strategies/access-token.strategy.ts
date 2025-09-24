@@ -30,6 +30,6 @@ export class AccessTokenStrategy extends PassportStrategy(
     if (!user) {
       throw new UnauthorizedException('Người dùng không hợp lệ');
     }
-    return { ...user, roles: payload.roles };
+    return payload;
   }
 }
