@@ -16,6 +16,7 @@ import {
 } from '@modules/job-tags/dtos/job-tag.dto';
 import { ApiResponse } from '@common/interfaces/api-response.interface';
 import { ApiTags } from '@nestjs/swagger';
+import { JobTag } from '@entities/job-tag.entity';
 
 @ApiTags('job-tags')
 @Controller('job-tags')
@@ -27,7 +28,7 @@ export class JobTagsController {
    * @returns List of all job tags wrapped in ApiResponse
    */
   @Get()
-  async findAll(): Promise<ApiResponse<any>> {
+  async findAll(): Promise<ApiResponse<JobTag[]>> {
     const jobTags = await this.JobTagsRepo.findAll();
     return {
       status: 'success',
@@ -45,7 +46,7 @@ export class JobTagsController {
   @Get(':id')
   async findOne(
     @Param('id', ParseUUIDPipe) id: string
-  ): Promise<ApiResponse<any>> {
+  ): Promise<ApiResponse<JobTag>> {
     const jobTag = await this.JobTagsRepo.findOne(id);
     return {
       status: 'success',

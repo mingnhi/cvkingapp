@@ -2,6 +2,7 @@ import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { CreateJobDto } from './dtos/create-job.dto';
 import { UpdateJobDto } from './dtos/update-job.dto';
+import { FilterJobsDto } from './dtos/filter-jobs.dto';
 import extractJson, { extractJsonArray } from 'src/utils/extractJson';
 
 @Injectable()
@@ -11,6 +12,51 @@ export class JobsRepository {
   async findAll(): Promise<any[]> {
     const raw = await this.em.getConnection().execute('EXEC SP_GetAllJobs');
     return extractJsonArray(raw);
+  }
+
+  async findFiltered(filter: FilterJobsDto): Promise<{ data: any[]; total: number }> {
+    const {
+      keyword,
+      location,
+      categoryId,
+      salaryMin,
+      salaryMax,
+      jobType,
+      companyId,
+      skillIds,
+      tagIds,
+      sortBy = 'posted_at',
+      sortOrder = 'DESC',
+      page = 1,
+      limit = 10,
+    } = filter;
+
+    const offset = (page - 1) * limit;
+    const params = [
+      keyword || null,
+      location || null,
+      categoryId || null,
+      salaryMin || null,
+      salaryMax || null,
+      jobType || null,
+      companyId || null,
+      skillIds || null,
+      tagIds || null,
+      sortBy,
+      sortOrder,
+      offset,
+      limit,
+    ];
+
+    const raw = await this.em.getConnection().execute('EXEC SP_GetFilteredJobs ?,?,?,?,?,?,?,?,?,?,?,?,?,?', params);
+
+    if (!raw?.[0]) return { data: [], total: 0 };
+
+    const result = extractJson(raw);
+    return {
+      data: result.data || [],
+      total: result.total || 0,
+    };
   }
 
   async findOne(id: string): Promise<any | null> {

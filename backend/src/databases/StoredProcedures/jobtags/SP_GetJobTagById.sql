@@ -1,11 +1,11 @@
-USE Job;
+USE JOB_DB;
 GO
 
 CREATE OR ALTER PROCEDURE dbo.SP_GetJobTagById
     @JobTagId NVARCHAR(36)
 AS
 BEGIN
-    SELECT id, Name
+    SELECT  * 
     FROM dbo.JobTags
     WHERE id = @JobTagId;
 END;

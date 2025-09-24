@@ -1,4 +1,4 @@
-USE Job;
+USE JOB_DB;
 GO
 
 CREATE OR ALTER PROCEDURE dbo.sp_RemoveSkillFromJob
