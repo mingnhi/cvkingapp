@@ -1,6 +1,6 @@
 import { type UseMutationOptions, useMutation } from '@tanstack/react-query';
-import { loginRequest, logoutRequest, registerRequest, socialLoginRequest } from './request';
-import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, SocialLoginRequest } from './type';
+import { loginRequest, logoutRequest, registerEmployerRequest, registerRequest } from './request';
+import type { LoginRequest, LoginResponse, RegisterEmployerRequest, RegisterEmployerResponse, RegisterRequest, RegisterResponse} from './type';
 
 export const useLoginMutation = (options?: UseMutationOptions<LoginResponse, Error, LoginRequest, unknown>) =>
   useMutation({
@@ -8,13 +8,13 @@ export const useLoginMutation = (options?: UseMutationOptions<LoginResponse, Err
     ...options,
   });
 
-export const useSocialLoginMutation = (
-  options?: UseMutationOptions<LoginResponse, Error, SocialLoginRequest, unknown>
-) =>
-  useMutation({
-    mutationFn: (params: SocialLoginRequest) => socialLoginRequest(params),
-    ...options,
-  });
+// export const useSocialLoginMutation = (
+//   options?: UseMutationOptions<LoginResponse, Error, SocialLoginRequest, unknown>
+// ) =>
+//   useMutation({
+//     mutationFn: (params: SocialLoginRequest) => socialLoginRequest(params),
+//     ...options,
+//   });
 
 export const useRegisterMutation = (options?: UseMutationOptions<RegisterResponse, Error, RegisterRequest, unknown>) =>
   useMutation({
@@ -22,6 +22,12 @@ export const useRegisterMutation = (options?: UseMutationOptions<RegisterRespons
     ...options,
   });
 
+
+export const useRegisterEmployerMutation = (options?: UseMutationOptions<RegisterEmployerResponse, Error, RegisterEmployerRequest, unknown>) =>
+  useMutation({
+    mutationFn: (params: RegisterEmployerRequest) => registerEmployerRequest(params),
+    ...options,
+  })
 export const useLogoutMutation = (options?: UseMutationOptions<null, Error, { refreshToken: string }, unknown>) =>
   useMutation({
     mutationFn: (params: { refreshToken: string }) => logoutRequest(params),

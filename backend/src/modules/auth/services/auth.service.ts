@@ -34,7 +34,7 @@ export class AuthService {
 
     @InjectRepository(EmployerProfile)
     private readonly employerRepo: EntityRepository<EmployerProfile>
-  ) {}
+  ) { }
   private async signTokens(userId: string, email: string) {
     const userRoleEntities = await this.usersRoleService.findByUser(userId);
 
@@ -84,10 +84,12 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
     const user = await this.usersService.createUser({
+
       email: dto.email,
       password: hashedPassword,
       displayName: dto.fullName,
-    });
+    }
+    );
 
     // gán role JobSeeker
     const jobSeekerRole = await this.rolesService.findByName('JobSeeker');

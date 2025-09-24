@@ -13,8 +13,11 @@ import {
 import { Lock, Mail, User, Eye, EyeOff, Building2 } from "lucide-react";
 import AuthSidebar from "@/components/layout/Sidebar/AuthSidebar";
 import Link from "next/link";
+import { useRegisterEmployerMutation, useRegisterMutation } from "@/api/auth/query";
+import { useRouter } from "next/navigation";
 
 const Register: React.FC = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -24,9 +27,50 @@ const Register: React.FC = () => {
   const [agreeTerms, setAgreeTerms] = useState(false);
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+   const [companyName, setCompanyName] = useState("");
+  const [fullName, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
+  const { mutate: registerJobSeeker, isPending: isRegisteringJobSeeker } =
+    useRegisterMutation({
+      onSuccess: (data) => {
+        localStorage.setItem("accessToken", data.accessToken ?? "");
+        localStorage.setItem("refreshToken", data.refreshToken ?? "");
+        alert("Đăng ký thành công! Hãy đăng nhập.");
+        router.push("/login");
+      },
+      onError: () => alert("Đăng ký thất bại"),
+    });
 
+  const { mutate: registerEmployer, isPending: isRegisteringEmployer } =
+    useRegisterEmployerMutation({
+      onSuccess: (data) => {
+        localStorage.setItem("accessToken", data.accessToken ?? "");
+        localStorage.setItem("refreshToken", data.refreshToken ?? "");
+        alert("Đăng ký nhà tuyển dụng thành công! Hãy đăng nhập.");
+        router.push("/login");
+      },
+      onError: () => alert("Đăng ký thất bại"),
+    });
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!agreeTerms) return alert("Bạn phải đồng ý điều khoản");
+    if (password !== confirmPassword) return alert("Mật khẩu không khớp");
+
+    if (accountType === "job-seeker") {
+      registerJobSeeker({ email, fullName, password });
+    } else {
+      if (!companyName.trim()) return alert("Vui lòng nhập tên công ty");
+      registerEmployer({
+        email,
+        password,
+        contactName: fullName,
+        companyName,
+      });
+    }
+  };
   return (
     <Box className="flex flex-col md:grid md:grid-cols-12 min-h-screen">
       <AuthSidebar />
@@ -42,7 +86,7 @@ const Register: React.FC = () => {
             Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý
             tưởng
           </span>
-          <form className="my-8">
+          <form className="my-8" onSubmit={handleSubmit}>
             {/* Tabs for account type */}
             <Box className="mb-6">
               <p className="mb-2 text-sm text-gray-600">I want to:</p>
@@ -94,6 +138,9 @@ const Register: React.FC = () => {
                 id="fullname"
                 label={accountType === "employer" ? "Tên liên hệ" : "Họ và tên"}
                 type="text"
+                value={fullName}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
                 variant="outlined"
                 placeholder={
                   accountType === "employer"
@@ -118,6 +165,9 @@ const Register: React.FC = () => {
                   type="text"
                   variant="outlined"
                   placeholder="Nhập tên công ty"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  autoComplete="company"
                   className="hover:border focus:border [&_.MuiInputBase-root]:h-12 [&_.MuiInputBase-root]:!rounded-lg"
                   InputProps={{
                     startAdornment: (
@@ -134,6 +184,9 @@ const Register: React.FC = () => {
                 id="email"
                 label="Email"
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
                 variant="outlined"
                 placeholder="Nhập email"
                 className="hover:border focus:border [&_.MuiInputBase-root]:h-12 [&_.MuiInputBase-root]:!rounded-lg"
@@ -151,6 +204,9 @@ const Register: React.FC = () => {
                 id="password"
                 label="Mật khẩu"
                 type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
                 variant="outlined"
                 placeholder="Nhập mật khẩu"
                 className="hover:border focus:border [&_.MuiInputBase-root]:h-12 [&_.MuiInputBase-root]:!rounded-lg"
@@ -179,6 +235,7 @@ const Register: React.FC = () => {
                 placeholder="Nhập lại mật khẩu"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
                 className="hover:border focus:border [&_.MuiInputBase-root]:h-12 [&_.MuiInputBase-root]:!rounded-lg"
                 InputProps={{
                   startAdornment: (
@@ -235,7 +292,9 @@ const Register: React.FC = () => {
             </FormGroup>
 
             <Button
+              type="submit"
               fullWidth
+              disabled={isRegisteringJobSeeker || isRegisteringEmployer}
               sx={{
                 py: 1.5,
                 backgroundColor: "orange",

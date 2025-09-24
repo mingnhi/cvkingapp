@@ -4,10 +4,29 @@ import { Button, Box, TextField } from "@mui/material";
 import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 import AuthSidebar from "@/components/layout/Sidebar/AuthSidebar";
 import Link from "next/link";
+import { useLoginMutation } from "@/api/auth/query";
+import { useRouter } from "next/navigation";
 
 const Login: React.FC = () => {
+  const router = useRouter(); 
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
+  const { mutate: login, isPending } = useLoginMutation({
+    onSuccess: (data) => {
+      localStorage.setItem("accessToken", data.accessToken ?? "");
+      localStorage.setItem("refreshToken", data.refreshToken ?? "");
+      alert(" Đăng nhập thành công");
+      router.push("/");
+    },
+    onError: () => alert("Sai email hoặc mật khẩu"),
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    login({ email, password });
+  }
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   return (
@@ -21,13 +40,16 @@ const Login: React.FC = () => {
           <span className="text-gray-400">
             Nơi đưa bạn đến gần hơn với công việc mơ ước
           </span>
-          <form className="my-8">
+          <form className="my-8" onSubmit={handleSubmit}>
             <Box className="mb-4 ">
               <TextField
                 fullWidth
                 id="email"
                 label="Email"
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
                 variant="outlined"
                 placeholder="Nhập email"
                 className="hover:border focus:border [&_.MuiInputBase-root]:h-12 [&_.MuiInputBase-root]:!rounded-lg"
@@ -44,6 +66,9 @@ const Login: React.FC = () => {
                 id="password"
                 label="Password"
                 type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
                 variant="outlined"
                 placeholder="Nhập mật khẩu"
                 className="hover:border focus:border [&_.MuiInputBase-root]:h-12 [&_.MuiInputBase-root]:!rounded-lg"
@@ -68,7 +93,9 @@ const Login: React.FC = () => {
               </a>
             </p>
             <Button
+              type="submit"
               fullWidth
+              disabled={isPending}
               sx={{
                 py: 1.5,
                 backgroundColor: "orange",

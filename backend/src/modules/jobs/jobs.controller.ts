@@ -19,7 +19,7 @@ import { UpdateJobDto } from './dtos/update-job.dto';
 @ApiTags('jobs')
 @Controller('jobs')
 export class JobsController {
-  constructor(private readonly repo: JobsRepository) {}
+  constructor(private readonly repo: JobsRepository) { }
 
   @Get()
   async findAll(): Promise<ApiResponse<any>> {
