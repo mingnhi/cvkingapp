@@ -34,13 +34,7 @@ export const CreateJobSchema = z
 
     JobType: z
       .enum([
-        "Full-time",
-        "Part-time",
-        "Contract",
-        "Freelance",
-        "Internship",
-        "Temporary",
-        "Remote",
+        "Toàn thời gian", "Bán thời gian", "Hợp đồng", "Freelance"
       ])
       .optional(),
 
@@ -172,13 +166,7 @@ export const JobFilterSchema = z
     salaryMax: z.coerce.number().int().nonnegative().optional(),
     jobType: z
       .enum([
-        "Full-time",
-        "Part-time",
-        "Contract",
-        "Freelance",
-        "Internship",
-        "Temporary",
-        "Remote",
+       "Toàn thời gian", "Bán thời gian", "Hợp đồng", "Freelance"
       ])
       .optional(),
     companyId: z.string().uuid().optional(),
@@ -188,8 +176,8 @@ export const JobFilterSchema = z
     tagIds: z.string().optional(),
 
     sortBy: z
-      .enum(["title", "salary_min", "posted_at", "views_count"])
-      .default("posted_at"),
+      .enum(["title", "salary_min", "created_at", "views_count"])
+      .default("title"),
     sortOrder: z.enum(["ASC", "DESC"]).default("DESC"),
 
     page: z.coerce.number().int().positive().default(1),
