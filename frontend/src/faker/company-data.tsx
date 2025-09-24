@@ -1,3 +1,97 @@
+
+import company from "@/assets/images/employee.png";
+export  const companies = [
+     {
+  id: 1,
+  name: 'TechCorp Innovation',
+  logo: company,
+  industry: 'Technology1',
+  location: 'Ho Chi Minh City',
+  employees: '500-1000',
+  rating: 4.8,
+  openJobs: 15,
+  description: 'Công ty công nghệ hàng đầu chuyên về giải pháp AI và máy học.',
+  founded: '2015',
+  website: 'www.techcorp-innovation.com',
+  benefits: ['Bảo hiểm y tế', 'Giờ làm việc linh hoạt', 'Làm việc từ xa', 'Ngân sách học tập'],
+  culture: 'Văn hóa đổi mới, tập trung vào công nghệ tiên tiến và phát triển nghề nghiệp.'
+},
+{
+  id: 2,
+  name: 'StartupVN',
+  logo: company,
+  industry: 'Fintech',
+  location: 'Hanoi',
+  employees: '100-500',
+  rating: 4.6,
+  openJobs: 8,
+  description: 'Startup fintech mang tính cách mạng, thay đổi thanh toán số tại Việt Nam.',
+  founded: '2018',
+  website: 'www.startupvn.com',
+  benefits: ['Cổ phần', 'Bữa trưa miễn phí', 'Thẻ thành viên phòng gym', 'Sự kiện nhóm'],
+  culture: 'Môi trường startup năng động, cơ hội phát triển sự nghiệp nhanh chóng.'
+},
+{
+  id: 3,
+  name: 'DesignStudio Pro',
+  logo: company,
+  industry: 'Design & Creative',
+  location: 'Da Nang',
+  employees: '50-100',
+  rating: 4.9,
+  openJobs: 5,
+  description: 'Công ty thiết kế đạt nhiều giải thưởng, tạo ra trải nghiệm số xuất sắc.',
+  founded: '2012',
+  website: 'www.designstudio-pro.com',
+  benefits: ['Tự do sáng tạo', 'Công cụ thiết kế', 'Ngân sách hội thảo', 'Lịch làm việc linh hoạt'],
+  culture: 'Môi trường sáng tạo, hợp tác, đề cao sự xuất sắc trong thiết kế.'
+},
+{
+  id: 4,
+  name: 'CloudTech Solutions',
+  logo: company,
+  industry: 'Cloud Computing',
+  location: 'Remote',
+  employees: '200-500',
+  rating: 4.7,
+  openJobs: 12,
+  description: 'Chuyên gia hạ tầng đám mây giúp doanh nghiệp mở rộng toàn cầu.',
+  founded: '2016',
+  website: 'www.cloudtech-solutions.com',
+  benefits: ['100% làm từ xa', 'Cung cấp thiết bị', 'Đội ngũ toàn cầu', 'Mức lương cạnh tranh'],
+  culture: 'Văn hóa làm việc từ xa, đề cao cân bằng công việc-cuộc sống và hợp tác toàn cầu.'
+},
+{
+  id: 5,
+  name: 'GrowthCo Marketing',
+  logo: company,
+  industry: 'Marketing',
+  location: 'Ho Chi Minh City',
+  employees: '100-200',
+  rating: 4.5,
+  openJobs: 7,
+  description: 'Công ty marketing dựa trên dữ liệu, thúc đẩy tăng trưởng thương hiệu tại châu Á.',
+  founded: '2017',
+  website: 'www.growthco-marketing.com',
+  benefits: ['Thưởng hiệu suất', 'Công cụ marketing', 'Tiếp xúc khách hàng', 'Phát triển sự nghiệp'],
+  culture: 'Văn hóa định hướng kết quả, tập trung vào chiến lược marketing dựa trên dữ liệu.'
+},
+{
+  id: 6,
+  name: 'DataFlow Analytics',
+  logo: company,
+  industry: 'Data Science',
+  location: 'Can Tho',
+  employees: '50-100',
+  rating: 4.8,
+  openJobs: 9,
+  description: 'Nền tảng phân tích nâng cao hỗ trợ ra quyết định dựa trên dữ liệu.',
+  founded: '2019',
+  website: 'www.dataflow-analytics.com',
+  benefits: ['Công cụ khoa học dữ liệu', 'Thời gian nghiên cứu', 'Tham dự hội thảo', 'Dự án sáng tạo'],
+  culture: 'Môi trường nghiên cứu, khuyến khích đổi mới và học hỏi liên tục.'
+}];
+
 export const Locations = [
     "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Kạn", "Bạc Liêu", "Bắc Ninh",
     "Bến Tre", "Bình Định", "Bình Dương", "Bình Phước", "Bình Thuận", "Cà Mau", "Cần Thơ",

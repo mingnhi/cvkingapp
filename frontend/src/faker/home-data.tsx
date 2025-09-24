@@ -1,5 +1,21 @@
 import employee from "@/assets/images/employee.png";
-
+export const jobSeekerData = {
+    name: 'Nguyễn Văn An',
+    email: 'nguyen.van.a@email.com',
+    phone: '0987 654 321',
+    title: 'Lập trình viên Frontend Senior',
+    summary: 'Lập trình viên Frontend chuyên nghiệp...',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+};
+export const employerData = {
+    companyName: 'TechCorp Vietnam',
+    contactName: 'Phòng Nhân sự',
+    email: 'hr@techcorp.vn',
+    phone: '028 3812 3456',
+    description: 'Công ty phát triển phần mềm hàng đầu...',
+    avatar: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=150&h=150&fit=crop&crop=face',
+};
+export const skills = ['React', 'TypeScript', 'Node.js', 'MongoDB'];
 export const mockJobs= [
           {
             id: 1,
