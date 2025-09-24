@@ -14,7 +14,7 @@ interface RefreshTokenResponse {
 let refreshTokenPromise: Promise<string | null> | null = null;
 
 const instance = axios.create({
-  baseURL: env.API_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -93,22 +93,31 @@ const handleError = async (error: unknown) => {
 };
 
 // Request interceptor
-instance.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = useAuthStore.getState().token;
-    if (token && config.headers) {
+// instance.interceptors.request.use(
+//   (config: InternalAxiosRequestConfig) => {
+//     const token = useAuthStore.getState().token;
+//     if (token && config.headers) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error: unknown) => {
+//     if (isAxiosError(error)) {
+//       return Promise.reject(error);
+//     }
+//     console.error('Request error:', error);
+//     return Promise.reject(error);
+//   }
+// );
+instance.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    return config;
-  },
-  (error: unknown) => {
-    if (isAxiosError(error)) {
-      return Promise.reject(error);
-    }
-    console.error('Request error:', error);
-    return Promise.reject(error);
   }
-);
+  return config;
+});
 
 // Response interceptor
 instance.interceptors.response.use(

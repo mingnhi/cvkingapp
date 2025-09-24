@@ -13,10 +13,27 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../common/avatar//avatar
 import { Button } from '../../common/button/button';
 import { useApp } from '@/components/AppContext';
 import { useRouter } from 'next/navigation';
-import {Progress } from '../../common/progress/progress';
+import { Progress } from '../../common/progress/progress';
+import { useMyProfileQuery } from '@/api/user/query';
 const MyProfile = () => {
     const { navigateTo } = useApp();
     const router = useRouter();
+    const accessToken =
+        typeof window !== "undefined"
+            ? localStorage.getItem("accessToken")
+            : null;
+    if (!accessToken) {
+    if (typeof window !== "undefined") router.push("/login");
+    return <div className="p-6">Đang chuyển hướng đến trang đăng nhập...</div>;
+  }
+
+            
+
+    const { data, isPending, isError } = useMyProfileQuery();
+    if (isPending) return <div className="p-6">Đang tải dữ liệu hồ sơ...</div>;
+    if (isError || !data) return <div className="p-6 text-red-500">Không thể tải thông tin hồ sơ</div>;
+    const user = data
+
     return (
         <div className="space-y-6 max-w-[1520px]" >
             <div className="flex items-center justify-between">
@@ -29,11 +46,11 @@ const MyProfile = () => {
                             <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" />
                         </Avatar>
                         <div className="flex-1 mt-2">
-                            <h2>Nguyen Van A</h2>
+                            <h2>{ user.displayName}</h2>
                             <p className="text-gray-600">Senior Frontend Developer</p>
                             <div className="flex items-center text-sm text-gray-500 mt-2">
                                 <MapPin className="w-4 h-4 mr-1" />
-                                Ho Chi Minh City, Vietnam
+                                {user.preferredLocale}
                             </div>
                             <div className="flex items-center text-sm text-gray-500 mt-1">
                                 <DollarSign className="w-4 h-4 mr-1" />
@@ -63,17 +80,24 @@ const MyProfile = () => {
                             <h3 className="mb-3">Thông tin kết nối</h3>
                             <div className="space-y-2 text-sm">
                                 <p><span className="font-medium">Email:</span>
-                                    <button className="text-primary hover:underline ml-1">nguyen.van.a@email.com</button>
+                                    <button className="text-primary hover:underline ml-1">{ user.email}</button>
                                 </p>
-                                <p><span className="font-medium">Phone:</span>
-                                    <button className="text-primary hover:underline ml-1">+84 123 456 789</button>
-                                </p>
-                                <p><span className="font-medium">LinkedIn:</span>
-                                    <button className="text-primary hover:underline ml-1">linkedin.com/in/nguyenvana</button>
-                                </p>
-                                <p><span className="font-medium">GitHub:</span>
-                                    <button className="text-primary hover:underline ml-1">github.com/nguyenvana</button>
-                                </p>
+                                {user.linkedInId && (
+                                    <p>
+                                        <span className="font-medium">LinkedIn:</span>
+                                        <button className="text-primary hover:underline ml-1">
+                                        {user.linkedInId}
+                                        </button>
+                                    </p>
+                                )}
+                                {user.googleId && (
+                                    <p>
+                                        <span className="font-medium">google:</span>
+                                        <button className="text-primary hover:underline ml-1">
+                                        {user.googleId}
+                                        </button>
+                                    </p>
+                                )}
                             </div>
                         </div>
 
