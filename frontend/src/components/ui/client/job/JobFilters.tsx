@@ -1,95 +1,106 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { Search, Filter, X } from "lucide-react";
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Input,
-  MenuItem,
-  useMediaQuery,
-} from "@mui/material";
+import { Badge, Button, Card, CardContent, CardHeader, Input, MenuItem, useMediaQuery } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { JobFilters as JobFiltersType, JobCategory } from "@/types/job.type";
+import { JobFilter } from "@/api/Job/type";
+import { JobCategory } from "@/api/JobCategory/type";
+import { useDebounce } from "@/lib/hook/useDebounce";
+
 
 interface JobFiltersProps {
-  filters: JobFiltersType;
+  filters: Partial<JobFilter>;
   categories: JobCategory[];
-  onFiltersChange: (filters: JobFiltersType) => void;
+  onFiltersChange: (filters: Partial<JobFilter>) => void;
   onSearch: (query: string) => void;
 }
 
-const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Freelance"];
-const EXP_LEVELS = ["Entry Level", "Mid Level", "Senior Level", "Executive"];
+const JOB_TYPES = ["Toàn thời gian", "Bán thời gian", "Hợp đồng", "Freelance"];
 const SALARY_RANGES = [
-  "Under $50K",
-  "$50K - $75K",
-  "$75K - $100K",
-  "$100K - $150K",
-  "Above $150K",
+  { label: "Under 50 triệu", value: { salaryMin: 0, salaryMax: 50000000 } },
+  { label: "50 - 75 triệu", value: { salaryMin: 50000000, salaryMax: 75000000 } },
+  { label: "75 - 100 triệu", value: { salaryMin: 75000000, salaryMax: 100000000 } },
+  { label: "100 - 150 triệu", value: { salaryMin: 100000000, salaryMax: 150000000 } },
+  { label: "Above 150 triệu", value: { salaryMin: 150000000, salaryMax: undefined } },
 ];
 
-export function JobFilters({
-  filters,
-  categories,
-  onFiltersChange,
-  onSearch,
-}: JobFiltersProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+/**
+ * Component hiển thị bộ lọc tìm kiếm công việc, tích hợp với JobFilterSchema.
+ * Sử dụng useDebounce để tối ưu hóa tìm kiếm.
+ */
+export function JobFilters({ filters, categories, onFiltersChange, onSearch }: JobFiltersProps) {
+  const [searchQuery, setSearchQuery] = useState(filters.keyword || "");
+  const [location, setLocation] = useState(filters.location || "");
   const [isExpanded, setIsExpanded] = useState(false);
   const isDesktop = useMediaQuery("(min-width:768px)", { noSsr: true });
   const [mounted, setMounted] = useState(false);
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const debouncedLocation = useDebounce(location, 500);
+
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    onFiltersChange({ ...filters, keyword: debouncedSearchQuery });
+    onSearch(debouncedSearchQuery);
+  }, [debouncedSearchQuery, onFiltersChange, onSearch]);
+
+  useEffect(() => {
+    onFiltersChange({ ...filters, location: debouncedLocation });
+  }, [debouncedLocation, onFiltersChange]);
 
   const show = isExpanded || isDesktop;
   const hasActiveFilters = useMemo(
-    () => Object.values(filters).some((a) => a.length > 0),
+    () => Object.values(filters).some((a) => (Array.isArray(a) ? a.length > 0 : !!a)),
     [filters]
   );
 
-  // helpers
-  const addFilter = (
-    type: keyof JobFiltersType,
-    value: string | JobCategory
-  ) => {
+  const addFilter = (type: keyof JobFilter, value: string | JobCategory | { salaryMin?: number; salaryMax?: number }) => {
     const next = { ...filters };
-    if (type === "category") {
+    if (type === "categoryId") {
       const v = value as JobCategory;
-      if (!next.category.some((c) => c.id === v.id))
-        next.category = [...next.category, v];
+      next.categoryId = v.id;
+    } else if (type === "salaryMin" || type === "salaryMax") {
+      const v = value as { salaryMin?: number; salaryMax?: number };
+      next.salaryMin = v.salaryMin;
+      next.salaryMax = v.salaryMax;
     } else {
       const v = String(value);
-      if (!next[type].includes(v)) next[type] = [...next[type], v];
+      next[type] = v as any;
     }
     onFiltersChange(next);
   };
 
-  const removeFilter = (type: keyof JobFiltersType, value: string) => {
+  const removeFilter = (type: keyof JobFilter) => {
     const next = { ...filters };
-    if (type === "category")
-      next.category = next.category.filter((c) => c.id !== value);
-    else next[type] = next[type].filter((v) => v !== value);
+    if (type === "categoryId") {
+      next.categoryId = undefined;
+    } else if (type === "salaryMin" || type === "salaryMax") {
+      next.salaryMin = undefined;
+      next.salaryMax = undefined;
+    } else {
+      next[type] = undefined;
+    }
     onFiltersChange(next);
   };
 
-  const clearAll = () =>
+  const clearAll = () => {
     onFiltersChange({
-      type: [],
-      location: [],
-      experience: [],
-      salaryRange: [],
-      category: [],
+      page: 1,
+      limit: 10,
+      sortBy: "title",
+      sortOrder: "DESC",
     });
+    setSearchQuery("");
+    setLocation("");
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch(searchQuery);
+    onSearch(debouncedSearchQuery);
   };
 
-  // small, reusable Select
   const SelectFilter = ({
     label,
     placeholder,
@@ -98,8 +109,9 @@ export function JobFilters({
   }: {
     label: string;
     placeholder: string;
-    items: { value: string; label: string }[];
-    onPick: (val: string) => void;
+    items: { value: string | { salaryMin?: number; salaryMax?: number }; label: string }[];
+    onPick: (val: string | { salaryMin?: number; salaryMax?: number }) => void;
+    valueKey: keyof JobFilter;
   }) => (
     <div>
       <label className="text-sm mb-2 block">{label}</label>
@@ -107,16 +119,13 @@ export function JobFilters({
         value=""
         className="w-full"
         displayEmpty
-        renderValue={(selected) =>
-          selected ? (
-            items.find((i) => i.value === selected)?.label ?? ""
-          ) : (
-            <span style={{ color: "#9e9e9e" }}>{placeholder}</span>
-          )
-        }
+        renderValue={() => <span style={{ color: "#9e9e9e" }}>{placeholder}</span>}
         onChange={(e: SelectChangeEvent<string>) => {
           const v = e.target.value as string;
-          if (v) onPick(v);
+          if (v) {
+            const item = items.find((i) => i.value === v || i.label === v);
+            if (item) onPick(item.value);
+          }
         }}
         MenuProps={{ disableScrollLock: true }}
       >
@@ -124,7 +133,7 @@ export function JobFilters({
           {placeholder}
         </MenuItem>
         {items.map((it) => (
-          <MenuItem key={it.value} value={it.value}>
+          <MenuItem key={it.label} value={typeof it.value === "string" ? it.value : it.label}>
             {it.label}
           </MenuItem>
         ))}
@@ -154,11 +163,7 @@ export function JobFilters({
               onClick={() => setIsExpanded(!isExpanded)}
               sx={{ display: { xs: "inline-flex", md: "none" } }}
             >
-              {isExpanded ? (
-                <X className="w-4 h-4" />
-              ) : (
-                <Filter className="w-4 h-4" />
-              )}
+              {isExpanded ? <X className="w-4 h-4" /> : <Filter className="w-4 h-4" />}
             </Button>
           }
         />
@@ -183,12 +188,7 @@ export function JobFilters({
                 }}
               />
             </div>
-            <Button
-              type="submit"
-              size="small"
-              variant="contained"
-              color="warning"
-            >
+            <Button type="submit" size="small" variant="contained" color="warning">
               Tìm
             </Button>
           </form>
@@ -223,50 +223,42 @@ export function JobFilters({
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-1">
-                  {filters.type.map((v) => (
-                    <Badge key={v} variant="standard" className="text-xs">
-                      {v}
-                      <Button
-                        onClick={() => removeFilter("type", v)}
-                        className="ml-1 hover:text-destructive"
-                      >
+                  {filters.jobType && (
+                    <Badge variant="standard" className="text-xs">
+                      {filters.jobType}
+                      <Button onClick={() => removeFilter("jobType")} className="ml-1 hover:text-destructive">
                         <X className="w-3 h-3" />
                       </Button>
                     </Badge>
-                  ))}
-                  {filters.category.map((c) => (
-                    <Badge key={c.id} variant="standard" className="text-xs">
-                      {c.name}
-                      <Button
-                        onClick={() => removeFilter("category", c.id)}
-                        className="ml-1 hover:text-destructive"
-                      >
+                  )}
+                  {filters.categoryId && categories.find((c) => c.id === filters.categoryId) && (
+                    <Badge variant="standard" className="text-xs">
+                      {categories.find((c) => c.id === filters.categoryId)?.name}
+                      <Button onClick={() => removeFilter("categoryId")} className="ml-1 hover:text-destructive">
                         <X className="w-3 h-3" />
                       </Button>
                     </Badge>
-                  ))}
-                  {filters.experience.map((v) => (
-                    <Badge key={v} variant="standard" className="text-xs">
-                      {v}
-                      <Button
-                        onClick={() => removeFilter("experience", v)}
-                        className="ml-1 hover:text-destructive"
-                      >
+                  )}
+                  {(filters.salaryMin || filters.salaryMax) && (
+                    <Badge variant="standard" className="text-xs">
+                      {SALARY_RANGES.find(
+                        (r) =>
+                          r.value.salaryMin === filters.salaryMin &&
+                          r.value.salaryMax === filters.salaryMax
+                      )?.label || `${filters.salaryMin || 0} - ${filters.salaryMax || "∞"} VNĐ`}
+                      <Button onClick={() => removeFilter("salaryMin")} className="ml-1 hover:text-destructive">
                         <X className="w-3 h-3" />
                       </Button>
                     </Badge>
-                  ))}
-                  {filters.salaryRange.map((v) => (
-                    <Badge key={v} variant="standard" className="text-xs">
-                      {v}
-                      <Button
-                        onClick={() => removeFilter("salaryRange", v)}
-                        className="ml-1 hover:text-destructive"
-                      >
+                  )}
+                  {filters.location && (
+                    <Badge variant="standard" className="text-xs">
+                      {filters.location}
+                      <Button onClick={() => removeFilter("location")} className="ml-1 hover:text-destructive">
                         <X className="w-3 h-3" />
                       </Button>
                     </Badge>
-                  ))}
+                  )}
                 </div>
               </motion.div>
             )}
@@ -276,7 +268,8 @@ export function JobFilters({
               label="Loại công việc"
               placeholder="Chọn loại"
               items={JOB_TYPES.map((v) => ({ value: v, label: v }))}
-              onPick={(v) => addFilter("type", v)}
+              onPick={(v) => addFilter("jobType", v)}
+              valueKey="jobType"
             />
 
             <SelectFilter
@@ -285,39 +278,35 @@ export function JobFilters({
               items={categories.map((c) => ({ value: c.id, label: c.name }))}
               onPick={(id) => {
                 const cat = categories.find((c) => c.id === id);
-                if (cat) addFilter("category", cat);
+                if (cat) addFilter("categoryId", cat);
               }}
-            />
-
-            <SelectFilter
-              label="Kinh nghiệm"
-              placeholder="Chọn kinh nghiệm"
-              items={EXP_LEVELS.map((v) => ({ value: v, label: v }))}
-              onPick={(v) => addFilter("experience", v)}
+              valueKey="categoryId"
             />
 
             <SelectFilter
               label="Mức lương"
               placeholder="Chọn mức lương"
-              items={SALARY_RANGES.map((v) => ({ value: v, label: v }))}
-              onPick={(v) => addFilter("salaryRange", v)}
+              items={SALARY_RANGES}
+              onPick={(v) => addFilter("salaryMin", v)}
+              valueKey="salaryMin"
             />
 
-            {/* Location */}
             <div>
               <label className="text-sm mb-2 block">Địa điểm</label>
               <Input
                 placeholder="Nhập địa điểm..."
-                className="w-full"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     const v = (e.target as HTMLInputElement).value.trim();
                     if (v) {
                       addFilter("location", v);
-                      (e.target as HTMLInputElement).value = "";
+                      setLocation("");
                     }
                   }
                 }}
+                className="w-full"
               />
             </div>
           </CardContent>

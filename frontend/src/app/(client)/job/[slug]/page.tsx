@@ -1,128 +1,77 @@
 "use client";
-import React, { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import React, { useState, useCallback } from "react";
+import { useParams } from "next/navigation";
 import BreadcrumbTabActive from "@/components/ui/common/breadcrumb/BreadcrumbTabActive";
 import JobHeader from "@/components/ui/client/job/job-details/JobHeader";
 import JobContent from "@/components/ui/client/job/job-details/JobContent";
 import CompanySidebar from "@/components/ui/client/job/job-details/CompanySidebar";
-import RelatedJobsSidebar from "@/components/ui/client/job/job-details/RelatedJobsSidebar";
 import ApplyModal from "@/components/ui/client/job/job-details/ApplyModal";
 
-interface JobDetailPageProps {
-  jobId: string | null;
-  navigate?: (page: string, id?: string) => void;
-}
+import { formatDistanceToNow } from "date-fns";
+import { vi } from "date-fns/locale";
+import { useJobByIdQuery } from "@/api/Job/query";
 
-export default function JobDetailPage({ jobId, navigate }: JobDetailPageProps) {
+export default function JobDetailPage() {
   const [showApplyModal, setShowApplyModal] = useState(false);
+  const { slug } = useParams<{ slug: string }>();
 
-  // Mock job data
-  const job = {
-    id: jobId || "1",
-    title: "Lập Trình Viên Frontend Senior",
-    company: "TechCorp Vietnam",
-    logo: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=96&h=96&fit=crop&crop=face",
-    location: "TP. Hồ Chí Minh",
-    salary: "25 - 35 triệu",
-    type: "Toàn thời gian",
-    experience: "3-5 năm",
-    posted: "2 ngày trước",
-    deadline: "30/12/2024",
-    featured: true,
-    urgent: false,
-    views: 234,
-    applicants: 45,
-    tags: ["React", "TypeScript", "Node.js", "Remote", "Senior Level"],
-    description: `
-Chúng tôi đang tìm kiếm một Senior Frontend Developer có kinh nghiệm để gia nhập đội ngũ phát triển sản phẩm của chúng tôi. 
-Bạn sẽ chịu trách nhiệm xây dựng và duy trì các ứng dụng web hiện đại, làm việc chặt chẽ với đội thiết kế UX/UI và backend.
+  // Lấy chi tiết công việc
+  const { data: job, isLoading, isError } = useJobByIdQuery(slug);
 
-🔹 Trách nhiệm chính:
-• Phát triển và duy trì ứng dụng web với React, TypeScript  
-• Hợp tác với đội thiết kế để hiện thực hóa UI/UX  
-• Tối ưu hiệu suất và trải nghiệm người dùng  
-• Code review & mentoring junior developer  
-• Tham gia vào quy trình phát triển sản phẩm
+  // Xử lý sự kiện ứng tuyển
+  const handleApply = useCallback(() => {
+    setShowApplyModal(false);
+  }, []);
 
-🔹 Môi trường làm việc:
-• Văn phòng hiện đại tại trung tâm TP.HCM  
-• Flexible working time  
-• Remote 2-3 ngày/tuần  
-• Team building & hoạt động nội bộ thường xuyên
-    `,
-    requirements: [
-      "3+ năm kinh nghiệm với React và TypeScript",
-      "Hiểu biết sâu về HTML, CSS, JavaScript ES6+",
-      "Kinh nghiệm với state management (Redux, Zustand)",
-      "Có kinh nghiệm làm việc với API RESTful và GraphQL",
-      "Kiến thức về testing (Jest, React Testing Library)",
-      "Kinh nghiệm với Git và CI/CD",
-      "Khả năng giao tiếp tốt và làm việc nhóm",
-    ],
-    benefits: [
-      "Lương từ 25-35 triệu VND (có thể thương lượng theo năng lực)",
-      "Thưởng dự án và KPI hấp dẫn",
-      "Bảo hiểm xã hội, y tế đầy đủ theo quy định",
-      "Bảo hiểm sức khỏe cao cấp cho cá nhân và gia đình",
-      "Làm việc từ xa 2-3 ngày/tuần",
-      "13th month salary + performance bonus",
-      "Cơ hội học tập và phát triển với budget training",
-      "Môi trường làm việc trẻ, năng động và sáng tạo",
-      "Các hoạt động team building, du lịch công ty",
-    ],
-    companyInfo: {
-      name: "TechCorp Vietnam",
-      size: "100-500 nhân viên",
-      industry: "Công nghệ thông tin",
-      website: "https://techcorp.vn",
-      email: "hr@techcorp.vn",
-      phone: "+84 28 1234 5678",
-      address: "Tầng 15, Tòa nhà ABC, 123 Nguyễn Huệ, Quận 1, TP.HCM",
-      established: "2016",
-      specialties: [
-        "Web Development",
-        "Mobile Apps",
-        "Cloud Solutions",
-        "AI/ML",
-      ],
-    },
-  };
+  // Xử lý trạng thái tải
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">Đang tải...</p>
+      </div>
+    );
+  }
 
-  const relatedJobs = [
-    {
-      id: "2",
-      title: "Frontend Developer",
-      company: "StartupVN",
-      salary: "18 - 25 triệu",
-      location: "Hà Nội",
-      posted: "1 ngày trước",
-      urgent: false,
-    },
-    {
-      id: "3",
-      title: "React Developer",
-      company: "Digital Agency",
-      salary: "20 - 28 triệu",
-      location: "Đà Nẵng",
-      posted: "3 ngày trước",
-      urgent: true,
-    },
-    {
-      id: "4",
-      title: "Full Stack Developer",
-      company: "Tech Solutions",
-      salary: "22 - 32 triệu",
-      location: "TP. Hồ Chí Minh",
-      posted: "2 ngày trước",
-      urgent: false,
-    },
+  // Xử lý lỗi hoặc không tìm thấy công việc
+  if (isError || !job) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-red-600">Không tìm thấy công việc hoặc có lỗi xảy ra.</p>
+      </div>
+    );
+  }
+
+  // Định dạng lương
+  const salary = job.salary_min && job.salary_max && job.currency
+    ? `${job.salary_min} - ${job.salary_max} ${job.currency}`
+    : job.salary_min && job.currency
+    ? `${job.salary_min} ${job.currency}+`
+    : job.salary_max && job.currency
+    ? `Lên đến ${job.salary_max} ${job.currency}`
+    : "Thỏa thuận";
+
+  // Định dạng ngày đăng và ngày hết hạn
+  const posted = job.posted_at
+    ? formatDistanceToNow(new Date(job.posted_at), { addSuffix: true, locale: vi })
+    : "Không xác định";
+  const deadline = job.expires_at
+    ? new Date(job.expires_at).toLocaleDateString("vi-VN")
+    : "Không xác định";
+
+  // Định dạng tags từ skills và tags
+  const tags = [
+    ...(job.skills?.map(skill => skill.Name) || []),
+    ...(job.tags?.map(tag => tag.Name) || []),
   ];
 
-  const handleApply = () => {
-    setShowApplyModal(false);
-    if (navigate) {
-      navigate("cv-builder");
-    }
+  // Định dạng thông tin công ty từ job.company
+  const companyInfo = {
+    name: job.company?.Name || job.company_id || "Công ty không xác định",
+    address: job.company?.location || job.location || "Không xác định",
+    website: job.company?.website || "",
+    industry: job.category?.Name || "Không xác định",
+    companySize: job.company?.company_size || "Không xác định",
+    specialties: job.tags?.map(tag => tag.Name) || [],
   };
 
   return (
@@ -134,7 +83,7 @@ Bạn sẽ chịu trách nhiệm xây dựng và duy trì các ứng dụng web 
             items={[
               { name: "Trang chủ", link: "/" },
               { name: "Việc làm", link: "/job" },
-              { name: job.title },
+              { name: job.title || "Công việc" },
             ]}
           />
         </div>
@@ -143,24 +92,36 @@ Bạn sẽ chịu trách nhiệm xây dựng và duy trì các ứng dụng web 
           {/* Left: Job info */}
           <div className="lg:col-span-2 space-y-6">
             <JobHeader
-              job={job}
+              job={{
+                id: job.id,
+                title: job.title || "Công việc không xác định",
+                company: job.company?.Name || job.company_id || "Công ty không xác định",
+                logo: job.company?.logo_url || undefined,
+                location: job.location || "Không xác định",
+                salary,
+                posted,
+                deadline,
+                tags,
+                views: job.views_count || 0,
+              }}
               onApply={() => setShowApplyModal(true)}
-              onViewCompany={() => navigate?.("company-detail", "1")}
+              onViewCompany={() => {}}
             />
-            <JobContent job={job} />
+            <JobContent
+              job={{
+                description: job.description || "",
+                requirements: job.requirements ? job.requirements.split("\n") : [],
+                benefits: job.benefits ? job.benefits.split("\n") : [],
+              }}
+            />
           </div>
 
           {/* Right: Sidebar */}
           <div className="lg:col-span-1">
             <div className="lg:sticky lg:top-24 lg:h-fit lg:self-start space-y-6">
               <CompanySidebar
-                companyInfo={job.companyInfo}
-                onViewCompanyDetail={() => navigate?.("company-detail", "1")}
-              />
-              <RelatedJobsSidebar
-                relatedJobs={relatedJobs}
-                onJobClick={(id) => navigate?.("job-detail", id)}
-                onViewMore={() => navigate?.("jobs")}
+                companyInfo={companyInfo}
+                onViewCompanyDetail={() => {}}
               />
             </div>
           </div>
@@ -170,7 +131,7 @@ Bạn sẽ chịu trách nhiệm xây dựng và duy trì các ứng dụng web 
       {/* Apply Modal */}
       {showApplyModal && (
         <ApplyModal
-          jobTitle={job.title}
+          jobTitle={job.title || "Công việc"}
           onClose={() => setShowApplyModal(false)}
           onConfirm={handleApply}
         />

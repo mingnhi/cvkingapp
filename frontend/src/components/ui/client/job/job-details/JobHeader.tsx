@@ -1,49 +1,35 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
-import React, { useState } from "react";
-import {
-  MapPin,
-  DollarSign,
-  Clock,
-  Bookmark,
-  Share2,
-  Building2,
-  Users,
-  Calendar,
-  Star,
-  AlertCircle,
-  Send,
-  Eye,
-} from "lucide-react";
-
-interface Job {
-  title: string;
-  company: string;
-  logo: string;
-  featured?: boolean;
-  urgent?: boolean;
-  views: number;
-  applicants: number;
-  location: string;
-  salary: string;
-  posted: string;
-  deadline: string;
-  tags: string[];
-}
+import React, { memo, useState, useCallback } from "react";
+import { MapPin, DollarSign, Clock, Bookmark, Share2, Building2, Calendar, Send, Eye } from "lucide-react";
+import { Button } from "@mui/material";
 
 interface JobHeaderProps {
-  job: Job;
+  job: {
+    id: string;
+    title: string;
+    company: string;
+    logo?: string;
+    location: string;
+    salary: string;
+    posted: string;
+    deadline: string;
+    tags: string[];
+    views: number;
+  };
   onApply: () => void;
   onViewCompany: () => void;
 }
 
-export default function JobHeader({
-  job,
-  onApply,
-  onViewCompany,
-}: JobHeaderProps) {
+/**
+ * Component hiển thị tiêu đề và thông tin cơ bản của công việc.
+ * Sử dụng dữ liệu từ JobSchema, bao gồm thông tin công ty từ job.company.
+ */
+const JobHeader = memo(function JobHeader({ job, onApply, onViewCompany }: JobHeaderProps) {
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  const handleShare = () => {
+  // Xử lý chia sẻ công việc
+  const handleShare = useCallback(() => {
     if (navigator.share) {
       navigator.share({
         title: `${job.title} - ${job.company}`,
@@ -53,47 +39,35 @@ export default function JobHeader({
     } else {
       navigator.clipboard.writeText(window.location.href);
     }
-  };
+  }, [job.title, job.company]);
 
-  const handleImageError = (
-    e: React.SyntheticEvent<HTMLImageElement, Event>
-  ) => {
-    const target = e.target as HTMLImageElement;
-    target.src = `data:image/svg+xml;base64,${btoa(`
+  // Xử lý lỗi tải logo
+  const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.src = `data:image/svg+xml;base64,${btoa(`
       <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="96" height="96" rx="12" fill="#f26b38"/>
         <path d="M48 24C54.6274 24 60 29.3726 60 36V60C60 66.6274 54.6274 72 48 72C41.3726 72 36 66.6274 36 60V36C36 29.3726 41.3726 24 48 24ZM48 30C44.6863 30 42 32.6863 42 36V60C42 63.3137 44.6863 66 48 66C51.3137 66 54 63.3137 54 60V36C54 32.6863 51.3137 30 48 30Z" fill="white"/>
       </svg>
     `)}`;
-  };
+  }, []);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border p-6">
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-start gap-4 flex-1">
-          <div className="flex-shrink-0">
-            <img
-              src={job.logo}
-              alt={job.company}
-              className="w-16 h-16 rounded-lg object-cover"
-              onError={handleImageError}
-            />
-          </div>
+          {job.logo && (
+            <div className="flex-shrink-0">
+              <img
+                src={job.logo}
+                alt={job.company}
+                className="w-16 h-16 rounded-lg object-cover"
+                onError={handleImageError}
+              />
+            </div>
+          )}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <h1 className="text-2xl font-bold text-gray-900">{job.title}</h1>
-              {job.featured && (
-                <span className="bg-[#f26b38] text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                  <Star className="h-3 w-3 fill-current" />
-                  NỔI BẬT
-                </span>
-              )}
-              {job.urgent && (
-                <span className="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  URGENT
-                </span>
-              )}
             </div>
             <p className="text-lg text-gray-700 mb-2 flex items-center">
               <Building2 className="h-4 w-4 mr-2 text-gray-400" />
@@ -104,15 +78,11 @@ export default function JobHeader({
                 <Eye className="h-4 w-4 mr-1" />
                 {job.views} lượt xem
               </span>
-              <span className="flex items-center">
-                <Users className="h-4 w-4 mr-1" />
-                {job.applicants} ứng viên
-              </span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <button
+          <Button
             onClick={() => setIsBookmarked(!isBookmarked)}
             className={`p-2 rounded-lg border transition-colors ${
               isBookmarked
@@ -120,16 +90,14 @@ export default function JobHeader({
                 : "text-gray-400 border-gray-300 hover:text-[#f26b38] hover:border-[#f26b38]"
             }`}
           >
-            <Bookmark
-              className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`}
-            />
-          </button>
-          <button
+            <Bookmark className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`} />
+          </Button>
+          <Button
             onClick={handleShare}
             className="p-2 rounded-lg border border-gray-300 text-gray-400 hover:text-[#f26b38] hover:border-[#f26b38] transition-colors"
           >
             <Share2 className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -153,7 +121,7 @@ export default function JobHeader({
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">
-        {job.tags.map((tag: string, index: number) => (
+        {job.tags.map((tag, index) => (
           <span
             key={index}
             className="bg-orange-50 text-[#f26b38] text-xs px-3 py-1 rounded-full"
@@ -174,6 +142,7 @@ export default function JobHeader({
         <button
           onClick={onViewCompany}
           className="flex-1 sm:flex-none border border-gray-300 hover:border-[#f26b38] hover:text-[#f26b38] px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+          disabled
         >
           <Building2 className="h-4 w-4" />
           Xem công ty
@@ -181,4 +150,6 @@ export default function JobHeader({
       </div>
     </div>
   );
-}
+});
+
+export default JobHeader;
