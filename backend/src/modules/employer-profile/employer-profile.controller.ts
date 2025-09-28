@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { EmployerProfile } from '@entities/employer-profile.entity';
@@ -17,11 +18,18 @@ import {
   CreateEmployerProfileDto,
   UpdateEmployerProfileDto,
 } from './dtos/employer-profile.dto';
+import { Roles } from '@modules/auth/guards/roles.decorator';
+import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '@modules/auth/guards/roles.guard';
+import { UpdateEmployerCompanyDto } from './dtos/updateEmployer-Company.dto';
+
 
 @ApiTags('employer-profiles')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('Employer')
 @Controller('employer-profiles')
 export class EmployerProfilesController {
-  constructor(private readonly repo: EmployerProfilesRepository) {}
+  constructor(private readonly repo: EmployerProfilesRepository) { }
 
   @Get()
   async findAll(): Promise<ApiResponse<EmployerProfile[]>> {
@@ -57,6 +65,18 @@ export class EmployerProfilesController {
   ): Promise<ApiResponse<EmployerProfile>> {
     const data = await this.repo.update(id, dto);
     return { status: 'success', message: 'Employer profile updated', data };
+  }
+
+  @Put(':id/edit-company')
+  async updateEmployerAndCompany(
+    @Param('id') id: string,
+    @Body() dto:UpdateEmployerCompanyDto
+  ) {
+    return this.repo.updateEmployerAndCompany(
+      id,
+      dto.employerProfile,
+      dto.company
+    );
   }
 
   @Delete(':id')

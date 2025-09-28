@@ -60,4 +60,4 @@ export class CreateCompanyDto {
   isVerified?: boolean;
 }
 
-export class UpdateCompanyDto extends PartialType(CreateCompanyDto) {}
+export class UpdateCompanyDto extends PartialType(CreateCompanyDto) { }
