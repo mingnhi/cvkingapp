@@ -113,6 +113,7 @@ export const UserBaseSchema = z.object({
   email: z.string().email({ message: MESSAGES.INVALID_EMAIL }),
   username: z.string().optional(),
   displayName: z.string().optional(),
+  roles: z.array(z.string()),
   avatarUrl: z.string().optional(),
   preferredLocale: z.string().optional(),
   isEmailConfirmed: z.boolean().optional(),

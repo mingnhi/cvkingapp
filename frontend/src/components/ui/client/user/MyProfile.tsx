@@ -18,21 +18,25 @@ import { useMyProfileQuery } from '@/api/user/query';
 const MyProfile = () => {
     const { navigateTo } = useApp();
     const router = useRouter();
-    const accessToken =
-        typeof window !== "undefined"
-            ? localStorage.getItem("accessToken")
-            : null;
-    if (!accessToken) {
-    if (typeof window !== "undefined") router.push("/login");
-    return <div className="p-6">Đang chuyển hướng đến trang đăng nhập...</div>;
-  }
+    const { data: user, isLoading, isError } = useMyProfileQuery();
+
+    if (isLoading) return <div>Đang tải thông tin...</div>;
+    if (isError || !user) return <div>Không lấy được thông tin người dùng</div>;
+//     const accessToken =
+//         typeof window !== "undefined"
+//             ? localStorage.getItem("accessToken")
+//             : null;
+//     if (!accessToken) {
+//     if (typeof window !== "undefined") router.push("/login");
+//     return <div className="p-6">Đang chuyển hướng đến trang đăng nhập...</div>;
+//   }
 
             
 
-    const { data, isPending, isError } = useMyProfileQuery();
-    if (isPending) return <div className="p-6">Đang tải dữ liệu hồ sơ...</div>;
-    if (isError || !data) return <div className="p-6 text-red-500">Không thể tải thông tin hồ sơ</div>;
-    const user = data
+//     const { data, isPending, isError } = useMyProfileQuery();
+//     if (isPending) return <div className="p-6">Đang tải dữ liệu hồ sơ...</div>;
+//     if (isError || !data) return <div className="p-6 text-red-500">Không thể tải thông tin hồ sơ</div>;
+//     const user = data
 
     return (
         <div className="space-y-6 max-w-[1520px]" >

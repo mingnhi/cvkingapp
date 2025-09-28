@@ -1,15 +1,18 @@
-import { useState } from "react";
+"use client";
+import { Dispatch, SetStateAction, useState } from "react";
 
-const CompanyInformation = () => {
-    const [form, setForm] = useState({
-        name: "abc company",
-        industry: "Information Technology",
-        size: "100-500 employees",
-        founded: "2015",
-        description:
-            "Leading software development company specializing in web and mobile applications. We work with clients across various industries to deliver innovative digital solutions that drive business growth.",
-    });
-
+type CompanyForm = {
+  name: string;
+  industry: string;
+  size: string;
+//   founded: string;
+  description: string;
+};
+type Props = {
+  form: CompanyForm;                           
+  setForm: Dispatch<SetStateAction<CompanyForm>>; 
+};
+export default function CompanyInformation({ form, setForm }: Props) {
     const onChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
@@ -31,7 +34,7 @@ const CompanyInformation = () => {
                     <input
                         name="name"
                         value={form.name}
-                        onChange={onChange}
+                        disabled
                         className={fieldClass}
                         placeholder="Enter company name"
                     />
@@ -72,7 +75,7 @@ const CompanyInformation = () => {
                 </div>
 
                 {/* Founded Year */}
-                <div>
+                {/* <div>
                     <label className={labelClass}>Founded Year</label>
                     <input
                         name="founded"
@@ -81,7 +84,7 @@ const CompanyInformation = () => {
                         className={fieldClass}
                         placeholder="YYYY"
                     />
-                </div>
+                </div> */}
 
                 {/* Description (full width) */}
                 <div className="md:col-span-2">
@@ -99,4 +102,3 @@ const CompanyInformation = () => {
         </section>
     );
 }
-export default CompanyInformation;

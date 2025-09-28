@@ -93,31 +93,31 @@ const handleError = async (error: unknown) => {
 };
 
 // Request interceptor
-// instance.interceptors.request.use(
-//   (config: InternalAxiosRequestConfig) => {
-//     const token = useAuthStore.getState().token;
-//     if (token && config.headers) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error: unknown) => {
-//     if (isAxiosError(error)) {
-//       return Promise.reject(error);
-//     }
-//     console.error('Request error:', error);
-//     return Promise.reject(error);
-//   }
-// );
-instance.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
+instance.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const token = useAuthStore.getState().token;
+    if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
+  },
+  (error: unknown) => {
+    if (isAxiosError(error)) {
+      return Promise.reject(error);
+    }
+    console.error('Request error:', error);
+    return Promise.reject(error);
   }
-  return config;
-});
+);
+// instance.interceptors.request.use((config) => {
+//   if (typeof window !== "undefined") {
+//     const token = localStorage.getItem("accessToken");
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//   }
+//   return config;
+// });
 
 // Response interceptor
 instance.interceptors.response.use(

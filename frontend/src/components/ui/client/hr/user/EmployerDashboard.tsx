@@ -10,7 +10,7 @@ import JobPostings from './JobPostings';
 import CandidateManagement from './CandidateManagement';
 import SavedCandidates from './SavedCandidates';
 import Overview from './Overview';
-import EditCompanyProfile from './Editcompany';
+import EditCompanyProfile from '@/app/(client)/hr/[slug]/edit-companyprofile/page';
 
 const EmployerDashboard = () => {
   const { navigateTo } = useApp();

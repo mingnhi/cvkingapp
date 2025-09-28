@@ -1,5 +1,5 @@
 import instance, { getSuccessResponse } from '../axios';
-import type { UserResponseData } from '../user/type';
+// import type { UserResponseData } from '../user/type';
 import type {
   ForgotPasswordRequest,
   LoginRequest,

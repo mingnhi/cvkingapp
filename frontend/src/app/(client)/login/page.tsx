@@ -6,6 +6,7 @@ import AuthSidebar from "@/components/layout/Sidebar/AuthSidebar";
 import Link from "next/link";
 import { useLoginMutation } from "@/api/auth/query";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/stores/authStore";
 
 const Login: React.FC = () => {
   const router = useRouter(); 
@@ -15,10 +16,22 @@ const Login: React.FC = () => {
 
   const { mutate: login, isPending } = useLoginMutation({
     onSuccess: (data) => {
+      console.log('Login response:', data);
+      console.log('roles type:', data.user.roles);
+      const { setToken, setRefreshToken, setUser } = useAuthStore.getState();
+      setToken(data.accessToken ?? "");
+      setRefreshToken(data.refreshToken ?? "");
+      setUser(data.user);
+
       localStorage.setItem("accessToken", data.accessToken ?? "");
       localStorage.setItem("refreshToken", data.refreshToken ?? "");
+      // const roles = data.user?.roles ?? [];
       alert(" Đăng nhập thành công");
-      router.push("/");
+      if (data.user.roles?.includes("Employer")) {
+        router.push("/hr");
+      } else {
+        router.push("/");
+      }
     },
     onError: () => alert("Sai email hoặc mật khẩu"),
   });
