@@ -1,12 +1,12 @@
 "use client";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction} from "react";
 
 type CompanyForm = {
   name: string;
   industry: string;
   size: string;
-//   founded: string;
   description: string;
+  benefits: string[];
 };
 type Props = {
   form: CompanyForm;                           

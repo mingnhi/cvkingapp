@@ -11,6 +11,7 @@ export const CompanyCreateRequestSchema = z.object({
   website: z.string().url().optional(),
   location: z.string().trim().optional(),
   description: z.string().optional(),
+  benefits: z.array(z.string()).optional(),
   isVerified: z.boolean().optional(),
 });
 
@@ -25,11 +26,12 @@ export const CompanyUpdateRequestSchema = z.object({
   website: z.string().url().optional(),
   location: z.string().trim().optional(),
   description: z.string().optional(),
+  benefits: z.array(z.string()).optional(),
   isVerified: z.boolean().optional(),
 });
 
 /** ====== RESPONSE (camel đầu thường) ====== */
-export const CompanySchema = z.object({
+export const CompanyResponseSchema = z.object({
   id: z.string(),                        // không ràng buộc
   name: z.string(),
   slug: z.string().nullable().optional(),
@@ -40,6 +42,7 @@ export const CompanySchema = z.object({
   website: z.string().nullable().optional(),
   location: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
+  benefits: z.array(z.string()).optional(),
   isVerified: z.boolean().optional(),
   created_at: z.union([z.string(), z.date()]).nullable().optional(),
   updated_at: z.union([z.string(), z.date()]).nullable().optional(),

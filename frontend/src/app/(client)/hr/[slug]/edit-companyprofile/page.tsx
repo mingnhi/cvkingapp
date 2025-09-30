@@ -29,6 +29,7 @@ export default function EditCompanyProfile() {
         industry: "",
         size: "",
         description: "",
+        benefits: [] as string[],
     });
     const [contactInfo, setContactInfo] = useState({
         contactName: "",
@@ -52,6 +53,7 @@ export default function EditCompanyProfile() {
                 industry: companyData.industry ?? "",
                 size: companyData.companySize ?? "",
                 description: companyData.description ?? "",
+                benefits: companyData.benefits ?? [],
             });
 
             setContactInfo({
@@ -81,6 +83,7 @@ export default function EditCompanyProfile() {
                         description: companyInfo.description,
                         website: contactInfo.website,
                         location: contactInfo.address,
+                        benefits: companyInfo.benefits,
                     },
                 },
             });
@@ -161,7 +164,11 @@ export default function EditCompanyProfile() {
                         <ProfilePhoto />
                         <CompanyInformation form={companyInfo} setForm={setCompanyInfo} />
                         <ContactInformation form={contactInfo} setForm={setContactInfo} />
-                        <CompanyBenifits />
+                        <CompanyBenifits
+                            benefits={companyInfo.benefits}
+                            setBenefits={(newBenefits) =>
+                                setCompanyInfo((prev) => ({...prev, benefits: newBenefits}))
+                             } />
                     </Stack>
                 </Box>
             );

@@ -142,22 +142,14 @@ const CompanyProfile = ({ onEdit }: CompanyProfileProps) => {
                 />
                 <CardContent>
                     <div className="grid md:grid-cols-2 gap-4">
-                        {[
-                            "Lương và thưởng cạnh tranh",
-                            "Giờ làm việc linh hoạt",
-                            "Bảo hiểm y tế",
-                            "Nghỉ phép và nghỉ ốm",
-                            "Cơ hội phát triển chuyên môn",
-                            "Môi trường văn phòng hiện đại",
-                            "Hoạt động xây dựng đội nhóm",
-                            "Lựa chọn làm việc tại nhà",
-                        ].map((benefit) => (
-                            <div key={benefit} className="flex items-center space-x-2">
-                                <CheckCircle className="w-4 h-4 text-green-600" />
-                                <Typography variant="body2">{benefit}</Typography>
-                            </div>
-                        ))}
+                    {(company.benefits || []).map((benefit, idx) => (
+                        <div key={idx} className="flex items-center space-x-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <Typography variant="body2">{benefit}</Typography>
+                        </div>
+                    ))}
                     </div>
+
                 </CardContent>
             </Card>
         </div>

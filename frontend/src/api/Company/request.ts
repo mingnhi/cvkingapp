@@ -1,44 +1,44 @@
 import { z } from "zod";
 import httpInstance, { getSuccessResponse } from "@/api/axios";
 import {
-  CompanySchema,
+  CompanyResponseSchema,
   CompanyCreateRequestSchema,
   CompanyUpdateRequestSchema,
 } from "./schema";
-import type { Company, CompanyCreateRequest, CompanyUpdateRequest } from "./type";
+import type { CompanyResponse, CompanyCreateRequest, CompanyUpdateRequest } from "./type";
 
 /** GET /companies → Company[] */
-export async function getCompaniesRequest(): Promise<Company[]> {
+export async function getCompaniesRequest(): Promise<CompanyResponse[]> {
   const res = await httpInstance.get("/companies");
-  const data = getSuccessResponse<Company[]>(res);
-  return z.array(CompanySchema).parse(data);
+  const data = getSuccessResponse<CompanyResponse[]>(res);
+  return z.array(CompanyResponseSchema).parse(data);
 }
 
 /** GET /companies/:id → Company */
-export async function getCompanyByIdRequest(id: string): Promise<Company> {
+export async function getCompanyByIdRequest(id: string): Promise<CompanyResponse> {
   const res = await httpInstance.get(`/companies/${id}`);
-  const data = getSuccessResponse<Company>(res);
-  return CompanySchema.parse(data);
+  const data = getSuccessResponse<CompanyResponse>(res);
+  return CompanyResponseSchema.parse(data);
 }
 
 /** POST /companies  body: PascalCase → Company */
-export async function createCompanyRequest(input: CompanyCreateRequest): Promise<Company> {
+export async function createCompanyRequest(input: CompanyCreateRequest): Promise<CompanyResponse> {
   const body = CompanyCreateRequestSchema.parse(input);
   const res = await httpInstance.post("/companies", body);
-  const data = getSuccessResponse<Company>(res);
-  return CompanySchema.parse(data);
+  const data = getSuccessResponse<CompanyResponse>(res);
+  return CompanyResponseSchema.parse(data);
 }
 
 /** PUT /companies/:id  body: PascalCase (partial) → Company */
 export async function updateCompanyRequest(params: {
   id: string;
   data: CompanyUpdateRequest;
-}): Promise<Company> {
+}): Promise<CompanyResponse> {
   const { id, data } = params;
   const body = CompanyUpdateRequestSchema.parse(data);
   const res = await httpInstance.put(`/companies/${id}`, body);
-  const resp = getSuccessResponse<Company>(res);
-  return CompanySchema.parse(resp);
+  const resp = getSuccessResponse<CompanyResponse>(res);
+  return CompanyResponseSchema.parse(resp);
 }
 
 /** DELETE /companies/:id → ApiResponse<null> */
