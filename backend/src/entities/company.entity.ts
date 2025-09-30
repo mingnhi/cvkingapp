@@ -30,6 +30,9 @@ export class Company extends AuditableEntity {
   @Property({ type: 'text', nullable: true })
   description?: string;
 
+  @Property({ type: 'json', nullable: true })
+  benefits?: string[];
+
   @Property({ default: false })
   isVerified: boolean = false;
 }

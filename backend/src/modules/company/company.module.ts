@@ -9,4 +9,4 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
   providers: [CompaniesRepository],
   controllers: [CompaniesController],
 })
-export class CompanyModule {}
+export class CompanyModule { }

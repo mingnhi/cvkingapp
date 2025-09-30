@@ -5,6 +5,7 @@ import {
   IsBoolean,
   IsUrl,
   MaxLength,
+  IsArray,
 } from 'class-validator';
 
 export class CreateCompanyDto {
@@ -53,6 +54,12 @@ export class CreateCompanyDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiProperty({required: false, type: [String]})
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  benefits?: string[];
 
   @ApiProperty({ required: false, default: false })
   @IsOptional()
