@@ -19,6 +19,7 @@ import { JobCategoryModule } from './modules/job-category/job-category.module';
 import { CompanyModule } from './modules/company/company.module';
 import { JobSeekerProfileModule } from './modules/job-seeker-profile/job-seeker-profile.module';
 import { EmployerProfileModule } from './modules/employer-profile/employer-profile.module';
+import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { EmployerProfileModule } from './modules/employer-profile/employer-profi
     CompanyModule,
     JobSeekerProfileModule,
     EmployerProfileModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
