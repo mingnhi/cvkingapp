@@ -164,8 +164,7 @@ import {
     Download,
     Edit,
     MapPin,
-    DollarSign,
-    Briefcase,
+    Mail,
 } from 'lucide-react';
 import {
     Card,
@@ -237,15 +236,15 @@ const MyProfile = () => {
                                         {user.displayName}
                                     </Typography>
                                     <Typography variant="body1" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                        <Briefcase size={16} /> {user.email}
+                                        <Mail size={16} /> {user.email}
                                     </Typography>
                                     <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
                                         <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                             <MapPin size={14} /> {user.preferredLocale ?? "Chưa cập nhật địa điểm"}
                                         </Typography>
-                                        <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                            <DollarSign size={14} /> {user.linkedInId ?? "Chưa cập nhật địa điểm"}
-                                        </Typography>
+                                        {/* <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <DollarSign size={14} /> {user.linkedInId ?? "Chưa cập nhật lonk"}
+                                        </Typography> */}
                                     </Box>
                                 </div>
                                 <Box sx={{ display: 'flex', gap: 1 }}>

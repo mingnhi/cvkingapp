@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     Save,
@@ -21,42 +21,49 @@ import {
     CircularProgress
 } from '@mui/material';
 import { useMyProfileQuery, useUpdateUserMutation } from '@/api/user/query';
+import { useUpdateFileMutation, useUploadFileMutation } from '@/api/cloudinary/query';
 
 const toast = (message: string) => alert(message);
 
 const EditProfilePage = () => {
-    const router = useRouter();
-    const { data: user, isLoading: loadingProfile } = useMyProfileQuery();
-    const { mutateAsync: updateUser, isLoading: updating } = useUpdateUserMutation({
-        onSuccess: () => {
-        toast("Hồ sơ đã được cập nhật!");
-        setHasChanges(false);
-        router.back();
-        },
-        onError: (err: Error) => toast(`Lỗi: ${err.message}`),
-    });
-    const [isEmployer, setIsEmployer] = useState(false);
-    const [jobSeekerData, setJobSeekerData] = useState<any>(null);
-    const [employerData, setEmployerData] = useState<any>(null);
-    const [skills, setSkills] = useState<string[]>([]);
-    const [newSkill, setNewSkill] = useState("");
-    const [hasChanges, setHasChanges] = useState(false);
-    useEffect(() => {
-        if (user) {
-        // Nếu backend trả về role, có thể setIsEmployer(user.role === 'Employer')
-        setJobSeekerData({
-            name: user.displayName || "",
-            email: user.email || "",
-            avatar: user.avatarUrl || "",
-        });
-        setEmployerData({
-            email: user.email || "",
-            avatar: user.avatarUrl || "",
-        });
-        //   setSkills(user.skills || []);
-        }
-    }, [user]);
-
+  const router = useRouter();
+  const { data: user, isLoading: loadingProfile } = useMyProfileQuery();
+  const { mutateAsync: updateUser, isPending: updating } = useUpdateUserMutation({
+    onSuccess: () => {
+      toast("Hồ sơ đã được cập nhật!");
+      setHasChanges(false);
+      router.back();
+    },
+    onError: (err: Error) => toast(`Lỗi: ${err.message}`),
+  });
+  const [isEmployer] = useState(false);
+  const [jobSeekerData, setJobSeekerData] = useState<any>(null);
+  const [employerData, setEmployerData] = useState<any>(null);
+  const [skills, setSkills] = useState<string[]>([]);
+  const [newSkill, setNewSkill] = useState("");
+  const [hasChanges, setHasChanges] = useState(false);
+  useEffect(() => {
+    if (user) {
+      // Nếu backend trả về role, có thể setIsEmployer(user.role === 'Employer')
+      setJobSeekerData({
+        name: user.displayName || "",
+        email: user.email || "",
+        avatar: user.avatarUrl || "",
+        address: user.preferredLocale || "Chưa cập nhật địa điểm",
+      });
+      setEmployerData({
+        name: user.displayName || "",
+        email: user.email || "",
+        avatar: user.avatarUrl || "",
+        address: user.preferredLocale || "Chưa cập nhật địa điểm",
+      });
+      //   setSkills(user.skills || []);
+    }
+  }, [user]);
+  
+  const { mutateAsync: uploadFile } = useUploadFileMutation();
+  const { mutateAsync: updateFile } = useUpdateFileMutation();
+ 
   const handleJobSeekerChange = (field: string, value: string) => {
     setJobSeekerData((p: any) => ({ ...p, [field]: value }));
     setHasChanges(true);
@@ -80,7 +87,33 @@ const EditProfilePage = () => {
     setHasChanges(true);
   };
 
-  const handleAvatarUpload = () => toast("Cập nhật ảnh đại diện thành công!");
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return;
+    const file = e.target.files[0];
+
+    try {
+      let result;
+      if (user?.avatarUrl) {
+        result = await updateFile({ file, publicId: user.avatarUrl, folder: "avatars" });
+      } else {
+        result = await uploadFile({ file, folder: "avatars" });
+      }
+      if (isEmployer && employerData) {
+      setEmployerData({ ...employerData, avatar: result.url });
+    } else if (jobSeekerData) {
+      setJobSeekerData({ ...jobSeekerData, avatar: result.url });
+    }
+
+      setHasChanges(true);
+      toast("Cập nhật ảnh đại diện thành công!");
+    } catch (err) {
+    if (err instanceof Error) {
+      toast(`Lỗi upload ảnh: ${err.message}`);
+    } else {
+      toast("Lỗi upload ảnh không xác định");
+    }
+  }
+  };
 
   const handleSave = async () => {
     const payload = isEmployer
@@ -88,11 +121,13 @@ const EditProfilePage = () => {
           email: employerData.email,
           phone: employerData.phone,
           avatarUrl: employerData.avatar,
+          location: employerData.address,
         }
       : {
           displayName: jobSeekerData.name,
           email: jobSeekerData.email,
           avatarUrl: jobSeekerData.avatar,
+          location: jobSeekerData.address,
           skills,
         };
     await updateUser(payload);
@@ -252,9 +287,9 @@ return (
                   onChange={(e) => handleJobSeekerChange("name", e.target.value)}
                 />
                 <TextField
-                  label="Chức danh"
+                  label="Địa chỉ"
                   fullWidth
-                  value={jobSeekerData.title}
+                  value={jobSeekerData.address}
                   onChange={(e) => handleJobSeekerChange("title", e.target.value)}
                 />
                 <TextField
