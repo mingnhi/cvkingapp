@@ -2,23 +2,17 @@ import { z } from "zod";
 
 export const CreateJobSchema = z
   .object({
-    CompanyId: z.string().optional(),
-    PostedByUserId: z.string().optional(),
+    CompanyId: z.string().min(1, "Vui lòng chọn công ty"), // bắt buộc
+    PostedByUserId: z.string(), // bắt buộc
     Title: z
       .string()
       .trim()
       .min(3, "Tiêu đề quá ngắn")
       .max(120, "Tiêu đề quá dài"),
-    Slug: z.string().optional(),
-    ShortDescription: z
-      .string()
-      .trim()
-      .max(280, "Tóm tắt tối đa 280 ký tự")
-      .optional(),
-    Description: z.string().trim().max(20000, "Mô tả quá dài").optional(),
-    Requirements: z.string().trim().max(20000, "Yêu cầu quá dài").optional(),
-    Benefits: z.string().trim().max(20000, "Quyền lợi quá dài").optional(),
-
+    ShortDescription: z.string().trim().min(1, "Tóm tắt là bắt buộc").max(280),
+    Description: z.string().trim().min(1, "Mô tả là bắt buộc").max(20000),
+    Requirements: z.string().trim().min(1, "Yêu cầu là bắt buộc").max(20000),
+    Benefits: z.string().trim().optional(), // có thể optional
     SalaryMin: z.coerce
       .number()
       .nonnegative("Lương tối thiểu không hợp lệ")
@@ -29,21 +23,17 @@ export const CreateJobSchema = z
       .optional(),
     Currency: z
       .string()
-      .regex(/^[A-Z]{3}$/, "Mã tiền tệ phải là 3 chữ cái in hoa (VD: USD, VND)")
+      .regex(/^[A-Z]{3}$/, "Mã tiền tệ…")
       .optional(),
-
-    JobType: z
-      .enum([
-        "Toàn thời gian", "Bán thời gian", "Hợp đồng", "Freelance"
-      ])
-      .optional(),
-
-    Location: z.string().trim().max(140, "Địa điểm quá dài").optional(),
-    CategoryId: z.string().uuid("CategoryId phải là UUID").optional(),
-    ExpiresAt: z.coerce
-      .date()
-      .min(new Date(), "Ngày hết hạn phải ở tương lai")
-      .optional(),
+    JobType: z.enum([
+      "Toàn thời gian",
+      "Bán thời gian",
+      "Hợp đồng",
+      "Freelance",
+    ]),
+    Location: z.string().trim().min(1, "Địa điểm là bắt buộc").max(140),
+    CategoryId: z.string().uuid("Danh mục phải là UUID"),
+    ExpiresAt: z.coerce.date().min(new Date(), "Ngày hết hạn phải ở tương lai"),
     skillIds: z.array(z.string()).default([]),
     tagIds: z.array(z.string()).default([]),
   })
@@ -74,7 +64,7 @@ export const CreateJobSchema = z
 export const JobSchema = z.object({
   id: z.string(),
 
-  created_at: z.string(),              // 'yyyy-MM-dd' từ DB
+  created_at: z.string(), // 'yyyy-MM-dd' từ DB
   company_id: z.string(),
   posted_by_user_id: z.string().nullable().optional(),
 
@@ -95,8 +85,8 @@ export const JobSchema = z.object({
   status: z.string(),
   views_count: z.number().nullable().optional(),
 
-  posted_at: z.string().nullable().optional(),   // ISO datetime
-  expires_at: z.string().nullable().optional(),  // ISO datetime
+  posted_at: z.string().nullable().optional(), // ISO datetime
+  expires_at: z.string().nullable().optional(), // ISO datetime
 
   // Có trong list (SP_GetFilteredJobs)
   total: z.number().optional(),
@@ -135,7 +125,7 @@ export const JobSchema = z.object({
   company: z
     .object({
       id: z.string(),
-      Name: z.string(),                 // giữ "Name" (N hoa) để đồng nhất với backend
+      Name: z.string(), // giữ "Name" (N hoa) để đồng nhất với backend
       slug: z.string().nullable().optional(),
       logo_url: z.string().nullable().optional(),
       banner_url: z.string().nullable().optional(),
@@ -165,9 +155,7 @@ export const JobFilterSchema = z
     salaryMin: z.coerce.number().int().nonnegative().optional(),
     salaryMax: z.coerce.number().int().nonnegative().optional(),
     jobType: z
-      .enum([
-       "Toàn thời gian", "Bán thời gian", "Hợp đồng", "Freelance"
-      ])
+      .enum(["Toàn thời gian", "Bán thời gian", "Hợp đồng", "Freelance"])
       .optional(),
     companyId: z.string().uuid().optional(),
 

@@ -48,13 +48,10 @@ export default function BasicDetailsSection({ control, errors, companies, catego
   };
 
   const jobTypes = [
-    { label: "Toàn thời gian", value: "Full-time" },
-    { label: "Bán thời gian", value: "Part-time" },
-    { label: "Hợp đồng", value: "Contract" },
+    { label: "Toàn thời gian", value: "Toàn thời gian" },
+    { label: "Bán thời gian", value: "Bán thời gian" },
+    { label: "Hợp đồng", value: "Hợp đồng" },
     { label: "Freelance", value: "Freelance" },
-    { label: "Thực tập", value: "Internship" },
-    { label: "Tạm thời", value: "Temporary" },
-    { label: "Remote", value: "Remote" },
   ];
 
   const currencies = [
