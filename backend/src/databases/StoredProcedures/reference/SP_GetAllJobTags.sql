@@ -1,4 +1,4 @@
-use JOB_PORTAL
+use cvkingapp
 go
 
 create procedure [dbo].[SP_GetAllJobTags]

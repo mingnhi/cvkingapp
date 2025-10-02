@@ -77,7 +77,6 @@ export default function PostJobPage() {
     () => (tagsData ?? []).map((t) => ({ id: t.id, name: t.name })),
     [tagsData]
   );
-
   // ===== ✅ fetch companies & categories bằng query =====
   const { data: companiesData, isLoading: companiesLoading } =
     useCompaniesQuery();

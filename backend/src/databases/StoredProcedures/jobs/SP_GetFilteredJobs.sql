@@ -1,4 +1,4 @@
-USE [JOB_DB]
+USE [cvkingapp]
 GO
 SET ANSI_NULLS ON
 GO
