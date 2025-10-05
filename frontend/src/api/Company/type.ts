@@ -1,12 +1,12 @@
 import type { z } from "zod";
 import {
-  CompanySchema,
+  CompanyResponseSchema,
   CompanyCreateRequestSchema,
   CompanyUpdateRequestSchema,
 } from "./schema";
 
 /** Response item (server trả về) */
-export type Company = z.infer<typeof CompanySchema>;
+export type CompanyResponse = z.infer<typeof CompanyResponseSchema>;
 
 /** Request bodies (client gửi lên: PascalCase) */
 export type CompanyCreateRequest = z.infer<typeof CompanyCreateRequestSchema>;

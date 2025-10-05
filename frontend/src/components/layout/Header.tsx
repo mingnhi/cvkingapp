@@ -18,8 +18,10 @@ import { Bell, ChevronDown, ChevronRight, Crown } from "lucide-react";
 import NavbarDesktop from "../ui/common/navbar/NavbarDesktop";
 import NavbarMobile from "../ui/common/navbar/NavbarMobile";
 import { actionItems } from "@/faker/navbar-data";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
+  const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [isScreen, setIsScreen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -138,7 +140,10 @@ const Header = () => {
 
               <Tooltip title="Account settings">
                 <IconButton
-                  onClick={handleMenuClick}
+                    onClick={(e) => {
+                      handleMenuClick(e);
+                      router.push("/user/a");
+                    }}
                   size="small"
                   sx={{ ml: 2 }}
                   aria-controls={anchorEl ? "account-menu" : undefined}

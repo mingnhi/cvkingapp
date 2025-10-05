@@ -476,6 +476,15 @@
           "nullable": true,
           "mappedType": "text"
         },
+        "benefits": {
+          "name": "benefits",
+          "type": "nvarchar(max)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": -1
+        },
         "is_verified": {
           "name": "is_verified",
           "type": "bit",

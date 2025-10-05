@@ -1,3 +1,4 @@
+"use client"; 
 import { useApp } from "@/components/AppContext";
 import {
     Card,
@@ -7,13 +8,34 @@ import {
     Typography,
 } from "@mui/material";
 import { CheckCircle, Edit } from "lucide-react";
-import EditCompanyProfile from "./Editcompany";
+import EditCompanyProfile from "@/app/(client)/hr/[slug]/edit-companyprofile/page";
+import { useEmployerProfilesQuery } from "@/api/employer-profile/query";
+import { useCompaniesQuery, useCompanyByIdQuery } from "@/api/Company/query";
+import { useRouter } from "next/navigation";
+import slugify from "slugify";
+
 type CompanyProfileProps = {
     onEdit: () => void;
 };
 
-const CompanyProfile = ({onEdit}: CompanyProfileProps) => {
+const CompanyProfile = ({ onEdit }: CompanyProfileProps) => {
     const { navigateTo } = useApp();
+    const router = useRouter();
+    const { data: employerProfiles, isLoading: loadingProfiles, isError: err } = useEmployerProfilesQuery();
+    const employerProfile = employerProfiles?.items?.[0];
+    const companyId = employerProfile?.company ?? "";
+    const {
+    data: company,
+    isLoading: loadingCompany,
+    isError: errorCompany,
+    } = useCompanyByIdQuery(companyId, { enabled: Boolean(companyId) });
+    if (loadingProfiles || loadingCompany)
+        return <Typography>Đang tải thông tin công ty...</Typography>;
+    if (err || !employerProfile)
+        return <Typography>Không tìm thấy hồ sơ Employer</Typography>;
+    if (errorCompany || !company)
+        return <Typography>Không tìm thấy công ty</Typography>;
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -21,7 +43,10 @@ const CompanyProfile = ({onEdit}: CompanyProfileProps) => {
                 <Typography variant="h5">Thông tin công ty</Typography>
                 <Button
                     variant="contained"
-                    onClick={onEdit}
+                    onClick={() => {
+                        const slug = slugify(company.name,{ lower: true, strict: true });
+                        router.push(`/hr/${slug}/edit-companyprofile`);
+                    }}
                     startIcon={<Edit className="w-4 h-4" />}
                     sx={{
                         backgroundColor: "black",
@@ -41,12 +66,12 @@ const CompanyProfile = ({onEdit}: CompanyProfileProps) => {
                 <CardContent className="p-6">
                     <div className="flex items-start space-x-6">
                         <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center text-white text-2xl font-bold">
-                            TC
+                            {company.name.slice(0,2).toUpperCase()}
                         </div>
                         <div className="flex-1">
-                            <Typography variant="h6">TechCorp Vietnam</Typography>
+                            <Typography variant="h6">{ company.name}</Typography>
                             <Typography color="text.secondary" className="mb-4">
-                                Công ty phát triển phần mềm hàng đầu tại Việt Nam
+                                {company.description}
                             </Typography>
 
                             <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -56,20 +81,18 @@ const CompanyProfile = ({onEdit}: CompanyProfileProps) => {
                                     </Typography>
                                     <div className="space-y-2 text-sm">
                                         <p>
-                                            <span className="font-medium">Ngành:</span> Công Nghệ Thông
-                                            Tin
+                                            <span className="font-medium">Ngành:</span> {company.industry}
                                         </p>
                                         <p>
-                                            <span className="font-medium">Quy mô:</span> 100-500 Nhân
-                                            viên
+                                            <span className="font-medium">Quy mô:</span> {company.companySize}
                                         </p>
-                                        <p>
+                                        {/* <p>
                                             <span className="font-medium">Thành lập:</span> 2015
-                                        </p>
+                                        </p> */}
                                         <p>
                                             <span className="font-medium">Website:</span>
                                             <Button variant="text" color="primary" size="small">
-                                                www.techcorp.vn
+                                                {company.website}
                                             </Button>
                                         </p>
                                     </div>
@@ -81,19 +104,18 @@ const CompanyProfile = ({onEdit}: CompanyProfileProps) => {
                                     </Typography>
                                     <div className="space-y-2 text-sm">
                                         <p>
-                                            <span className="font-medium">Địa chỉ:</span> Quận 1, Thành
-                                            phố Hồ Chí Minh
+                                            <span className="font-medium">Địa chỉ:</span> {company.location}
                                         </p>
                                         <p>
                                             <span className="font-medium">Số điện thoại:</span>
                                             <Button variant="text" color="primary" size="small">
-                                                0123 456 789
+                                                {employerProfile.phone}
                                             </Button>
                                         </p>
                                         <p>
                                             <span className="font-medium">Email:</span>
                                             <Button variant="text" color="primary" size="small">
-                                                hr@techcorp.vn
+                                                {employerProfile.title}
                                             </Button>
                                         </p>
                                     </div>
@@ -105,13 +127,7 @@ const CompanyProfile = ({onEdit}: CompanyProfileProps) => {
                                     Về chúng tôi
                                 </Typography>
                                 <Typography color="text.secondary">
-                                    TechCorp Vietnam là công ty phát triển phần mềm hàng đầu chuyên
-                                    về ứng dụng web và di động. Chúng tôi hợp tác với khách hàng
-                                    trong nhiều ngành nghề khác nhau để cung cấp các giải pháp kỹ
-                                    thuật số sáng tạo, thúc đẩy tăng trưởng kinh doanh. Đội ngũ các
-                                    nhà phát triển, nhà thiết kế và quản lý dự án giàu kinh nghiệm
-                                    của chúng tôi luôn tâm huyết với việc tạo ra những phần mềm chất
-                                    lượng cao, tạo nên sự khác biệt thực sự.
+                                    {company.description}
                                 </Typography>
                             </div>
                         </div>
@@ -126,22 +142,14 @@ const CompanyProfile = ({onEdit}: CompanyProfileProps) => {
                 />
                 <CardContent>
                     <div className="grid md:grid-cols-2 gap-4">
-                        {[
-                            "Lương và thưởng cạnh tranh",
-                            "Giờ làm việc linh hoạt",
-                            "Bảo hiểm y tế",
-                            "Nghỉ phép và nghỉ ốm",
-                            "Cơ hội phát triển chuyên môn",
-                            "Môi trường văn phòng hiện đại",
-                            "Hoạt động xây dựng đội nhóm",
-                            "Lựa chọn làm việc tại nhà",
-                        ].map((benefit) => (
-                            <div key={benefit} className="flex items-center space-x-2">
-                                <CheckCircle className="w-4 h-4 text-green-600" />
-                                <Typography variant="body2">{benefit}</Typography>
-                            </div>
-                        ))}
+                    {(company.benefits || []).map((benefit, idx) => (
+                        <div key={idx} className="flex items-center space-x-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <Typography variant="body2">{benefit}</Typography>
+                        </div>
+                    ))}
                     </div>
+
                 </CardContent>
             </Card>
         </div>

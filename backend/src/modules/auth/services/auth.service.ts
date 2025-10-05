@@ -137,14 +137,14 @@ export class AuthService {
 
     // tạo Company
     const company = this.companyRepo.create({ name: dto.companyName });
-    await this.companyRepo.create(company);
+    await this.em.persistAndFlush(company);
 
     // tạo EmployerProfile
     const profile = this.employerRepo.create({
       userId: user.id,
-      company: dto.companyName,
+      company: company.id,
     });
-    await this.jobSeekerRepo.create(profile);
+    await this.employerRepo.create(profile);
 
     const { accessToken, refreshToken } = await this.signTokens(
       user.id,
@@ -172,7 +172,22 @@ export class AuthService {
     );
     await this.usersService.update(user.id, { refreshToken });
 
-    return { user, accessToken, refreshToken };
+    const userRoleEntities = await this.usersRoleService.findByUser(user.id);
+    const roleNames = await Promise.all(
+      userRoleEntities.map(async ur => {
+        const role = await this.rolesService.findOne(ur.roleId);
+        return role.roleName;
+      })
+    );
+
+    return {
+      user: {
+        ...user,
+        roles: roleNames,
+      },
+      accessToken,
+      refreshToken,
+    };
   }
 
   async refresh(userId: string, refreshToken: string) {

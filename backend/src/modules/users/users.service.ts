@@ -2,14 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { CreateUserDto, UpdateUserDto } from '@modules/users/dtos/user.dto';
 import { Users } from '@entities/user.entity';
-import { EntityManager } from '@mikro-orm/core';
+import { EntityManager, wrap } from '@mikro-orm/core';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly em: EntityManager
-  ) {}
+  ) { }
 
   /**
    * Retrieve all users
@@ -33,6 +33,44 @@ export class UsersService {
     return user;
   }
 
+  /**
+ * Lấy thông tin user đầy đủ cho API "My Profile"
+ * Trả về tất cả trường an toàn, ẩn password và refreshToken
+ */
+  async getSafeUserById(id: string): Promise<Partial<Users>> {
+    const user = await this.em.findOne(
+      Users,
+      { id },
+      {
+        fields: [
+          'id',
+          'email',
+          'username',
+          'displayName',
+          'avatarUrl',
+          'preferredLocale',
+          'isEmailConfirmed',
+          'isActive',
+          'isDeleted',
+          'lastLoginAt',
+          'createdAt',
+          'updatedAt',
+        ],
+      },
+    );
+
+    if (!user) throw new NotFoundException(`User with ID ${id} not found`);
+    return user; 
+  }
+
+
+
+  // async getUserById(id: string): Promise<Omit<Users, 'password' | 'refreshToken'>> {
+  //   const user = await this.usersRepository.findOne(id);
+  //   if (!user) throw new NotFoundException(`User with ID ${id} not found`);
+  //   const { password, refreshToken, ...safeUser } = user as any;
+  //   return safeUser;
+  // }
   /**
    * Find a user by email
    * @param email user's email

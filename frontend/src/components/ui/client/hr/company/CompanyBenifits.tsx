@@ -1,17 +1,13 @@
+"use client";
 import { useState } from "react";
 
-const CompanyBenifits = () => {
-    const [benefits, setBenefits] = useState([
-        "Competitive salary and bonuses",
-        "Flexible working hours",
-        "Health insurance",
-        "Annual leave and sick leave",
-        "Professional development opportunities",
-        "Modern office environment",
-        "Team building activities",
-        "Work from home options",
-    ]);
-    const [input, setInput] = useState("");
+type Props = {
+  benefits: string[];
+  setBenefits: (benefits: string[]) => void;
+};
+
+const CompanyBenifits = ({ benefits, setBenefits }: Props) => {
+  const [input, setInput] = useState("");
 
     const add = () => {
         const v = input.trim();
@@ -20,11 +16,11 @@ const CompanyBenifits = () => {
             setInput("");
             return;
         }
-        setBenefits((prev) => [...prev, v]);
+        setBenefits([...benefits, v]);
         setInput("");
     };
     const remove = (i: number) =>
-        setBenefits((prev) => prev.filter((_, idx) => idx !== i));
+        setBenefits(benefits.filter((_, idx) => idx !== i));
 
     return (
         <section className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">

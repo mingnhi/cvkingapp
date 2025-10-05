@@ -23,8 +23,7 @@ export class CompaniesRepository {
 
   async create(data: Partial<Company>): Promise<Company> {
     const company = this.repo.create(data);
-    await this.repo.create(company);
-    await this.em.flush();
+    await this.em.persistAndFlush(company);
     return company;
   }
 

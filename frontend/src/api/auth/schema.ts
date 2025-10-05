@@ -1,5 +1,6 @@
 import { MESSAGES } from '@/lib/messages';
 import { z } from 'zod';
+import { UserBaseSchema } from '../user/schema';
 
 export const LoginRequestSchema = z
   .object({
@@ -72,6 +73,7 @@ export const ResetPasswordRequestSchema = z.object({
 export const LoginResponseSchema = z.object({
   accessToken: z.string().optional(),
   refreshToken: z.string().optional(),
+  user: UserBaseSchema,
 });
 
 export const RegisterResponseSchema = z.object({

@@ -10,6 +10,8 @@ import {
   Put,
   ParseIntPipe,
   UseGuards,
+  Req,
+  NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from '@modules/users/dtos/user.dto';
@@ -23,7 +25,41 @@ import { Roles } from '@modules/auth/guards/roles.decorator';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
+
+  // @Get('my-profile')
+  // @UseGuards(JwtAuthGuard)
+  // async getMyProfile(@Req() req: any): Promise<ApiResponse<Partial<Users>>> {
+  //   const userId = req.user.sub;
+  //   const data = await this.usersService.getUserById(userId);
+  //   return { status: 'success', message: 'User profile fetched', data };
+  // }
+  @Get('my-profile')
+  @UseGuards(JwtAuthGuard)
+  async getMyProfile(
+    @Req() req: any
+  ): Promise<ApiResponse<Partial<Users>>> {
+    console.log('req.user', req.user); // thêm log
+    const userId = req.user.sub;
+    if (!userId) throw new NotFoundException('No userId in JWT');
+
+
+    const data = await this.usersService.getSafeUserById(userId);
+    return { status: 'success', message: 'User profile fetched', data };
+  }
+
+
+
+  @Put('my-profile')
+  @UseGuards(JwtAuthGuard)
+  async updateMyProfile(
+    @Req() req: any,
+    @Body(ValidationPipe) dto: UpdateUserDto,
+  ): Promise<ApiResponse<Users>> {
+    const userId = req.user.sub;
+    const data = await this.usersService.update(userId, dto);
+    return { status: 'success', message: 'User profile updated', data };
+  }
 
   /**
    * Retrieve all users
@@ -48,9 +84,11 @@ export class UsersController {
    * @returns User wrapped in ApiResponse
    */
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin')
   async findOne(
     @Param('id', ParseIntPipe) id: string
-  ): Promise<ApiResponse<Users>> {
+  ): Promise<ApiResponse<Partial<Users>>> {
     const user = await this.usersService.getUserById(id);
     return {
       status: 'success',
@@ -58,6 +96,8 @@ export class UsersController {
       data: user,
     };
   }
+
+
 
   /**
    * Create a new user
@@ -81,9 +121,9 @@ export class UsersController {
    * @param updateUserDto Data to update the user
    * @returns Updated user wrapped in ApiResponse
    */
-  @Put()
+  @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('Admin, JobSeeker')
+  @Roles('Admin')
   async update(
     @Param('id', ParseIntPipe) id: string,
     @Body() dto: UpdateUserDto
