@@ -1,4 +1,4 @@
-USE JOB_DB;
+USE cvkingapp;
 GO
 
 CREATE OR ALTER PROCEDURE dbo.SP_GetJobTagById

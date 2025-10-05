@@ -1,4 +1,4 @@
-use JOB_DB
+use cvkingapp
 go
 
 -- 📌 Lấy application theo ID
