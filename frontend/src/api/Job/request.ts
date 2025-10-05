@@ -14,6 +14,7 @@ export async function getJobsRequest(filter?: Partial<JobFilter>): Promise<Job[]
   // Chỉ gửi param có giá trị (lọc theo trường đã nhập)
   const params: Record<string, string | number> = {};
   if (parsed.keyword) params.keyword = parsed.keyword;
+
   if (parsed.location) params.location = parsed.location;
   if (parsed.categoryId) params.categoryId = parsed.categoryId;
   if (parsed.salaryMin != null) params.salaryMin = parsed.salaryMin;
@@ -28,11 +29,19 @@ export async function getJobsRequest(filter?: Partial<JobFilter>): Promise<Job[]
   params.limit = parsed.limit;   // default 10
 
   const res = await instance.get("/jobs", { params });
+  // console.log(res);
+
 
   // parse qua ApiResponse<JobsSchema>, nhưng hàm vẫn trả về Job[]
   const ListResp = ApiResponseSchema(JobsSchema);
+
+
   const parsedResp = ListResp.parse(res.data);
+
+
+
   const list = Array.isArray(parsedResp.data) ? parsedResp.data : (parsedResp.data ? [parsedResp.data] : []);
+
   return list;
 }
 
