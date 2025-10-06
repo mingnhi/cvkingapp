@@ -85,7 +85,7 @@ export class UsersController {
    */
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('Admin')
+  @Roles('Admin', 'JobSeeker')
   async findOne(
     @Param('id', ParseIntPipe) id: string
   ): Promise<ApiResponse<Partial<Users>>> {
