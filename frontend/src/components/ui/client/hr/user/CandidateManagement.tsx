@@ -13,7 +13,6 @@ import {
     Chip,
     Button,
     Divider,
-    Paper
 } from '@mui/material';
 import {
     Search,
@@ -31,17 +30,27 @@ import {
 } from 'lucide-react';
 
 const statusMap = {
-    moi: { label: 'Mới', icon: <AlertCircle size={14} />, color: 'primary' as 'primary' },
-    dat_yeu_cau: { label: 'Đạt yêu cầu', icon: <Star size={14} />, color: 'info' as 'info' },
-    da_phong_van: { label: 'Đã phỏng vấn', icon: <UserCheck size={14} />, color: 'secondary' as 'secondary' },
-    tu_choi: { label: 'Từ chối', icon: <XCircle size={14} />, color: 'error' as 'error' },
-    da_tuyen: { label: 'Đã tuyển', icon: <CheckCircle size={14} />, color: 'success' as 'success' }
+  moi: { label: "Mới", icon: <AlertCircle size={14} />, color: "primary" },
+  dat_yeu_cau: { label: "Đạt yêu cầu", icon: <Star size={14} />, color: "info" },
+  da_phong_van: { label: "Đã phỏng vấn", icon: <UserCheck size={14} />, color: "secondary" },
+  tu_choi: { label: "Từ chối", icon: <XCircle size={14} />, color: "error" },
+  da_tuyen: { label: "Đã tuyển", icon: <CheckCircle size={14} />, color: "success" },
+} as const;
+
+
+const getStatusChip = (status: keyof typeof statusMap) => {
+  const statusInfo =
+    statusMap[status] || { label: status, icon: null, color: "default" as const };
+  return (
+    <Chip
+      label={statusInfo.label}
+      icon={statusInfo.icon}
+      color={statusInfo.color}
+      size="small"
+    />
+  );
 };
 
-const getStatusChip = (status: string) => {
-    const statusInfo = statusMap[status] || { label: status, icon: null, color: 'default' as 'default' };
-    return <Chip label={statusInfo.label} icon={statusInfo.icon} color={statusInfo.color} size="small" />;
-};
 
 const CandidateManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');

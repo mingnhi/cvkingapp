@@ -1,199 +1,263 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from '../../common/card/card';
+// import { Card, CardContent, CardHeader, CardTitle } from '../../common/card/card';
 import {
     Edit,
     Eye,
     Calendar,
-    MapPin,
-    DollarSign,
    Search,
    AlertCircle,
    CheckCircle,
 } from 'lucide-react';
-import { Avatar , AvatarImage , AvatarFallback} from '../../common/avatar/avatar';
-import { Button } from '../../common/button/button';
+import {
+  Card,
+  CardContent,
+  Avatar,
+  Button,
+  Typography,
+  Chip,
+  Box,
+  Stack,
+  CircularProgress,
+} from "@mui/material";
+// import { Avatar , AvatarImage , AvatarFallback} from '../../common/avatar/avatar';
+// import { Button } from '../../common/button/button';
 import { useApp } from '@/components/AppContext';
 import { XCircle } from 'lucide-react';
-import { Badge } from '@mui/material';
-const MyApplycation = ()=> {
+import { Grid } from '@mui/material';
+import { useMyProfileQuery } from '@/api/user/query';
+import { useJobApplicationsByJobSeekerQuery } from '@/api/JobApplication/query';
+const MyApplication = ()=> {
 
     const { navigateTo } = useApp();
-const mockApplications = [
-    {
-      id: 1,
-      jobTitle: 'Senior Frontend Developer',
-      company: 'TechCorp Vietnam',
-      location: 'Ho Chi Minh City',
-      salary: '$2000 - $3000',
-      appliedDate: '2024-01-15',
-      status: 'interview',
-      logo: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=64&h=64&fit=crop&crop=face',
-      description: 'Exciting opportunity to work with cutting-edge technologies...',
-      interviewDate: '2024-01-25 14:00',
-      notes: 'Technical interview scheduled with the development team'
-    },
-    {
-      id: 2,
-      jobTitle: 'React Developer',
-      company: 'StartupXYZ',
-      location: 'Hanoi',
-      salary: '$1500 - $2500',
-      appliedDate: '2024-01-10',
-      status: 'pending',
-      logo: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=64&h=64&fit=crop&crop=face',
-      description: 'Join our fast-growing startup and make an impact...',
-      notes: 'Application under review by HR team'
-    },
-    {
-      id: 3,
-      jobTitle: 'Full Stack Developer',
-      company: 'DevStudio',
-      location: 'Da Nang',
-      salary: '$1800 - $2800',
-      appliedDate: '2024-01-05',
-      status: 'rejected',
-      logo: 'https://images.unsplash.com/photo-1560472355-536de3962603?w=64&h=64&fit=crop&crop=face',
-      description: 'Work on exciting projects with modern technology stack...',
-      notes: 'Thank you for your interest. Unfortunately, we have moved forward with other candidates.'
+    
+    const { data: userProfile, isLoading: loadingProfile } = useMyProfileQuery();
+    console.log("userProfile?.id =", userProfile?.id);
+
+    const { data: applications = [], isLoading: loadingApplications, error } = useJobApplicationsByJobSeekerQuery(userProfile?.id);
+    
+    if (loadingProfile || loadingApplications) {
+        return (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
+            <CircularProgress />
+            </Box>
+        );
     }
-  ];
+
  const handleViewJob = (application: any) => {
-        const jobDetail = {
-            id: application.id,
-            title: application.jobTitle,
-            company: application.company,
-            location: application.location,
-            salary: application.salary,
-            description: application.description,
-            posted: application.appliedDate,
-            type: 'Full-time',
-            experience: '2-5 years'
-        };
-        navigateTo('job-detail', { job: jobDetail });
-    };
- const getStatusBadge = (status: string) => {
-        switch (status) {
-            case 'pending':
-                return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800"><AlertCircle className="w-3 h-3 mr-1" />Pending</Badge>;
-            case 'interview':
-                return <Badge variant="secondary" className="bg-blue-100 text-blue-800"><Calendar className="w-3 h-3 mr-1" />Interview</Badge>;
-            case 'rejected':
-                return <Badge variant="secondary" className="bg-red-100 text-red-800"><XCircle className="w-3 h-3 mr-1" />Rejected</Badge>;
-            case 'accepted':
-                return <Badge variant="secondary" className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Accepted</Badge>;
-            default:
-                return <Badge variant="secondary">{status}</Badge>;
-        }
+    navigateTo("job-detail", { jobId: application.jobId });
+  };
+ const getStatusChip = (status: string) => {
+    const styles: Record<string, any> = {
+      Pending: {
+        bg: "#FEF3C7",
+        color: "#92400E",
+        icon: <AlertCircle size={16} color="#92400E" />,
+        label: "Pending",
+      },
+      Interview: {
+        bg: "#DBEAFE",
+        color: "#1E40AF",
+        icon: <Calendar size={16} color="#1E40AF" />,
+        label: "Interview",
+      },
+      Rejected: {
+        bg: "#FEE2E2",
+        color: "#991B1B",
+        icon: <XCircle size={16} color="#991B1B" />,
+        label: "Rejected",
+      },
+      Hired: {
+        bg: "#DCFCE7",
+        color: "#166534",
+        icon: <CheckCircle size={16} color="#166534" />,
+        label: "Hired",
+      },
     };
 
-    return  (
-                    <div className="space-y-6 w-full">
+    const cfg = styles[status] || {
+      bg: "#E5E7EB",
+      color: "#374151",
+      icon: <AlertCircle size={16} color="#374151" />,
+      label: status,
+     };
+     
+     return (
+      <Chip
+        icon={cfg.icon}
+        label={cfg.label}
+        sx={{
+          backgroundColor: cfg.bg,
+          color: cfg.color,
+          fontWeight: 500,
+          "& .MuiChip-icon": {
+            color: cfg.color, // ✅ giúp icon cùng màu text
+          },
+        }}
+      />
+    );
+    };
+    
+    if (error) {
+    return (
+      <Typography color="error" textAlign="center" sx={{ mt: 5 }}>
+        Lỗi khi tải dữ liệu: {(error as Error).message}
+      </Typography>
+    );
+  }
 
-                        <div className="flex items-center justify-between">
-                            <h1>My Applications ({mockApplications.length})</h1>
-                            <Button variant="outline" onClick={() => navigateTo('jobs')}>
-                                <Search className="w-4 h-4 mr-2" />
-                                Find More Jobs
+    return (
+    <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 4 }}>
+      {/* Header */}
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Typography variant="h5" fontWeight={600}>
+          My Applications ({applications.length})
+        </Typography>
+        <Button
+          variant="outlined"
+          startIcon={<Search size={18} />}
+          onClick={() => navigateTo("jobs")}
+        >
+          Find More Jobs
+        </Button>
+      </Stack>
+
+      {/* Summary Cards */}
+      <Grid container spacing={2} mb={2}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent sx={{ textAlign: "center", py: 4 }}>
+              <Typography variant="h4" color="primary">
+                {applications.length}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Total Applications
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent sx={{ textAlign: "center", py: 4 }}>
+              <Typography variant="h4" sx={{ color: "#CA8A04" }}>
+                {applications.filter((a) => a.status === "Pending").length}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Pending
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent sx={{ textAlign: "center", py: 4 }}>
+              <Typography variant="h4" sx={{ color: "#2563EB" }}>
+                {applications.filter((a) => a.status === "Interview").length}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Interview
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent sx={{ textAlign: "center", py: 4 }}>
+              <Typography variant="h4" sx={{ color: "#16A34A" }}>
+                {applications.filter((a) => a.status === "Hired").length}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Hired
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Application List */}
+      {applications.length === 0 ? (
+        <Typography variant="body1" textAlign="center" color="text.secondary" mt={4}>
+          You haven't applied for any jobs yet.
+        </Typography>
+      ) : (
+        <Stack spacing={3}>
+          {applications.map((application) => (
+            <Card key={application.id} elevation={2}>
+              <CardContent sx={{ p: 3 }}>
+                <Stack direction="row" spacing={2} alignItems="flex-start">
+                  <Avatar sx={{ width: 56, height: 56 }}>
+                    {application.jobId.charAt(0)}
+                  </Avatar>
+
+                  <Box flex={1}>
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="flex-start"
+                      mb={1}
+                    >
+                      <Box>
+                        <Typography
+                          variant="subtitle1"
+                          fontWeight={600}
+                          sx={{
+                            cursor: "pointer",
+                            "&:hover": { color: "primary.main" },
+                          }}
+                          onClick={() => handleViewJob(application)}
+                        >
+                          Job ID: {application.jobId}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Cover Letter:{" "}
+                          {application.coverLetter || "No cover letter provided"}
+                        </Typography>
+                      </Box>
+                      {getStatusChip(application.status)}
+                    </Stack>
+
+                    <Stack
+                      direction="row"
+                      spacing={3}
+                      alignItems="center"
+                      color="text.secondary"
+                      mb={2}
+                      sx={{ flexWrap: "wrap" }}
+                    >
+                      <Box display="flex" alignItems="center">
+                        <Calendar size={16} style={{ marginRight: 4 }} />
+                        Applied:{" "}
+                        {new Date(application.appliedAt).toLocaleDateString()}
+                      </Box>
+                    </Stack>
+
+                    <Stack direction="row" spacing={1.5} flexWrap="wrap">
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<Eye size={16} />}
+                        onClick={() => handleViewJob(application)}
+                      >
+                        View Job
+                        </Button>
+                        {application.status === "Pending" && (
+                            <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<Edit size={16} />}
+                            >
+                            Update Application
                             </Button>
-                        </div>
+                      )}       
+                    </Stack>
+                  </Box>
+                </Stack>
+              </CardContent>
+            </Card>
+          ))}
+        </Stack>
+      )}
+    </Box>
+  );
+};
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                                <CardContent className="p-4 text-center">
-                                    <div className="text-2xl font-bold text-primary mt-8">12</div>
-                                    <div className="text-sm text-gray-600">Total Applications</div>
-                                </CardContent>
-                            </Card>
-                            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                                <CardContent className="p-4 text-center">
-                                    <div className="text-2xl font-bold text-yellow-600 mt-8">5</div>
-                                    <div className="text-sm text-gray-600">Pending</div>
-                                </CardContent>
-                            </Card>
-                            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                                <CardContent className="p-4 text-center">
-                                    <div className="text-2xl font-bold text-blue-600 mt-8">3</div>
-                                    <div className="text-sm text-gray-600">Interview</div>
-                                </CardContent>
-                            </Card>
-                            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                                <CardContent className="p-4 text-center">
-                                    <div className="text-2xl font-bold text-green-600 mt-8">2</div>
-                                    <div className="text-sm text-gray-600">Accepted</div>
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        <div className="space-y-4">
-                            {mockApplications.map((application) => (
-                                <Card key={application.id} className="hover:shadow-md transition-shadow">
-                                    <CardContent className="p-6 mt-8">
-                                        <div className="flex items-start space-x-4">
-                                            <Avatar className="w-12 h-12">
-                                                <AvatarImage src={application.logo} />
-                                                <AvatarFallback>{application.company.charAt(0)}</AvatarFallback>
-                                            </Avatar>
-                                            <div className="flex-1">
-                                                <div className="flex items-start justify-between mb-2">
-                                                    <div>
-                                                        <h3 className="mb-1 cursor-pointer hover:text-primary" onClick={() => handleViewJob(application)}>
-                                                            {application.jobTitle}
-                                                        </h3>
-                                                        <p className="text-gray-600">{application.company}</p>
-                                                    </div>
-                                                    {getStatusBadge(application.status)}
-                                                </div>
-                                                <div className="flex items-center text-sm text-gray-500 space-x-4 mb-3">
-                                                    <div className="flex items-center">
-                                                        <MapPin className="w-4 h-4 mr-1" />
-                                                        {application.location}
-                                                    </div>
-                                                    <div className="flex items-center">
-                                                        <DollarSign className="w-4 h-4 mr-1" />
-                                                        {application.salary}
-                                                    </div>
-                                                    <div className="flex items-center">
-                                                        <Calendar className="w-4 h-4 mr-1" />
-                                                        Applied: {application.appliedDate}
-                                                    </div>
-                                                </div>
-                                                {application.notes && (
-                                                    <div className="bg-gray-50 p-3 rounded-lg mb-3">
-                                                        <p className="text-sm text-gray-600">{application.notes}</p>
-                                                        {application.interviewDate && (
-                                                            <p className="text-sm font-medium text-blue-600 mt-1">
-                                                                Interview: {application.interviewDate}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                )}
-                                                <div className="flex flex-wrap gap-2">
-                                                    <Button variant="outline" size="sm" onClick={() => handleViewJob(application)}>
-                                                        <Eye className="w-4 h-4 mr-2" />
-                                                        View Details
-                                                    </Button>
-                                                    {application.status === 'interview' && (
-                                                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                                                            <Calendar className="w-4 h-4 mr-2" />
-                                                            View Interview Info
-                                                        </Button>
-                                                    )}
-                                                    {application.status === 'pending' && (
-                                                        <Button variant="outline" size="sm">
-                                                            <Edit className="w-4 h-4 mr-2" />
-                                                            Update Application
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    </div>
-                ) ;
-}
-
-export default MyApplycation;
-
+export default MyApplication;

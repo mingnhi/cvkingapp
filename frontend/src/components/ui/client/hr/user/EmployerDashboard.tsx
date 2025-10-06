@@ -19,12 +19,12 @@ const EmployerDashboard = () => {
   const [isEditingCompany, setIsEditingCompany] = useState(false);
 
   const navigationItems = [
-    { id: 'overview', label: 'Overview', icon: TrendingUp },
-    { id: 'company', label: 'Company Profile', icon: Building2 },
-    { id: 'jobs', label: 'Job Postings', icon: Briefcase },
-    { id: 'candidates', label: 'Candidate Management', icon: Users },
-    { id: 'saved', label: 'Saved Candidates', icon: Star },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'overview', label: 'Tổng quan', icon: TrendingUp },
+    { id: 'company', label: 'Hồ sơ công ty', icon: Building2 },
+    { id: 'jobs', label: 'Tin tuyển dụng', icon: Briefcase },
+    { id: 'candidates', label: 'Quản lý ứng viên', icon: Users },
+    { id: 'saved', label: 'Ứng viên đã lưu', icon: Star },
+    { id: 'settings', label: 'Cài đặt', icon: Settings },
   ] as const;
 
   const renderContent = () => {

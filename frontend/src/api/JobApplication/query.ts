@@ -10,6 +10,7 @@ import {
     createJobApplicationRequest,
     updateJobApplicationRequest,
     deleteJobApplicationRequest,
+    getJobApplicationsByJobSeekerIdRequest,
 } from "./request";
 import { onMutateError } from "@/lib/utils";
 import type {
@@ -21,6 +22,8 @@ import type {
 export const JobApplicationQueryKey = {
     all: ["job-applications"] as const,
     detail: (id: string) => ["job-applications", "detail", id] as const,
+    byJobSeeker: (jobSeekerId: string) =>
+        ["job-applications", "by-jobseeker", jobSeekerId] as const,
 };
 
 /** QUERIES */
@@ -35,6 +38,15 @@ export const useJobApplicationByIdQuery = (id?: string) =>
         queryKey: JobApplicationQueryKey.detail(id || "unknown"),
         queryFn: () => getJobApplicationByIdRequest(id as string),
         enabled: !!id,
+        refetchOnMount: true,
+        refetchOnWindowFocus: true,
+    });
+
+export const useJobApplicationsByJobSeekerQuery = (jobSeekerId?: string) =>
+    useQuery<JobApplicationResponse[]>({
+        queryKey: JobApplicationQueryKey.byJobSeeker(jobSeekerId || "unknown"),
+        queryFn: () => getJobApplicationsByJobSeekerIdRequest(jobSeekerId as string),
+        enabled: !!jobSeekerId,
         refetchOnMount: true,
         refetchOnWindowFocus: true,
     });

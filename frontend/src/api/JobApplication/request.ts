@@ -15,6 +15,12 @@ export async function getJobApplicationByIdRequest(id: string): Promise<JobAppli
     return JobApplicationResponseSchema.parse(data);
 }
 
+export async function getJobApplicationsByJobSeekerIdRequest(jobSeekerId: string): Promise<JobApplicationResponse[]>{
+    const res = await httpInstance.get(`/job-applications/jobSeekerId/${jobSeekerId}`);
+    const data = getSuccessResponse<JobApplicationResponse[]>(res);
+    return z.array(JobApplicationResponseSchema).parse(data);
+}
+
 export async function createJobApplicationRequest(
     input: JobApplicationCreateRequest
 ): Promise<JobApplicationResponse> {
