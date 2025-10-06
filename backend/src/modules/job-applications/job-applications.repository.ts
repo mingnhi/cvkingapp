@@ -22,6 +22,13 @@ export class JobApplicationsRepository {
     return extractJson(raw);
   }
 
+  async findByJobSeekerId(jobSeekerId: string): Promise<any[]>{
+    const raw = await this.em
+      .getConnection()
+      .execute('EXEC SP_GetJobApplicationsByJobSeekerId ?', [jobSeekerId]);
+    return extractJsonArray(raw) ?? [];
+  }
+
   async create(dto: CreateJobApplicationDto): Promise<any> {
     const raw = await this.em
       .getConnection()

@@ -14,6 +14,7 @@ import { JobApplicationsRepository } from './job-applications.repository';
 import { ApiResponse } from '@common/interfaces/api-response.interface';
 import { CreateJobApplicationDto } from './dtos/create-job-application.dto';
 import { UpdateJobApplicationDto } from './dtos/update-job-application.dto';
+import { count } from 'console';
 
 @ApiTags('job-applications')
 @Controller('job-applications')
@@ -39,6 +40,13 @@ export class JobApplicationsController {
     return { status: 'success', message: 'Found job application', data };
   }
 
+  @Get('jobSeekerId/:id')
+  async findByJobSeekerId(
+      @Param('id', ParseUUIDPipe) jobSeekerId: string,
+  ): Promise<ApiResponse<any>>{
+    const data = await this.repo.findByJobSeekerId(jobSeekerId);
+    return{status:'success', message:`Applications of job seeker ${jobSeekerId}`,data, meta:{count:data.length}}
+    }
   @Post()
   async create(
     @Body(ValidationPipe) dto: CreateJobApplicationDto
