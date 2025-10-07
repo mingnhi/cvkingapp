@@ -19,7 +19,7 @@ import { count } from 'console';
 @ApiTags('job-applications')
 @Controller('job-applications')
 export class JobApplicationsController {
-  constructor(private readonly repo: JobApplicationsRepository) {}
+  constructor(private readonly repo: JobApplicationsRepository) { }
 
   @Get()
   async findAll(): Promise<ApiResponse<any>> {
@@ -42,11 +42,23 @@ export class JobApplicationsController {
 
   @Get('jobSeekerId/:id')
   async findByJobSeekerId(
-      @Param('id', ParseUUIDPipe) jobSeekerId: string,
-  ): Promise<ApiResponse<any>>{
+    @Param('id', ParseUUIDPipe) jobSeekerId: string,
+  ): Promise<ApiResponse<any>> {
     const data = await this.repo.findByJobSeekerId(jobSeekerId);
-    return{status:'success', message:`Applications of job seeker ${jobSeekerId}`,data, meta:{count:data.length}}
-    }
+    return { status: 'success', message: `Applications of job seeker ${jobSeekerId}`, data, meta: { count: data.length } }
+  }
+
+  @Get('company/:id')
+  async findByCompanyId(@Param('id', ParseUUIDPipe) companyId: string):Promise<ApiResponse<any>> {
+    const data = await this.repo.findByCompanyId(companyId);
+    return {
+      status: 'success',
+      message: `Applications for company ${companyId}`,
+      data,
+      meta: { count: data.length },
+    };
+  }
+
   @Post()
   async create(
     @Body(ValidationPipe) dto: CreateJobApplicationDto
