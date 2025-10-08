@@ -23,6 +23,12 @@ export class EmployerProfilesRepository {
     if (!profile) throw new NotFoundException('EmployerProfile not found');
     return profile;
   }
+  async findByUserId(userId: string): Promise<EmployerProfile> {
+    const profile = await this.repo.findOne({ userId: userId });
+    if (!profile) throw new NotFoundException('Employer profile not found');
+    return profile;
+  }
+
 
   async create(data: Partial<EmployerProfile>): Promise<EmployerProfile> {
     const profile = this.repo.create(data);

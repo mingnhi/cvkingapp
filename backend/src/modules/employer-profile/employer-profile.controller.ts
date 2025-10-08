@@ -50,6 +50,18 @@ export class EmployerProfilesController {
     return { status: 'success', message: 'Employer profile found', data };
   }
 
+  @Get('by-user/:userId')
+  async findByUserId(@Param('userId', ParseUUIDPipe) userId: string):
+    Promise<ApiResponse<EmployerProfile>> {
+    const profile = await this.repo.findByUserId(userId);
+    return {
+      status: 'success',
+      message: `Employer profile of user ${userId}`,
+      data: profile,
+    };
+  }
+
+
   @Post()
   async create(
     @Body(ValidationPipe) dto: CreateEmployerProfileDto
