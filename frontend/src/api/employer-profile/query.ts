@@ -7,6 +7,7 @@ import {
     updateEmployerProfileRequest,
     deleteEmployerProfileRequest,
     UpdateEmployerCompanyRequest,
+    getEmployerProfileByUserIdRequest,
 } from './request';
 import type {
     EmployerProfileResponse,
@@ -36,6 +37,18 @@ export const useEmployerProfileByIdQuery = (
         ...options,
     });
 
+
+export const useEmployerProfileByUserIdQuery = (
+    userId: string | undefined,
+    options?: UseQueryOptions<EmployerProfileResponse, Error>
+) =>
+    useQuery<EmployerProfileResponse, Error>({
+        queryKey: ['employer-profile-by-user', userId],
+        queryFn: () => getEmployerProfileByUserIdRequest(userId as string),
+        enabled: !!userId,
+        ...options,
+    });
+    
 export const useCreateEmployerProfileMutation = (
     options?: UseMutationOptions<EmployerProfileResponse, Error, CreateEmployerProfileRequest>
 ) =>
@@ -54,7 +67,7 @@ export const useUpdateEmployerProfileMutation = (
 
 
 export const useUpdateEmployerAndCompanyMutation = (
-    options?: UseMutationOptions<EmployerProfileResponse, Error, {id: string, data:UpdateEmployerAndCompanyRequest}>
+    options?: UseMutationOptions<EmployerProfileResponse, Error, { id: string, data: UpdateEmployerAndCompanyRequest }>
 ) =>
     useMutation({
         mutationFn: ({ id, data }) => UpdateEmployerCompanyRequest(id, data),

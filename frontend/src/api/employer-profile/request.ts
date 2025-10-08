@@ -12,6 +12,11 @@ export const getEmployerProfileByIdRequest = async (id: string) => {
     return getSuccessResponse<EmployerProfileResponse>(res);
 };
 
+export const getEmployerProfileByUserIdRequest = async (userId: string) => {
+    const res = await instance.get(`/employer-profiles/by-user/${userId}`);
+    return getSuccessResponse<EmployerProfileResponse>(res);
+};
+
 export const createEmployerProfileRequest = async (data: CreateEmployerProfileRequest) => {
     const res = await instance.post('/employer-profiles', data);
     return getSuccessResponse<EmployerProfileResponse>(res);
@@ -25,7 +30,7 @@ export const updateEmployerProfileRequest = async (
     return getSuccessResponse<EmployerProfileResponse>(res);
 };
 
-export const UpdateEmployerCompanyRequest = async(
+export const UpdateEmployerCompanyRequest = async (
     id: string,
     data: UpdateEmployerAndCompanyRequest
 ) => {

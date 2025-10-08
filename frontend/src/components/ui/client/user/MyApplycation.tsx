@@ -31,7 +31,6 @@ const MyApplication = ()=> {
     const { navigateTo } = useApp();
     
     const { data: userProfile, isLoading: loadingProfile } = useMyProfileQuery();
-    console.log("userProfile?.id =", userProfile?.id);
 
     const { data: applications = [], isLoading: loadingApplications, error } = useJobApplicationsByJobSeekerQuery(userProfile?.id);
     

@@ -15,10 +15,32 @@ export async function getJobApplicationByIdRequest(id: string): Promise<JobAppli
     return JobApplicationResponseSchema.parse(data);
 }
 
-export async function getJobApplicationsByJobSeekerIdRequest(jobSeekerId: string): Promise<JobApplicationResponse[]>{
+export async function getJobApplicationsByJobSeekerIdRequest(jobSeekerId: string): Promise<JobApplicationResponse[]> {
     const res = await httpInstance.get(`/job-applications/jobSeekerId/${jobSeekerId}`);
     const data = getSuccessResponse<JobApplicationResponse[]>(res);
     return z.array(JobApplicationResponseSchema).parse(data);
+}
+
+export async function getApplicationsByCompanyIdRequest(id: string): Promise<JobApplicationResponse[]> {
+    // console.log(" [getApplicationsByCompanyIdRequest] called with ID:", id);
+    const res = await httpInstance.get(`job-applications/company/${id}`);
+    // console.log(" Raw API Response:", res.data);
+    const data = res.data.data;
+    const normalized = data.map((a: any) => ({
+        id: a.ApplicationId,
+        jobId: a.JobId,
+        jobSeekerId: a.job_seeker_id,
+        status: a.ApplicationStatus,
+        fullName: a.display_name,
+        email: a.email,
+        jobTitle: a.JobTitle,
+        appliedAt: a.appliedAt,
+        companyId: a.CompanyId,
+        companyName: a.CompanyName,
+    }));
+    console.log(" Normalized:", normalized);
+    const SafeSchema = JobApplicationResponseSchema.passthrough();
+    return z.array(SafeSchema).parse(normalized);
 }
 
 export async function createJobApplicationRequest(

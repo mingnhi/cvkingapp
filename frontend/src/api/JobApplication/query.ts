@@ -11,6 +11,7 @@ import {
     updateJobApplicationRequest,
     deleteJobApplicationRequest,
     getJobApplicationsByJobSeekerIdRequest,
+    getApplicationsByCompanyIdRequest,
 } from "./request";
 import { onMutateError } from "@/lib/utils";
 import type {
@@ -49,6 +50,22 @@ export const useJobApplicationsByJobSeekerQuery = (jobSeekerId?: string) =>
         enabled: !!jobSeekerId,
         refetchOnMount: true,
         refetchOnWindowFocus: true,
+    });
+
+export const useJobApplicationsByCompanyQuery = (companyId?: string) =>
+    useQuery({
+        queryKey: ['job-applications', 'company', companyId ?? 'none'],
+        queryFn: async () => {
+            if (!companyId) return [];
+            const data = await getApplicationsByCompanyIdRequest(companyId);
+            console.log(" Data returned to React Query:", data);
+            return data;
+        },
+        enabled: !!companyId,
+        refetchOnMount: true,
+        refetchOnWindowFocus: true,
+        staleTime: 0,
+        gcTime: 0,
     });
 
 /** MUTATIONS */
