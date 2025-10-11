@@ -49,7 +49,7 @@ export class JobApplicationsController {
   }
 
   @Get('company/:id')
-  async findByCompanyId(@Param('id', ParseUUIDPipe) companyId: string):Promise<ApiResponse<any>> {
+  async findByCompanyId(@Param('id', ParseUUIDPipe) companyId: string): Promise<ApiResponse<any>> {
     const data = await this.repo.findByCompanyId(companyId);
     return {
       status: 'success',

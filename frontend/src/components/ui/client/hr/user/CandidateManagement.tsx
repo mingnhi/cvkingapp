@@ -13,6 +13,15 @@ import {
   Chip,
   Button,
   Divider,
+  Stack,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  InputLabel,
+  FormControl,
+  Select,
+  MenuItem,
+  DialogActions,
 } from "@mui/material";
 import {
   Search,
@@ -27,22 +36,21 @@ import {
   AlertCircle,
   Star,
   UserCheck,
+  UserPlus,
 } from "lucide-react";
 
 import { useMyProfileQuery } from "@/api/user/query";
-import { useJobApplicationsByCompanyQuery } from "@/api/JobApplication/query";
+import { useJobApplicationsByCompanyQuery, useUpdateJobApplicationMutation } from "@/api/JobApplication/query";
 import { useEmployerProfileByUserIdQuery } from "@/api/employer-profile/query";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const statusMap = {
-  Pending: { label: "Mới", icon: <AlertCircle size={14} />, color: "primary" },
-  Reviewed: { label: "Đạt yêu cầu", icon: <Star size={14} />, color: "info" },
-  Interview: {
-    label: "Đã phỏng vấn",
-    icon: <UserCheck size={14} />,
-    color: "secondary",
-  },
-  Rejected: { label: "Từ chối", icon: <XCircle size={14} />, color: "error" },
-  Hired: { label: "Đã tuyển", icon: <CheckCircle size={14} />, color: "success" },
+  Pending: { label: "Mới", color: "#3b82f6", icon: <AlertCircle size={14} /> },
+  Reviewed: { label: "Đạt yêu cầu", color: "#f59e0b", icon: <Star size={14} /> },
+  Interview: { label: "Đã phỏng vấn", color: "#8b5cf6", icon: <UserCheck size={14} /> },
+  Rejected: { label: "Từ chối", color: "#ef4444", icon: <XCircle size={14} /> },
+  Hired: { label: "Đã tuyển", color: "#10b981", icon: <CheckCircle size={14} /> },
 } as const;
 
 interface Candidate {
@@ -57,43 +65,29 @@ interface Candidate {
   location: string;
   experienceYears: number;
   appliedAt: string;
+  skills?: string[];
 }
-
-const getStatusChip = (status: keyof typeof statusMap) => {
-  const statusInfo =
-    statusMap[status] || {
-      label: status,
-      icon: null,
-      color: "default" as const,
-    };
-  return (
-    <Chip
-      label={statusInfo.label}
-      icon={statusInfo.icon}
-      color={statusInfo.color}
-      size="small"
-    />
-  );
-};
 
 const CandidateManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: user, isLoading: loadingUser } = useMyProfileQuery();
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
+  const [status, setStatus] = useState<string>("Pending");
+
+  const { data: user } = useMyProfileQuery();
   const userId = user?.id;
-  const { data: employerProfile, isLoading: loadingEmployer } =
-    useEmployerProfileByUserIdQuery(userId);
+  const { data: employerProfile } = useEmployerProfileByUserIdQuery(userId);
   const companyId = employerProfile?.company;
+  const { data: applications = [], refetch } = useJobApplicationsByCompanyQuery(companyId);
 
-  const {
-    data: applications = [],
-    isLoading: loadingCandidates,
-    error,
-  } = useJobApplicationsByCompanyQuery(companyId);
-
-  if (error) console.error("❌ Query error:", error);
-
-  console.log("🧩 Normalized API:", applications);
+  const { mutateAsync: updateJobApplication, isPending } = useUpdateJobApplicationMutation({
+    onSuccess: () => {
+      setOpen(false);
+      refetch();
+    },
+  });
 
   const candidates = useMemo((): Candidate[] => {
     return applications.map((a: any, index: number) => ({
@@ -108,6 +102,7 @@ const CandidateManagement = () => {
       location: a.location ?? "Chưa cập nhật",
       experienceYears: a.experienceYears ?? 0,
       appliedAt: a.appliedAt ?? new Date().toISOString(),
+      skills: a.skills ?? ["React", "TypeScript", "Node.js"],
     }));
   }, [applications]);
 
@@ -121,32 +116,38 @@ const CandidateManagement = () => {
     );
   }, [candidates, searchTerm]);
 
-  const stats = useMemo(() => {
-    return {
+  const stats = useMemo(
+    () => ({
       moi: candidates.filter((c) => c.status === "Pending").length,
       dat_yeu_cau: candidates.filter((c) => c.status === "Reviewed").length,
       da_phong_van: candidates.filter((c) => c.status === "Interview").length,
       da_tuyen: candidates.filter((c) => c.status === "Hired").length,
-    };
-  }, [candidates]);
+    }),
+    [candidates]
+  );
 
-  if (loadingUser || loadingEmployer || loadingCandidates)
-    return <Typography>Đang tải dữ liệu...</Typography>;
+  const handleOpenEdit = (candidate: Candidate) => {
+    setSelectedCandidate(candidate);
+    setStatus(candidate.status);
+    setOpen(true);
+  };
 
-  if (!companyId)
-    return (
-      <Typography color="error" sx={{ mt: 3 }}>
-        Không tìm thấy công ty của bạn. Hãy tạo hoặc liên kết công ty trước khi
-        xem danh sách ứng viên.
-      </Typography>
-    );
+  const handleSave = async () => {
+    if (!selectedCandidate) return;
+    await updateJobApplication({
+      id: selectedCandidate.id,
+      jobId: selectedCandidate.jobId,
+      jobSeekerId: selectedCandidate.jobSeekerId,
+      coverLetter: "",
+      status: status as "Pending" | "Reviewed" | "Interview" | "Rejected" | "Hired",
+    });
+  };
+
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    <Box sx={{ p: 3, bgcolor: "#f9fafb", minHeight: "100vh" }}>
       {/* Header */}
-      <Box
-        sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
         <Typography variant="h4" fontWeight="bold">
           Quản lý ứng viên ({candidates.length})
         </Typography>
@@ -154,83 +155,115 @@ const CandidateManagement = () => {
           placeholder="Tìm kiếm ứng viên..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{ width: 300 }}
+          sx={{
+            width: 320,
+            bgcolor: "white",
+            borderRadius: 2,
+            boxShadow: 1,
+            "& .MuiOutlinedInput-root": { borderRadius: 2 },
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Search size={16} />
+                <Search size={18} />
               </InputAdornment>
             ),
           }}
         />
       </Box>
 
-      {/* Stats */}
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography variant="h5" color="primary.main">
-                {stats.moi}
-              </Typography>
-              <Typography color="text.secondary">Hồ sơ mới</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography variant="h5" color="info.main">
-                {stats.dat_yeu_cau}
-              </Typography>
-              <Typography color="text.secondary">Đạt yêu cầu</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography variant="h5" color="secondary.main">
-                {stats.da_phong_van}
-              </Typography>
-              <Typography color="text.secondary">Đã phỏng vấn</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography variant="h5" color="success.main">
-                {stats.da_tuyen}
-              </Typography>
-              <Typography color="text.secondary">Đã tuyển</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+      {/* Stats Cards */}
+      <Grid container spacing={2} sx={{ mb: 4 }}>
+        {[
+          { label: "Hồ sơ mới", value: stats.moi, color: "#2563eb", icon: <UserPlus size={18} /> },
+          { label: "Đạt yêu cầu", value: stats.dat_yeu_cau, color: "#f59e0b", icon: <Star size={18} /> },
+          { label: "Đã phỏng vấn", value: stats.da_phong_van, color: "#8b5cf6", icon: <UserCheck size={18} /> },
+          { label: "Đã tuyển", value: stats.da_tuyen, color: "#10b981", icon: <CheckCircle size={18} /> },
+        ].map((s, i) => (
+          <Grid item xs={12} sm={6} md={3} key={i}>
+            <Card
+              sx={{
+                height: 120,
+                width: 300,
+                borderRadius: 4,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: 2,
+                "&:hover": { boxShadow: 5, transform: "translateY(-3px)" },
+                transition: "0.25s",
+              }}
+            >
+              <CardContent sx={{ textAlign: "center", p: 2 }}>
+                <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
+                  <Box
+                    sx={{
+                      bgcolor: `${s.color}15`,
+                      borderRadius: "50%",
+                      p: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {s.icon}
+                  </Box>
+                </Box>
+                <Typography variant="h5" sx={{ fontWeight: "bold", color: s.color }}>
+                  {s.value}
+                </Typography>
+                <Typography color="text.secondary" fontSize={14}>
+                  {s.label}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
 
-      {/* Danh sách ứng viên */}
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      {/* Candidate Cards */}
+      <Stack spacing={2}>
         {filteredCandidates.map((candidate, index) => (
           <Card
             key={candidate.id ?? `candidate-${index}`}
-            sx={{ transition: "0.2s", "&:hover": { boxShadow: 4 } }}
+            sx={{
+              borderRadius: 3,
+              boxShadow: 1,
+              "&:hover": { boxShadow: 4 },
+              transition: "0.2s",
+              p: 1,
+            }}
           >
-            <CardContent>
-              {/* Avatar + FullName + Status */}
+            <CardContent sx={{ p: 3 }}>
+              {/* Header row */}
               <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-                <Avatar sx={{ width: 56, height: 56 }}>
+                <Avatar
+                  sx={{
+                    width: 56,
+                    height: 56,
+                    bgcolor: "#e0e7ff",
+                    fontWeight: "bold",
+                    color: "#374151",
+                  }}
+                >
                   {candidate.fullName?.charAt(0) ?? "?"}
                 </Avatar>
                 <Box sx={{ flexGrow: 1 }}>
                   <Typography variant="subtitle1" fontWeight="bold">
                     {candidate.fullName}
                   </Typography>
-                  <Typography color="text.secondary">
-                    {candidate.jobTitle}
-                  </Typography>
+                  <Typography color="text.secondary">{candidate.jobTitle}</Typography>
                 </Box>
-                {getStatusChip(candidate.status as keyof typeof statusMap)}
+                
+                <Chip
+                  label={statusMap[candidate.status as keyof typeof statusMap]?.label ?? "Mới"}
+                  icon={statusMap[candidate.status as keyof typeof statusMap]?.icon}
+                  sx={{
+                    bgcolor: `${statusMap[candidate.status as keyof typeof statusMap]?.color}15`,
+                    color: statusMap[candidate.status as keyof typeof statusMap]?.color,
+                    fontWeight: "bold",
+                  }}
+                />
               </Box>
 
               {/* Info */}
@@ -241,58 +274,128 @@ const CandidateManagement = () => {
                   gap: 2,
                   color: "text.secondary",
                   mb: 2,
+                  fontSize: 14,
                 }}
               >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <MapPin size={14} /> {candidate.location}
                 </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <Briefcase size={14} /> {candidate.experienceYears} năm kinh
-                  nghiệm
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Briefcase size={14} /> {candidate.experienceYears} năm KN
                 </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <Calendar size={14} /> Nộp ngày:{" "}
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Calendar size={14} /> Nộp:{" "}
                   {new Date(candidate.appliedAt).toLocaleDateString("vi-VN")}
                 </Box>
+              </Box>
+
+              {/* Skills */}
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
+                {candidate.skills?.map((skill, i) => (
+                  <Chip
+                    key={i}
+                    label={skill}
+                    size="small"
+                    sx={{
+                      borderRadius: "8px",
+                      bgcolor: "#f3f4f6",
+                      fontSize: 13,
+                      height: 28,
+                      fontWeight: 500,
+                    }}
+                  />
+                ))}
               </Box>
 
               <Divider sx={{ mb: 2 }} />
 
               {/* Buttons */}
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  startIcon={<Eye size={16} />}
-                >
-                  Xem hồ sơ
-                </Button>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  startIcon={<Download size={16} />}
-                >
-                  Tải CV
-                </Button>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  startIcon={<MessageSquare size={16} />}
-                >
-                  Liên hệ
-                </Button>
+                {[
+                  { label: "Xem hồ sơ", icon: <Eye size={16} /> },
+                  { label: "Tải CV", icon: <Download size={16} /> },
+                  { label: "Liên hệ", icon: <MessageSquare size={16} /> },
+                ].map((btn, i) => (
+                  <Button
+                    key={i}
+                    size="small"
+                    variant="outlined"
+                    startIcon={btn.icon}
+                    sx={{
+                      fontWeight: "bold",
+                      textTransform: "none",
+                      color: "#111827",
+                      borderColor: "#d1d5db",
+                      borderRadius: "8px",
+                      "&:hover": {
+                        bgcolor: "#f3f4f6",
+                        borderColor: "#9ca3af",
+                      },
+                    }}
+                  >
+                    {btn.label}
+                  </Button>
+                ))}
                 <Button
                   size="small"
                   variant="contained"
                   startIcon={<Calendar size={16} />}
+                  sx={{
+                    bgcolor: "#f97316",
+                    "&:hover": { bgcolor: "#ea580c" },
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
                 >
                   Hẹn phỏng vấn
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  startIcon={<CheckCircle size={16} />}
+                  sx={{
+                    bgcolor: "#2563eb",
+                    "&:hover": { bgcolor: "#1e40af" },
+                    color: "white",
+                    fontWeight: "bold",
+                    borderRadius: "8px",
+                  }}
+                  onClick={() => handleOpenEdit(candidate)}
+                >
+                  Chỉnh sửa
                 </Button>
               </Box>
             </CardContent>
           </Card>
         ))}
-      </Box>
+      </Stack>
+
+      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="xs">
+        <DialogTitle>Cập nhật trạng thái ứng viên</DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel>Trạng thái</InputLabel>
+            <Select value={status} label="Trạng thái" onChange={(e) => setStatus(e.target.value)}>
+              {Object.keys(statusMap).map((key) => (
+                <MenuItem key={key} value={key}>
+                  {statusMap[key as keyof typeof statusMap].label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>Hủy</Button>
+          <Button
+            onClick={handleSave}
+            disabled={isPending}
+            variant="contained"
+            sx={{ bgcolor: "#2563eb", "&:hover": { bgcolor: "#1e40af" } }}
+          >
+            {isPending ? "Đang lưu..." : "Lưu thay đổi"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

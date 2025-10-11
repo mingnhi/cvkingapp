@@ -16,7 +16,9 @@ export const JobApplicationCreateRequestSchema = z.object({
 
 export const JobApplicationUpdateRequestSchema = z.object({
     id: z.string().uuid(),
-    coverLetter: z.string().uuid(),
+    jobId: z.string().uuid(),
+    jobSeekerId: z.string().uuid(),
+    coverLetter: z.string().trim().optional(),
     status: ApplicationStatusEnum,
 });
 
