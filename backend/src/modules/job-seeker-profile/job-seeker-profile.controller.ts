@@ -21,7 +21,7 @@ import {
 @ApiTags('job-seeker-profiles')
 @Controller('job-seeker-profiles')
 export class JobSeekerProfilesController {
-  constructor(private readonly repo: JobSeekerProfilesRepository) {}
+  constructor(private readonly repo: JobSeekerProfilesRepository) { }
 
   @Get()
   async findAll(): Promise<ApiResponse<JobSeekerProfile[]>> {

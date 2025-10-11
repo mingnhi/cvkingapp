@@ -82,7 +82,7 @@ export class EmployerProfilesController {
   @Put(':id/edit-company')
   async updateEmployerAndCompany(
     @Param('id') id: string,
-    @Body() dto:UpdateEmployerCompanyDto
+    @Body() dto: UpdateEmployerCompanyDto
   ) {
     return this.repo.updateEmployerAndCompany(
       id,
