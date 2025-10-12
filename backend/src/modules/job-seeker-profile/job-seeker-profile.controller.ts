@@ -41,6 +41,17 @@ export class JobSeekerProfilesController {
     const data = await this.repo.findOne(id);
     return { status: 'success', message: 'Job seeker profile found', data };
   }
+  @Get('by-user/:userId')
+  async findByUserId(
+    @Param('userId', ParseUUIDPipe) userId: string
+  ): Promise<ApiResponse<JobSeekerProfile>> {
+    const data = await this.repo.findByUserId(userId);
+    return {
+      status: 'success',
+      message: `Job seeker profile of user ${userId}`,
+      data,
+    };
+  }
 
   @Post()
   async create(

@@ -4,6 +4,10 @@ import {
     Edit,
     MapPin,
     Mail,
+    Phone,
+    Axe,
+    Cake,
+    Briefcase,
 } from 'lucide-react';
 import {
     Card,
@@ -19,30 +23,62 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useMyProfileQuery } from '@/api/user/query';
+import { useJobSeekerProfileByUserIdQuery } from '@/api/jobseeker-profile/query';
+import { useMemo } from 'react';
 //a
 const MyProfile = () => {
     const router = useRouter();
     const { data: user, isLoading, isError } = useMyProfileQuery();
-    if (isLoading) return <div>Đang tải thông tin...</div>;
-    if (isError || !user) return <div>Không lấy được thông tin người dùng</div>;
-
+    const userId = user?.id;
+    const { data: jobSeekerProfile, isLoading: isJobProfileLoading } =
+        useJobSeekerProfileByUserIdQuery(userId);
     
-    const userProfile = {
-        name: 'Nguyễn Văn An',
-        title: 'Lập trình viên Frontend Senior tại TechCorp',
-        location: 'Thành phố Hồ Chí Minh, Việt Nam',
-        salary: '58.000.000 VNĐ / tháng',
-        avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop&crop=face',
-        profileCompletion: 85,
-        summary: 'Lập trình viên Frontend chuyên nghiệp với hơn 5 năm kinh nghiệm xây dựng các ứng dụng web động và đáp ứng bằng React, Next.js, và TypeScript. Có khả năng lãnh đạo dự án và hướng dẫn các lập trình viên trẻ.',
-        skills: ['React', 'TypeScript', 'Next.js', 'Node.js', 'GraphQL', 'MUI', 'Docker'],
-        stats: {
-            applications: 12,
-            savedJobs: 8,
-            profileViews: 156,
-        }
+    const profileCompletion = useMemo(() => {
+        if (!jobSeekerProfile) return 0; 
+
+        const fieldsToCheck = [
+            "fullName",
+            "email",
+            "phone",
+            "location",
+            "summary",
+            "skills",
+            "experience",
+            "education",
+        ];
+
+        const filledCount = fieldsToCheck.reduce((count, field) => {
+            const value = (jobSeekerProfile as any)[field];
+            if (Array.isArray(value)) return count + (value.length > 0 ? 1 : 0);
+            return count + (value ? 1 : 0);
+        }, 0);
+
+    return Math.round((filledCount / fieldsToCheck.length) * 100);
+    }, [jobSeekerProfile]);
+
+    const stats = {
+        applications: 12,   // Tổng số việc đã ứng tuyển
+        savedJobs: 8,       // Việc đã lưu
+        profileViews: 156,  // Lượt xem hồ sơ
     };
 
+    if (isLoading || isJobProfileLoading) return <div>Đang tải thông tin...</div>;
+    if (isError || !user) return <div>Không lấy được thông tin người dùng</div>;
+
+    if (!jobSeekerProfile) {
+        return (
+            <Box sx={{ textAlign: "center", mt: 10 }}>
+                <Typography variant="h6">Bạn chưa có hồ sơ ứng viên.</Typography>
+                <Button
+                    variant="contained"
+                    sx={{ mt: 2 }}
+                    onClick={() => router.push("/register")}
+                >
+                    Tạo hồ sơ ngay
+                </Button>
+            </Box>
+        );
+    }
     return (
         <Box sx={{
             display: 'flex',
@@ -54,75 +90,122 @@ const MyProfile = () => {
         }}>
 
             {/* Thẻ Thông Tin Cá Nhân */}
-            <Card sx={{
-                borderRadius: "12px",
-                border: '1px solid',
-                borderColor: 'divider',
-                boxShadow: 'none',
-                transition: 'box-shadow 0.2s',
-                '&:hover': { boxShadow: 2 }
-            }}>
-                <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3 }}>
-                        <Avatar
-                            src={user.avatarUrl}
-                            sx={{ width: 96, height: 96, mt: 1, border: '3px solid white', boxShadow: 2 }}
-                        />
-                        <Box sx={{ flex: 1 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <div>
-                                    <Typography variant="h4" component="h1" fontWeight="bold">
-                                        {user.displayName}
-                                    </Typography>
-                                    <Typography variant="body1" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                        <Mail size={16} /> {user.email}
-                                    </Typography>
-                                    <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
-                                        <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                            <MapPin size={14} /> {user.preferredLocale ?? "Chưa cập nhật địa điểm"}
-                                        </Typography>
-                                        {/* <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                            <DollarSign size={14} /> {user.linkedInId ?? "Chưa cập nhật lonk"}
-                                        </Typography> */}
-                                    </Box>
-                                </div>
-                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                    <Button
-                                        onClick={() => router.push('a/edit-profile')}
-                                        sx={{
-                                            textTransform: 'none',
-                                            border: '1px solid',
-                                            borderColor: 'divider',
-                                            color: "text.primary",
-                                            "&:hover": { bgcolor: "action.hover" },
-                                            height: 40,
-                                        }}
-                                        startIcon={<Edit size={16} />}
-                                    >
-                                        Chỉnh sửa
-                                    </Button>
-                                    <Button
-                                        sx={{
-                                            textTransform: 'none',
-                                            bgcolor: "#000000",
-                                            color: "primary.contrastText",
-                                            "&:hover": { bgcolor: "#333333" },
-                                            height: 40,
-                                        }}
-                                        startIcon={<Download size={16} />}
-                                    >
-                                        Tải CV
-                                    </Button>
-                                </Box>
-                            </Box>
-                            <Divider sx={{ my: 2 }} />
-                            <Typography variant="body2" color="text.secondary">
-                                {userProfile.summary}
+            <Card
+                sx={{
+                    borderRadius: "12px",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    boxShadow: "none",
+                    transition: "box-shadow 0.2s",
+                    "&:hover": { boxShadow: 2 },
+                }}
+                >
+                <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
+                    <Box sx={{ display: "flex", alignItems: "flex-start", gap: 3, flexWrap: "wrap" }}>
+                    {/* Avatar */}
+                    <Avatar
+                        src={user.avatarUrl}
+                        sx={{
+                        width: 96,
+                        height: 96,
+                        mt: 1,
+                        border: "3px solid white",
+                        boxShadow: 2,
+                        }}
+                    />
+
+                    {/* Thông tin chính */}
+                    <Box sx={{ flex: 1, minWidth: 300 }}>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 2 }}>
+                        <div>
+                            <Typography variant="h4" component="h1" fontWeight="bold">
+                            {jobSeekerProfile?.fullName ?? user.displayName ?? "Chưa có tên"}
+                            </Typography>
+                            <Typography
+                            variant="body1"
+                            color="text.secondary"
+                            sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}
+                            >
+                            <Briefcase size={16} /> {jobSeekerProfile?.currentTitle ?? "Chưa mô tả"}
+                            </Typography>
+                        </div>
+
+                        {/* Nút hành động */}
+                        <Box sx={{ display: "flex", gap: 1 }}>
+                            <Button
+                            onClick={() => router.push("a/edit-profile")}
+                            sx={{
+                                textTransform: "none",
+                                border: "1px solid",
+                                borderColor: "divider",
+                                color: "text.primary",
+                                "&:hover": { bgcolor: "action.hover" },
+                                height: 40,
+                            }}
+                            startIcon={<Edit size={16} />}
+                            >
+                            Chỉnh sửa
+                            </Button>
+                            <Button
+                            sx={{
+                                textTransform: "none",
+                                bgcolor: "#000000",
+                                color: "primary.contrastText",
+                                "&:hover": { bgcolor: "#333333" },
+                                height: 40,
+                            }}
+                            startIcon={<Download size={16} />}
+                            >
+                            Tải CV
+                            </Button>
+                        </Box>
+                        </Box>
+
+                        <Divider sx={{ my: 2 }} />
+
+                        {/* === THÔNG TIN CÁ NHÂN CHIA 2 CỘT === */}
+                        <Box sx={{ display: "flex", gap: 4, flexWrap: "wrap", mt: 1 }}>
+                        {/* Cột trái */}
+                        <Box sx={{ flex: 1, minWidth: 250 }}>
+                            <Typography variant="body1" color="text.secondary" sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
+                            <Mail size={16} /> {jobSeekerProfile.email ?? user.email}
+                            </Typography>
+                            <Typography variant="body1" color="text.secondary" sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
+                            <Phone size={16} /> {jobSeekerProfile.phone ?? "Chưa cập nhập số điện thoại"}
+                            </Typography>
+                            <Typography variant="body1" color="text.secondary" sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
+                            <MapPin size={16} /> {jobSeekerProfile.location ?? "Chưa cập nhật địa điểm"}
                             </Typography>
                         </Box>
+
+                        {/* Cột phải */}
+                        <Box sx={{ flex: 1, minWidth: 250 }}>
+                            <Typography variant="body1" color="text.secondary" sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
+                            <Cake size={16} />
+                            {jobSeekerProfile?.dob
+                                ? new Date(jobSeekerProfile.dob).toLocaleDateString("vi-VN")
+                                : "Chưa cập nhật ngày sinh"}
+                            </Typography>
+                            <Typography variant="body1" color="text.secondary" sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
+                            <Axe size={16} />
+                            {jobSeekerProfile?.yearsExperience !== undefined && jobSeekerProfile?.yearsExperience !== null
+                                ? `${jobSeekerProfile.yearsExperience} năm kinh nghiệm`
+                                : "Chưa cập nhật kinh nghiệm"}
+                            </Typography>
+                        </Box>
+                        </Box>
+
+                        <Divider sx={{ my: 2 }} />
+
+                        {/* Phần mô tả bản thân */}
+                        <Typography variant="body2" color="text.secondary">
+                        {jobSeekerProfile.summary ?? "Chưa có phần giới thiệu cá nhân"}
+                        </Typography>
+                    </Box>
                     </Box>
                 </CardContent>
-            </Card>
+                </Card>
+
 
             {/* Thống Kê Nhanh */}
             <Box sx={{
@@ -132,19 +215,19 @@ const MyProfile = () => {
             }}>
                 <Card sx={{ cursor: 'pointer', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 2 } }}>
                     <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                        <Typography variant="h5" fontWeight="bold" color="primary.main">{userProfile.stats.applications}</Typography>
+                        <Typography variant="h5" fontWeight="bold" color="primary.main">{stats.applications}</Typography>
                         <Typography variant="body2" color="text.secondary">Việc đã ứng tuyển</Typography>
                     </CardContent>
                 </Card>
                 <Card sx={{ cursor: 'pointer', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 2 } }}>
                     <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                        <Typography variant="h5" fontWeight="bold" color="info.main">{userProfile.stats.savedJobs}</Typography>
+                        <Typography variant="h5" fontWeight="bold" color="info.main">{stats.savedJobs}</Typography>
                         <Typography variant="body2" color="text.secondary">Việc đã lưu</Typography>
                     </CardContent>
                 </Card>
                 <Card sx={{ cursor: 'pointer', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 2 } }}>
                     <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                        <Typography variant="h5" fontWeight="bold" color="success.main">{userProfile.stats.profileViews}</Typography>
+                        <Typography variant="h5" fontWeight="bold" color="success.main">{stats.profileViews}</Typography>
                         <Typography variant="body2" color="text.secondary">Lượt xem hồ sơ</Typography>
                     </CardContent>
                 </Card>
@@ -160,8 +243,8 @@ const MyProfile = () => {
                     <CardHeader title="Mức độ hoàn thiện" sx={{pb: 0}} />
                     <CardContent>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                            <LinearProgress variant="determinate" value={userProfile.profileCompletion} sx={{ height: 8, borderRadius: 4, flexGrow: 1 }} />
-                            <Typography fontWeight="bold" color="primary.main">{userProfile.profileCompletion}%</Typography>
+                            <LinearProgress variant="determinate" value={profileCompletion} sx={{ height: 8, borderRadius: 4, flexGrow: 1 }} />
+                            <Typography fontWeight="bold" color="primary.main">{profileCompletion}%</Typography>
                         </Box>
                         <Typography variant="caption" color="text.secondary">
                             Hoàn thiện hồ sơ để nhận được gợi ý việc làm tốt hơn.
@@ -172,14 +255,17 @@ const MyProfile = () => {
                     <CardHeader title="Các kỹ năng" />
                     <CardContent sx={{pt: 0}}>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                            {userProfile.skills.map(skill => (
-                                <Chip key={skill} label={skill} variant="outlined" />
-                            ))}
+                            {jobSeekerProfile.skills?.length
+                                ? jobSeekerProfile.skills.map((skill, i) => (
+                                    <Chip key={i} label={skill} variant="outlined" />
+                                ))
+                                : <Typography variant="body2" color="text.secondary">Chưa cập nhật kỹ năng</Typography>}
                         </Box>
                     </CardContent>
                 </Card>
             </Box>
         </Box>
+        
     );
 }
 

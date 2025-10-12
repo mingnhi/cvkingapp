@@ -10,6 +10,7 @@ import {
     createJobSeekerProfileRequest,
     updateJobSeekerProfileRequest,
     deleteJobSeekerProfileRequest,
+    getJobSeekerProfileByUserIdRequest,
 } from "./request";
 import {
     JobSeekerProfileResponse,
@@ -36,6 +37,14 @@ export const useJobSeekerProfileByIdQuery = (id?: string) =>
         queryFn: () => getJobSeekerProfileByIdRequest(id as string),
         enabled: !!id,
     });
+
+export const useJobSeekerProfileByUserIdQuery = (userId?: string) =>
+    useQuery<JobSeekerProfileResponse>({
+        queryKey: JobSeekerProfileQueryKey.detail(userId || "unknown"),
+        queryFn: () => getJobSeekerProfileByUserIdRequest(userId as string),
+        enabled: !!userId,
+    });
+
 
 /** MUTATIONS */
 export const useCreateJobSeekerProfileMutation = (

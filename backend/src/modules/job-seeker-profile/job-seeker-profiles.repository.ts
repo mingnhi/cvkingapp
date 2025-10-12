@@ -25,6 +25,12 @@ export class JobSeekerProfilesRepository {
     return profile;
   }
 
+  async findByUserId(userId: string): Promise<JobSeekerProfile> {
+    const profile = await this.repo.findOne({ userId });
+    if (!profile) throw new NotFoundException('Job seeker profile not found');
+    return profile;
+  }
+
   async create(data: CreateJobSeekerProfileDto): Promise<JobSeekerProfile> {
     const profile = this.repo.create(data);
     await this.em.persistAndFlush(profile);

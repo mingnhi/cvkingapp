@@ -24,6 +24,11 @@ export async function getJobSeekerProfileByIdRequest(id: string): Promise<JobSee
     const data = getSuccessResponse<JobSeekerProfileResponse>(res);
     return JobSeekerProfileSchema.parse(data);
 }
+export async function getJobSeekerProfileByUserIdRequest(userId: string) {
+    const res = await httpInstance.get(`/job-seeker-profiles/by-user/${userId}`);
+    const data = getSuccessResponse<JobSeekerProfileResponse>(res);
+    return JobSeekerProfileSchema.parse(data);
+}
 
 // ✅ Tạo JobSeekerProfile
 export async function createJobSeekerProfileRequest(

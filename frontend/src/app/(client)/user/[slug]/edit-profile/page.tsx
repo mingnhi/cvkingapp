@@ -1,76 +1,76 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
-    Save,
-    ArrowLeft,
-    Upload,
-    Plus,
-    Camera
-} from 'lucide-react';
+  Save,
+  ArrowLeft,
+  Upload,
+  Plus,
+  Camera,
+} from "lucide-react";
 import {
-    Button,
-    Card,
-    CardContent,
-    CardHeader,
-    TextField,
-    Typography,
-    Box,
-    Chip,
-    Avatar,
-    CircularProgress
-} from '@mui/material';
-import { useMyProfileQuery, useUpdateUserMutation } from '@/api/user/query';
-import { useUpdateFileMutation, useUploadFileMutation } from '@/api/cloudinary/query';
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  TextField,
+  Typography,
+  Box,
+  Chip,
+  Avatar,
+  CircularProgress,
+} from "@mui/material";
+import { useMyProfileQuery, useUpdateUserMutation } from "@/api/user/query";
+import { useUpdateFileMutation, useUploadFileMutation } from "@/api/cloudinary/query";
+import {
+  useJobSeekerProfileByUserIdQuery,
+  useUpdateJobSeekerProfileMutation,
+} from "@/api/jobseeker-profile/query";
 
 const toast = (message: string) => alert(message);
 
 const EditProfilePage = () => {
   const router = useRouter();
   const { data: user, isLoading: loadingProfile } = useMyProfileQuery();
-  const { mutateAsync: updateUser, isPending: updating } = useUpdateUserMutation({
-    onSuccess: () => {
-      toast("Hồ sơ đã được cập nhật!");
-      setHasChanges(false);
-      router.back();
-    },
-    onError: (err: Error) => toast(`Lỗi: ${err.message}`),
+  const { mutateAsync: updateUser, isPending: updatingUser } = useUpdateUserMutation({
+    onSuccess: () => toast("Cập nhật thông tin tài khoản thành công!"),
+    onError: (err: Error) => toast(`Lỗi User: ${err.message}`),
   });
-  const [isEmployer] = useState(false);
+  const { data: jobSeekerProfile } = useJobSeekerProfileByUserIdQuery(user?.id);
+  const { mutateAsync: updateJobSeekerProfile, isPending: updatingProfile } = useUpdateJobSeekerProfileMutation({
+    onSuccess: () => toast("Cập nhật hồ sơ ứng viên thành công!"),
+    onError: (err: Error) => toast(`Lỗi hồ sơ: ${err.message}`),
+  });
+
   const [jobSeekerData, setJobSeekerData] = useState<any>(null);
-  const [employerData, setEmployerData] = useState<any>(null);
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
-  useEffect(() => {
-    if (user) {
-      // Nếu backend trả về role, có thể setIsEmployer(user.role === 'Employer')
-      setJobSeekerData({
-        name: user.displayName || "",
-        email: user.email || "",
-        avatar: user.avatarUrl || "",
-        address: user.preferredLocale || "Chưa cập nhật địa điểm",
-      });
-      setEmployerData({
-        name: user.displayName || "",
-        email: user.email || "",
-        avatar: user.avatarUrl || "",
-        address: user.preferredLocale || "Chưa cập nhật địa điểm",
-      });
-      //   setSkills(user.skills || []);
-    }
-  }, [user]);
-  
+
   const { mutateAsync: uploadFile } = useUploadFileMutation();
   const { mutateAsync: updateFile } = useUpdateFileMutation();
- 
-  const handleJobSeekerChange = (field: string, value: string) => {
-    setJobSeekerData((p: any) => ({ ...p, [field]: value }));
-    setHasChanges(true);
-  };
 
-  const handleEmployerChange = (field: string, value: string) => {
-    setEmployerData((p: any) => ({ ...p, [field]: value }));
+  // Khởi tạo dữ liệu từ user + jobSeekerProfile
+  useEffect(() => {
+    if (user && jobSeekerProfile) {
+      setJobSeekerData({
+        id: jobSeekerProfile.id,
+        name: jobSeekerProfile.fullName || user.displayName || "",
+        email: user.email || "",
+        dob: jobSeekerProfile.dob || "",
+        currentTitle: jobSeekerProfile.currentTitle || "",
+        phone: jobSeekerProfile.phone || "",
+        avatar: user.avatarUrl || "",
+        location: jobSeekerProfile.location || "",
+        summary: jobSeekerProfile.summary || "",
+        yearsExperience: jobSeekerProfile.yearsExperience || "",
+      });
+      setSkills(jobSeekerProfile.skills || []);
+    }
+  }, [user, jobSeekerProfile]);
+
+  const handleJobSeekerChange = (field: string, value: string | number) => {
+    setJobSeekerData((p: any) => ({ ...p, [field]: value }));
     setHasChanges(true);
   };
 
@@ -98,45 +98,52 @@ const EditProfilePage = () => {
       } else {
         result = await uploadFile({ file, folder: "avatars" });
       }
-      if (isEmployer && employerData) {
-      setEmployerData({ ...employerData, avatar: result.url });
-    } else if (jobSeekerData) {
-      setJobSeekerData({ ...jobSeekerData, avatar: result.url });
-    }
-
+      setJobSeekerData((p: any) => ({ ...p, avatar: result.url }));
       setHasChanges(true);
       toast("Cập nhật ảnh đại diện thành công!");
     } catch (err) {
-    if (err instanceof Error) {
-      toast(`Lỗi upload ảnh: ${err.message}`);
-    } else {
-      toast("Lỗi upload ảnh không xác định");
+      toast(`Lỗi upload ảnh: ${(err as Error).message}`);
     }
-  }
   };
-
   const handleSave = async () => {
-    const payload = isEmployer
-      ? {
-          email: employerData.email,
-          phone: employerData.phone,
-          avatarUrl: employerData.avatar,
-          location: employerData.address,
-        }
-      : {
-          displayName: jobSeekerData.name,
-          email: jobSeekerData.email,
-          avatarUrl: jobSeekerData.avatar,
-          location: jobSeekerData.address,
-          skills,
-        };
-    await updateUser(payload);
+    if (!user || !jobSeekerData) return;
+
+    try {
+      // Cập nhật bảng User
+      await updateUser({
+        displayName: jobSeekerData.name,
+        email: jobSeekerData.email,
+        avatarUrl: jobSeekerData.avatar,
+      });
+
+      // Cập nhật bảng JobSeekerProfile
+      await updateJobSeekerProfile({
+        id: jobSeekerData.id,
+        fullName: jobSeekerData.name,
+        phone: jobSeekerData.phone,
+        dob: jobSeekerData.dob,
+        currentTitle: jobSeekerData.currentTitle,
+        yearsExperience: jobSeekerData.yearsExperience,
+        location: jobSeekerData.location,
+        summary: jobSeekerData.summary,
+        skills,
+      });
+
+      toast("Updated !");
+      setHasChanges(false);
+      router.back();
+    } catch (err) {
+      toast(`Lỗi lưu: ${(err as Error).message}`);
+    }
   };
 
-  if (loadingProfile || !jobSeekerData || !employerData) {
+  if (loadingProfile || !jobSeekerData) {
     return <div className="p-6">Đang tải dữ liệu...</div>;
   }
-return (
+
+  const saving = updatingUser || updatingProfile;
+
+  return (
     <Box sx={{ bgcolor: "grey.50", minHeight: "100vh", py: { xs: 2, md: 5 } }}>
       <Box sx={{ width: "100%", maxWidth: "960px", mx: "auto", px: { xs: 2, sm: 4 } }}>
         {/* Header */}
@@ -151,14 +158,14 @@ return (
             </Button>
             <Box>
               <Typography variant="h4" component="h1" fontWeight="600">
-                {isEmployer ? "Chỉnh sửa hồ sơ công ty" : "Chỉnh sửa hồ sơ"}
+                Chỉnh sửa hồ sơ
               </Typography>
               <Typography color="text.secondary">Cập nhật thông tin của bạn bên dưới</Typography>
             </Box>
           </Box>
           <Button
             onClick={handleSave}
-            disabled={updating || !hasChanges}
+            disabled={saving || !hasChanges}
             variant="contained"
             sx={{
               textTransform: "none",
@@ -168,7 +175,7 @@ return (
               "&.Mui-disabled": { bgcolor: "grey.300", color: "grey.500" },
             }}
           >
-            {updating ? (
+            {saving ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
               <>
@@ -184,7 +191,7 @@ return (
           <CardContent sx={{ display: "flex", alignItems: "center", gap: { xs: 2, sm: 4 } }}>
             <Box sx={{ position: "relative" }}>
               <Avatar
-                src={isEmployer ? employerData.avatar : jobSeekerData.avatar}
+                src={jobSeekerData.avatar}
                 sx={{ width: 96, height: 96, border: "3px solid white", boxShadow: 2 }}
               />
               <Box
@@ -213,142 +220,105 @@ return (
                 />
               </Box>
             </Box>
-            <Box>
+          </CardContent>
+        </Card>
+
+        {/* Thông tin cá nhân */}
+        <Card sx={{ borderRadius: 3, border: "1px solid", borderColor: "divider", boxShadow: "none", mb: 3 }}>
+          <CardHeader title="Thông tin cá nhân" />
+          <CardContent sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
+            <TextField
+              label="Họ và tên"
+              fullWidth
+              value={jobSeekerData.name}
+              onChange={(e) => handleJobSeekerChange("name", e.target.value)}
+            />
+            <TextField
+              label="Vị trí hiện tại"
+              fullWidth
+              value={jobSeekerData.currentTitle}
+              onChange={(e) => handleJobSeekerChange("currentTitle", e.target.value)}
+            />
+            <TextField
+              label="Email"
+              fullWidth
+              value={jobSeekerData.email}
+              onChange={(e) => handleJobSeekerChange("email", e.target.value)}
+            />
+            <TextField
+              label="Số điện thoại"
+              fullWidth
+              value={jobSeekerData.phone}
+              onChange={(e) => handleJobSeekerChange("phone", e.target.value)}
+            />
+            <TextField
+              label="Ngày sinh"
+              type="date"
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              value={jobSeekerData.dob ? jobSeekerData.dob.split("T")[0] : ""}
+              onChange={(e) => handleJobSeekerChange("dob", e.target.value)}
+            />
+            <TextField
+              label="Số năm kinh nghiệm"
+              type="number"
+              fullWidth
+              value={jobSeekerData.yearsExperience}
+              onChange={(e) =>
+                handleJobSeekerChange("yearsExperience", Number(e.target.value))
+              }
+            />
+            <TextField
+              label="Địa điểm làm việc"
+              fullWidth
+              value={jobSeekerData.location}
+              onChange={(e) => handleJobSeekerChange("location", e.target.value)}
+            />
+            <TextField
+              label="Giới thiệu bản thân"
+              multiline
+              rows={4}
+              fullWidth
+              value={jobSeekerData.summary}
+              onChange={(e) => handleJobSeekerChange("summary", e.target.value)}
+              sx={{ gridColumn: "1 / -1" }}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Kỹ năng */}
+        <Card sx={{ borderRadius: 3, border: "1px solid", borderColor: "divider", boxShadow: "none" }}>
+          <CardHeader title="Kỹ năng" />
+          <CardContent>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
+              {skills.map((skill) => (
+                <Chip key={skill} label={skill} onDelete={() => removeSkill(skill)} />
+              ))}
+            </Box>
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <TextField
+                fullWidth
+                placeholder="Thêm kỹ năng"
+                value={newSkill}
+                onChange={(e) => setNewSkill(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && addSkill()}
+              />
               <Button
-                component="label"
-                htmlFor="avatar-upload"
-                startIcon={<Upload size={16} />}
+                onClick={addSkill}
                 sx={{
                   textTransform: "none",
                   border: "1px solid",
                   borderColor: "divider",
                   color: "text.primary",
-                  "&:hover": { bgcolor: "action.hover" },
+                  minWidth: "auto",
+                  px: 2,
                 }}
               >
-                Tải ảnh lên
+                <Plus size={16} />
               </Button>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                JPG, GIF hoặc PNG. Tối đa 1MB.
-              </Typography>
             </Box>
           </CardContent>
         </Card>
-
-        {/* Thông tin */}
-        {isEmployer ? (
-          <Card sx={{ borderRadius: 3, border: "1px solid", borderColor: "divider", boxShadow: "none" }}>
-            <CardHeader title="Thông tin công ty" />
-            <CardContent sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
-              <TextField
-                label="Tên công ty"
-                fullWidth
-                value={employerData.companyName}
-                onChange={(e) => handleEmployerChange("companyName", e.target.value)}
-              />
-              <TextField
-                label="Người liên hệ"
-                fullWidth
-                value={employerData.contactName}
-                onChange={(e) => handleEmployerChange("contactName", e.target.value)}
-              />
-              <TextField
-                label="Email"
-                fullWidth
-                value={employerData.email}
-                onChange={(e) => handleEmployerChange("email", e.target.value)}
-              />
-              <TextField
-                label="Số điện thoại"
-                fullWidth
-                value={employerData.phone}
-                onChange={(e) => handleEmployerChange("phone", e.target.value)}
-              />
-              <TextField
-                label="Mô tả công ty"
-                multiline
-                rows={4}
-                fullWidth
-                value={employerData.description}
-                onChange={(e) => handleEmployerChange("description", e.target.value)}
-                sx={{ gridColumn: "1 / -1" }}
-              />
-            </CardContent>
-          </Card>
-        ) : (
-          <>
-            <Card sx={{ borderRadius: 3, border: "1px solid", borderColor: "divider", boxShadow: "none", mb: 3 }}>
-              <CardHeader title="Thông tin cá nhân" />
-              <CardContent sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
-                <TextField
-                  label="Họ và tên"
-                  fullWidth
-                  value={jobSeekerData.name}
-                  onChange={(e) => handleJobSeekerChange("name", e.target.value)}
-                />
-                <TextField
-                  label="Địa chỉ"
-                  fullWidth
-                  value={jobSeekerData.address}
-                  onChange={(e) => handleJobSeekerChange("title", e.target.value)}
-                />
-                <TextField
-                  label="Email"
-                  fullWidth
-                  value={jobSeekerData.email}
-                  onChange={(e) => handleJobSeekerChange("email", e.target.value)}
-                />
-                <TextField
-                  label="Số điện thoại"
-                  fullWidth
-                  value={jobSeekerData.phone}
-                  onChange={(e) => handleJobSeekerChange("phone", e.target.value)}
-                />
-                <TextField
-                  label="Giới thiệu bản thân"
-                  multiline
-                  rows={4}
-                  fullWidth
-                  value={jobSeekerData.summary}
-                  onChange={(e) => handleJobSeekerChange("summary", e.target.value)}
-                  sx={{ gridColumn: "1 / -1" }}
-                />
-              </CardContent>
-            </Card>
-            <Card sx={{ borderRadius: 3, border: "1px solid", borderColor: "divider", boxShadow: "none" }}>
-              <CardHeader title="Kỹ năng" />
-              <CardContent>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
-                  {skills.map((skill) => (
-                    <Chip key={skill} label={skill} onDelete={() => removeSkill(skill)} />
-                  ))}
-                </Box>
-                <Box sx={{ display: "flex", gap: 2 }}>
-                  <TextField
-                    fullWidth
-                    placeholder="Thêm kỹ năng"
-                    value={newSkill}
-                    onChange={(e) => setNewSkill(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && addSkill()}
-                  />
-                  <Button
-                    onClick={addSkill}
-                    sx={{
-                      textTransform: "none",
-                      border: "1px solid",
-                      borderColor: "divider",
-                      color: "text.primary",
-                      minWidth: "auto",
-                      px: 2,
-                    }}
-                  >
-                    <Plus size={16} />
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </>
-        )}
       </Box>
     </Box>
   );
