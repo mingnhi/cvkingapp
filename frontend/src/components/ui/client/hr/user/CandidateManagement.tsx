@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -42,8 +42,9 @@ import {
 import { useMyProfileQuery } from "@/api/user/query";
 import { useJobApplicationsByCompanyQuery, useUpdateJobApplicationMutation } from "@/api/JobApplication/query";
 import { useEmployerProfileByUserIdQuery } from "@/api/employer-profile/query";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useJobSeekerProfileByUserIdQuery } from "@/api/jobseeker-profile/query";
+import { getJobSeekerProfileByUserIdRequest } from "@/api/jobseeker-profile/request";
 
 const statusMap = {
   Pending: { label: "Mới", color: "#3b82f6", icon: <AlertCircle size={14} /> },
@@ -71,10 +72,11 @@ interface Candidate {
 const CandidateManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const router = useRouter();
+  // const router = useRouter();
   const [open, setOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
   const [status, setStatus] = useState<string>("Pending");
+  const [profiles, setProfiles] = useState<Record<string, any>>({});
 
   const { data: user } = useMyProfileQuery();
   const userId = user?.id;
@@ -89,22 +91,50 @@ const CandidateManagement = () => {
     },
   });
 
+  const jobSeekerId = selectedCandidate?.jobSeekerId;
+  const { data: jobSeekerProfile, isLoading: loadingProfile } =
+    useJobSeekerProfileByUserIdQuery(jobSeekerId);
+  
+  useEffect(() => {
+  const fetchProfiles = async () => {
+    if (!applications.length) return;
+    const results: Record<string, any> = {};
+    for (const app of applications) {
+      if (app.jobSeekerId && !results[app.jobSeekerId]) {
+        try {
+          const profile = await getJobSeekerProfileByUserIdRequest(app.jobSeekerId);
+          results[app.jobSeekerId] = profile;
+        } catch {
+          results[app.jobSeekerId] = null;
+        }
+      }
+    }
+    setProfiles(results);
+  };
+  fetchProfiles();
+}, [applications]);
+
   const candidates = useMemo((): Candidate[] => {
-    return applications.map((a: any, index: number) => ({
+  return applications.map((a: any, index: number) => {
+    const profile = profiles[a.jobSeekerId];
+
+    return {
       id: a.id ?? `app-${index}`,
       jobId: a.jobId ?? "",
       jobSeekerId: a.jobSeekerId ?? "",
-      fullName: a.fullName ?? "Ứng viên chưa có tên",
-      email: a.email ?? "Chưa cập nhật",
+      fullName: profile?.fullName ?? a.fullName ?? "Ứng viên chưa có tên",
+      email: profile?.email ?? a.email ?? "Chưa cập nhật",
       status: a.status ?? "Pending",
-      jobTitle: a.jobTitle ?? "Chưa cập nhật",
+      jobTitle: profile?.currentTitle ?? a.jobTitle ?? "Chưa cập nhật",
       companyName: a.companyName ?? "Chưa có tên công ty",
-      location: a.location ?? "Chưa cập nhật",
-      experienceYears: a.experienceYears ?? 0,
+      location: profile?.location ?? a.location ?? "Chưa cập nhật",
+      experienceYears: profile?.yearsExperience ?? a.experienceYears ?? 0,
       appliedAt: a.appliedAt ?? new Date().toISOString(),
-      skills: a.skills ?? ["React", "TypeScript", "Node.js"],
-    }));
-  }, [applications]);
+      skills: profile?.skills ?? a.skills ?? [],
+      avatarUrl: profile?.avatarUrl ?? null,
+    };
+  });
+}, [applications, profiles]);
 
   const filteredCandidates = useMemo(() => {
     if (!searchTerm) return candidates;
