@@ -1,5 +1,5 @@
 CREATE OR ALTER PROCEDURE [dbo].[SP_SaveBlog]
-    @BlogPostId NVARCHAR(36),
+    @BlogPostId INT,
     @UserId NVARCHAR(36)
 AS
 BEGIN
@@ -19,21 +19,22 @@ BEGIN
         RETURN;
     END
 
-    INSERT INTO saved_blogs (blog_post_id, user_id)
-    VALUES (@BlogPostId, @UserId);
+    INSERT INTO saved_blogs (id, blog_post_id, user_id, created_at)
+    VALUES (NEWID(), @BlogPostId, @UserId, SYSDATETIMEOFFSET());
 
     SELECT
         sb.id,
         sb.blog_post_id,
         sb.user_id,
         sb.created_at,
-        bp.title,
-        bp.slug,
-        bp.excerpt,
-        bp.cover_image_url,
-        u.displayName as authorName
+        bp.Title,
+        bp.Slug,
+        bp.Excerpt,
+        bp.CoverImageUrl,
+        u.displayName as authorName,
+        bp.ViewsCount
     FROM saved_blogs sb
     INNER JOIN BlogPosts bp ON sb.blog_post_id = bp.id
-    LEFT JOIN Users u ON bp.author_user_id = u.id
+    LEFT JOIN Users u ON bp.AuthorUserId = u.id
     WHERE sb.blog_post_id = @BlogPostId AND sb.user_id = @UserId
 END

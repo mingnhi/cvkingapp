@@ -6,11 +6,20 @@ CREATE OR ALTER PROCEDURE dbo.SP_UpdateBlogComment
     @Content NVARCHAR(MAX)
 AS
 BEGIN
-    UPDATE BlogComments
-    SET content = @Content
+    UPDATE dbo.BlogComments
+    SET content = @Content, updated_at = SYSDATETIMEOFFSET()
     WHERE id = @Id;
 
-    SELECT id, blog_post_id, user_id, guest_name, content, is_approved, created_at, updated_at
-    FROM BlogComments WHERE id = @Id;
+    SELECT
+        id,
+        BlogPostId as blog_post_id,
+        UserId as user_id,
+        GuestName as guest_name,
+        Content as content,
+        IsApproved as is_approved,
+        created_at,
+        updated_at
+    FROM dbo.BlogComments
+    WHERE id = @Id;
 END;
 GO

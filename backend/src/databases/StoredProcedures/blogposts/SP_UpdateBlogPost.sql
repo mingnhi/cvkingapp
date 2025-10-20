@@ -26,7 +26,7 @@ BEGIN
         SET @UniqueSlug = @Slug;
         DECLARE @Counter INT = 1;
 
-        WHILE EXISTS (SELECT 1 FROM dbo.BlogPosts WHERE slug = @UniqueSlug AND id != @Id)
+        WHILE EXISTS (SELECT 1 FROM dbo.BlogPosts WHERE Slug = @UniqueSlug AND id != @Id)
         BEGIN
             SET @UniqueSlug = CONCAT(@Slug, '-', CAST(@Counter AS NVARCHAR(10)));
             SET @Counter = @Counter + 1;
@@ -40,24 +40,27 @@ BEGIN
 
     UPDATE dbo.BlogPosts
     SET
-        title = COALESCE(@Title, title),
-        slug = COALESCE(@UniqueSlug, slug),
-        content = COALESCE(@Content, content),
-        excerpt = COALESCE(@Excerpt, excerpt),
-        cover_image_url = COALESCE(@CoverImageUrl, cover_image_url),
+        Title = COALESCE(@Title, Title),
+        Slug = COALESCE(@UniqueSlug, Slug),
+        Content = COALESCE(@Content, Content),
+        Excerpt = COALESCE(@Excerpt, Excerpt),
+        CoverImageUrl = COALESCE(@CoverImageUrl, CoverImageUrl),
         category_id = COALESCE(@CategoryId, category_id),
-        is_published = COALESCE(@IsPublished, is_published),
-        published_at = COALESCE(@PublishedAt, published_at),
-        status = COALESCE(@Status, status),
+        IsPublished = COALESCE(@IsPublished, IsPublished),
+        PublishedAt = COALESCE(@PublishedAt, PublishedAt),
+        Status = COALESCE(@Status, Status),
+        ShortDescription = NULL, -- Có thể thêm parameter nếu cần
+        requirements = NULL, -- Có thể thêm parameter nếu cần
+        benefits = NULL, -- Có thể thêm parameter nếu cần
         updated_at = @Now
     WHERE id = @Id;
 
     IF @TagIds IS NOT NULL
     BEGIN
-        DELETE FROM dbo.BlogPostTags WHERE blog_post_id = @Id;
+        DELETE FROM dbo.BlogPostTags WHERE BlogPostId = @Id;
         IF LEN(@TagIds) > 0
         BEGIN
-            INSERT INTO dbo.BlogPostTags (id, blog_post_id, blog_tag_id, created_at)
+            INSERT INTO dbo.BlogPostTags (id, BlogPostId, BlogTagId, created_at)
             SELECT NEWID(), @Id, TRIM(value), @Now
             FROM STRING_SPLIT(@TagIds, ',');
         END

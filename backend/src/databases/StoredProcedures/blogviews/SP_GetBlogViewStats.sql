@@ -5,7 +5,7 @@ DROP PROCEDURE IF EXISTS dbo.SP_GetBlogViewStats;
 GO
 
 CREATE OR ALTER PROCEDURE dbo.SP_GetBlogViewStats
-    @BlogPostId NVARCHAR(36)
+    @BlogPostId UNIQUEIDENTIFIER
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -18,14 +18,14 @@ BEGIN
     FROM dbo.BlogPosts
     WHERE id = @BlogPostId;
 
-    SELECT @UniqueViews = COUNT(DISTINCT COALESCE(viewer_user_id, session_id))
+    SELECT @UniqueViews = COUNT(DISTINCT COALESCE(ViewerUserId, SessionId))
     FROM dbo.BlogViews
-    WHERE blog_post_id = @BlogPostId;
+    WHERE BlogPostId = @BlogPostId;
 
     SELECT @RecentViews = COUNT(*)
     FROM dbo.BlogViews
-    WHERE blog_post_id = @BlogPostId
-      AND viewed_at >= DATEADD(HOUR, -24, GETUTCDATE());
+    WHERE BlogPostId = @BlogPostId
+      AND ViewedAt >= DATEADD(HOUR, -24, GETUTCDATE());
 
     SELECT
         ISNULL(@TotalViews, 0) AS totalViews,

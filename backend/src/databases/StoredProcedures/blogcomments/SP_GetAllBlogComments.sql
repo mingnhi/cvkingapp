@@ -10,15 +10,15 @@ BEGIN
     SELECT CAST((
         SELECT
             bc.id,
-            bc.blog_post_id AS postId,
-            bc.user_id AS userId,
-            bc.guest_name AS guestName,
-            bc.content,
-            bc.is_approved AS isApproved,
-            bc.created_at AS createdAt,
-            bc.updated_at AS updatedAt
+            bc.BlogPostId as blog_post_id,
+            bc.UserId as user_id,
+            bc.GuestName as guest_name,
+            bc.Content as content,
+            bc.IsApproved as is_approved,
+            bc.created_at,
+            bc.updated_at
         FROM dbo.BlogComments bc
-        WHERE (@BlogPostId IS NULL OR bc.blog_post_id = @BlogPostId)
+        WHERE (@BlogPostId IS NULL OR bc.BlogPostId = @BlogPostId)
         ORDER BY bc.created_at DESC
         FOR JSON PATH
     ) AS NVARCHAR(MAX)) AS json_result;

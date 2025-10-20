@@ -37,7 +37,7 @@ BEGIN
         COUNT(bc.id) AS commentsCount
     FROM dbo.BlogPosts bp
         LEFT JOIN dbo.Users u ON u.id = bp.author_user_id
-        LEFT JOIN dbo.BlogComments bc ON bc.blog_post_id = bp.id AND bc.is_approved = 1
+        LEFT JOIN dbo.BlogComments bc ON bc.BlogPostId = bp.id AND bc.IsApproved = 1
     WHERE bp.created_at >= @StartDate
     GROUP BY bp.id, bp.title, bp.slug, bp.views_count, bp.created_at, bp.author_user_id, u.display_name
     ORDER BY

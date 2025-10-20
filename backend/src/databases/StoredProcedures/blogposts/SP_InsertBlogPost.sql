@@ -17,12 +17,12 @@ BEGIN
     SET NOCOUNT ON;
     BEGIN TRANSACTION;
 
-    DECLARE @NewPostId UNIQUEIDENTIFIER = NEWID();
+    DECLARE @NewPostId UNIQUEIDtENTIFIER = NEWID();
     DECLARE @Now DATETIMEOFFSET = SYSDATETIMEOFFSET();
     DECLARE @UniqueSlug NVARCHAR(500) = @Slug;
     DECLARE @Counter INT = 1;
 
-    WHILE EXISTS (SELECT 1 FROM dbo.BlogPosts WHERE slug = @UniqueSlug)
+    WHILE EXISTS (SELECT 1 FROM dbo.BlogPosts WHERE Slug = @UniqueSlug)
     BEGIN
         SET @UniqueSlug = CONCAT(@Slug, '-', CAST(@Counter AS NVARCHAR(10)));
         SET @Counter = @Counter + 1;
@@ -34,19 +34,20 @@ BEGIN
     END
 
     INSERT INTO dbo.BlogPosts (
-        id, title, slug, content, excerpt, cover_image_url,
-        author_user_id, category_id, is_published, published_at,
-        status, views_count, posted_at, created_at
+        id, Title, Slug, Content, Excerpt, CoverImageUrl,
+        AuthorUserId, category_id, IsPublished, PublishedAt,
+        Status, ViewsCount, PostedAt, created_at, ShortDescription,
+        requirements, benefits
     )
     VALUES (
         @NewPostId, @Title, @UniqueSlug, @Content, @Excerpt, @CoverImageUrl,
         @AuthorId, @CategoryId, @IsPublished, @PublishedAt,
-        'Active', 0, @Now, @Now
+        'Active', 0, @Now, @Now, NULL, NULL, NULL
     );
 
     IF @TagIds IS NOT NULL AND LEN(@TagIds) > 0
     BEGIN
-        INSERT INTO dbo.BlogPostTags (id, blog_post_id, blog_tag_id, created_at)
+        INSERT INTO dbo.BlogPostTags (id, BlogPostId, BlogTagId, created_at)
         SELECT NEWID(), @NewPostId, TRIM(value), @Now
         FROM STRING_SPLIT(@TagIds, ',');
     END

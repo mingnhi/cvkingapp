@@ -34,6 +34,9 @@ export const BlogPostSchema = z.object({
   categoryId: z.string().nullable().optional(),
   isPublished: z.boolean(),
   publishedAt: z.union([z.string(), z.date()]).nullable().optional(),
+  shortDescription: z.string().nullable().optional(),
+  requirements: z.string().nullable().optional(),
+  benefits: z.string().nullable().optional(),
 
   // Relations (optional để tương thích với Jobs)
   tags: z
@@ -139,6 +142,21 @@ export const CreateBlogPostSchema = z.object({
   tagIds: z
     .array(z.string().uuid("TagId phải là UUID hợp lệ"))
     .default([]),
+  shortDescription: z
+    .string()
+    .trim()
+    .max(2000, "Mô tả ngắn tối đa 2000 ký tự")
+    .optional(),
+  requirements: z
+    .string()
+    .trim()
+    .max(10000, "Yêu cầu tối đa 10000 ký tự")
+    .optional(),
+  benefits: z
+    .string()
+    .trim()
+    .max(10000, "Lợi ích tối đa 10000 ký tự")
+    .optional(),
 });
 
 export const UpdateBlogPostSchema = z.object({
@@ -183,6 +201,21 @@ export const UpdateBlogPostSchema = z.object({
     .optional(),
   tagIds: z
     .array(z.string().uuid("TagId phải là UUID hợp lệ"))
+    .optional(),
+  shortDescription: z
+    .string()
+    .trim()
+    .max(2000, "Mô tả ngắn tối đa 2000 ký tự")
+    .optional(),
+  requirements: z
+    .string()
+    .trim()
+    .max(10000, "Yêu cầu tối đa 10000 ký tự")
+    .optional(),
+  benefits: z
+    .string()
+    .trim()
+    .max(10000, "Lợi ích tối đa 10000 ký tự")
     .optional(),
 });
 

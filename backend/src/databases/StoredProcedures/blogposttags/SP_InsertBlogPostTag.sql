@@ -7,10 +7,10 @@ CREATE OR ALTER PROCEDURE dbo.SP_InsertBlogPostTag
 AS
 BEGIN
 
-    INSERT INTO BlogPostTags ([blog_post_id], [blog_tag_id])
+    INSERT INTO BlogPostTags ([BlogPostId], [BlogTagId])
     VALUES (@BlogPostId, @BlogTagId);
 
-    SELECT * FROM BlogPostTags WHERE blog_post_id = @BlogPostId AND blog_tag_id = @BlogTagId;
+    SELECT * FROM BlogPostTags WHERE BlogPostId = @BlogPostId AND BlogTagId = @BlogTagId;
 
 END;
 GO

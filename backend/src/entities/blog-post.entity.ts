@@ -10,20 +10,20 @@ export enum BlogStatus {
 
 @Entity({ tableName: 'BlogPosts' })
 export class BlogPosts extends AuditableEntity {
-  @Property({ type: 'string', length: 500, fieldName: 'Title' })
+  @Property({ type: 'string', length: 500, fieldName: 'title' })
   title: string;
 
-  @Property({ type: 'string', length: 500, unique: true, fieldName: 'Slug' })
+  @Property({ type: 'string', length: 500, unique: true, fieldName: 'slug' })
   slug: string;
 
-  @Property({ type: 'text', fieldName: 'Content' })
+  @Property({ type: 'text', fieldName: 'content' })
   content: string;
 
   @Property({
     type: 'string',
     length: 1000,
     nullable: true,
-    fieldName: 'Excerpt',
+    fieldName: 'excerpt',
   })
   excerpt?: string;
 
@@ -31,17 +31,42 @@ export class BlogPosts extends AuditableEntity {
     type: 'string',
     length: 1000,
     nullable: true,
-    fieldName: 'CoverImageUrl',
+    fieldName: 'cover_image_url',
   })
   coverImageUrl?: string;
 
-  @Property({ type: 'int', fieldName: 'AuthorUserId' })
-  authorUserId: number;
+  // Đồng bộ với Job entity - thêm các trường nâng cao
+  @Property({
+    type: 'string',
+    length: 1000,
+    nullable: true,
+    fieldName: 'short_description',
+  })
+  shortDescription?: string;
 
-  @Property({ type: 'boolean', default: false, fieldName: 'IsPublished' })
+  @Property({
+    type: 'string',
+    length: -1,
+    nullable: true,
+    fieldName: 'requirements',
+  })
+  requirements?: string;
+
+  @Property({
+    type: 'string',
+    length: -1,
+    nullable: true,
+    fieldName: 'benefits',
+  })
+  benefits?: string;
+
+  @Property({ type: 'string', fieldName: 'author_user_id' })
+  authorUserId: string;
+
+  @Property({ type: 'boolean', default: false, fieldName: 'is_published' })
   isPublished: boolean = false;
 
-  @Property({ type: 'datetime2', nullable: true, fieldName: 'PublishedAt' })
+  @Property({ type: 'datetime2', nullable: true, fieldName: 'published_at' })
   publishedAt?: Date;
 
   @Property({
@@ -49,7 +74,7 @@ export class BlogPosts extends AuditableEntity {
     length: 50,
     nullable: false,
     default: BlogStatus.ACTIVE,
-    fieldName: 'Status',
+    fieldName: 'status',
   })
   status: string = BlogStatus.ACTIVE;
 
@@ -57,7 +82,7 @@ export class BlogPosts extends AuditableEntity {
     type: 'int',
     nullable: false,
     default: 0,
-    fieldName: 'ViewsCount',
+    fieldName: 'views_count',
   })
   viewsCount: number = 0;
 
@@ -65,10 +90,10 @@ export class BlogPosts extends AuditableEntity {
     type: 'datetime2',
     nullable: false,
     defaultRaw: 'SYSUTCDATETIME()',
-    fieldName: 'PostedAt',
+    fieldName: 'posted_at',
   })
   postedAt: Date = new Date();
 
-  @Property({ type: 'datetime2', nullable: true, fieldName: 'ExpiresAt' })
+  @Property({ type: 'datetime2', nullable: true, fieldName: 'expires_at' })
   expiresAt?: Date;
 }

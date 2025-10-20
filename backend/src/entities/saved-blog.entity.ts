@@ -5,8 +5,8 @@ import { AuditableEntity } from './base/auditable_entity';
 @Unique({ properties: ['userId', 'blogPostId'] })
 export class SavedBlog extends AuditableEntity {
   @Property({ type: 'string', fieldName: 'user_id' })
-  userId: string;
+  userId: string; // User who saved the blog
 
-  @Property({ type: 'int', fieldName: 'blog_post_id' })
-  blogPostId: number;
+  @Property({ type: 'string', fieldName: 'blog_post_id' })
+  blogPostId: string; // ID of the saved blog post
 }

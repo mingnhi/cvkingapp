@@ -1,13 +1,21 @@
+USE JOB_DB;
+GO
+
 CREATE OR ALTER PROCEDURE [dbo].[SP_IsBlogSaved]
-    @BlogPostId NVARCHAR(36),
+    @BlogPostId INT,
     @UserId NVARCHAR(36)
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT
-        CASE WHEN EXISTS(
-            SELECT 1 FROM saved_blogs
-            WHERE blog_post_id = @BlogPostId AND user_id = @UserId
-        ) THEN 1 ELSE 0 END as isSaved
-END
+    DECLARE @IsSaved BIT = 0;
+
+    -- Check if blog is saved by user
+    IF EXISTS (SELECT 1 FROM saved_blogs WHERE blog_post_id = @BlogPostId AND user_id = @UserId)
+    BEGIN
+        SET @IsSaved = 1;
+    END
+
+    SELECT @IsSaved as is_saved;
+END;
+GO

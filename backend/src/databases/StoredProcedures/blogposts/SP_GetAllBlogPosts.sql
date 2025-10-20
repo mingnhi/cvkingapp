@@ -15,11 +15,11 @@ BEGIN
     DECLARE @Offset INT = (@Page - 1) * @PageSize;
 
     SELECT CAST((
-        SELECT 
-            bp.id, bp.title, bp.slug, bp.excerpt, bp.cover_image_url,
-            bp.author_user_id, bp.category_id, bp.is_published, bp.published_at,
-            bp.created_at, bp.updated_at, bp.status, bp.views_count, bp.posted_at,
-            bp.expires_at, bp.short_description,
+        SELECT
+            bp.id, bp.Title, bp.Slug, bp.Excerpt, bp.CoverImageUrl,
+            bp.AuthorUserId, bp.category_id, bp.IsPublished, bp.PublishedAt,
+            bp.created_at, bp.updated_at, bp.Status, bp.ViewsCount, bp.PostedAt,
+            bp.ExpiresAt, bp.ShortDescription,
             -- Remove bp.content from here to avoid GROUP BY issues
 
             (
@@ -33,19 +33,19 @@ BEGIN
                 SELECT bt.id, bt.Name
                 FROM BlogTags bt
                 JOIN BlogPostTags bpt ON bt.id = bpt.blog_tag_id
-                WHERE bpt.blog_post_id = bp.id
+                WHERE bpt.BlogPostId = bp.id
                 FOR JSON PATH
             ) AS tags
 
         FROM dbo.BlogPosts bp
-        LEFT JOIN dbo.BlogPostTags bpt ON bp.id = bpt.blog_post_id
-        WHERE (@AuthorUserId IS NULL OR bp.author_user_id = @AuthorUserId)
-          AND (@IsPublished IS NULL OR bp.is_published = @IsPublished)
-          AND (@Keyword IS NULL OR bp.title LIKE '%' + @Keyword + '%' OR bp.excerpt LIKE '%' + @Keyword + '%')
-          AND (@TagId IS NULL OR bpt.blog_tag_id = @TagId)
-        GROUP BY bp.id, bp.title, bp.slug, bp.excerpt, bp.cover_image_url,
-                 bp.author_user_id, bp.is_published, bp.published_at, bp.created_at, bp.updated_at,
-                 bp.status, bp.views_count, bp.posted_at, bp.expires_at, bp.short_description,
+        LEFT JOIN dbo.BlogPostTags bpt ON bp.id = bpt.BlogPostId
+        WHERE (@AuthorUserId IS NULL OR bp.AuthorUserId = @AuthorUserId)
+          AND (@IsPublished IS NULL OR bp.IsPublished = @IsPublished)
+          AND (@Keyword IS NULL OR bp.Title LIKE '%' + @Keyword + '%' OR bp.Excerpt LIKE '%' + @Keyword + '%')
+          AND (@TagId IS NULL OR bpt.BlogTagId = @TagId)
+        GROUP BY bp.id, bp.Title, bp.Slug, bp.Excerpt, bp.CoverImageUrl,
+                 bp.AuthorUserId, bp.IsPublished, bp.PublishedAt, bp.created_at, bp.updated_at,
+                 bp.Status, bp.ViewsCount, bp.PostedAt, bp.ExpiresAt, bp.ShortDescription,
                  bp.category_id
                  -- Remove bp.content from GROUP BY
         ORDER BY bp.created_at DESC

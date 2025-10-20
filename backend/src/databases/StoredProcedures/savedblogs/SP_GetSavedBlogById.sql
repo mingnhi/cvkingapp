@@ -1,3 +1,6 @@
+use JOB_DB
+go
+
 CREATE OR ALTER PROCEDURE [dbo].[SP_GetSavedBlogById]
     @Id NVARCHAR(36),
     @UserId NVARCHAR(36)
@@ -10,16 +13,16 @@ BEGIN
         sb.blog_post_id,
         sb.user_id,
         sb.created_at,
-        bp.title,
-        bp.slug,
-        bp.content,
-        bp.excerpt,
-        bp.cover_image_url,
+        bp.Title,
+        bp.Slug,
+        bp.Content,
+        bp.Excerpt,
+        bp.CoverImageUrl,
         u.displayName as authorName,
         bp.created_at as blogCreatedAt,
-        bp.views_count as blogViewsCount
+        bp.ViewsCount as blogViewsCount
     FROM saved_blogs sb
     INNER JOIN BlogPosts bp ON sb.blog_post_id = bp.id
-    LEFT JOIN Users u ON bp.author_user_id = u.id
+    LEFT JOIN Users u ON bp.AuthorUserId = u.id
     WHERE sb.id = @Id AND sb.user_id = @UserId
 END

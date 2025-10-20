@@ -3,18 +3,18 @@ import { AuditableEntity } from './base/auditable_entity';
 
 @Entity({ tableName: 'BlogComments' })
 export class BlogComments extends AuditableEntity {
-  @Property({ type: 'int', fieldName: 'BlogPostId' })
-  blogPostId: number;
+  @Property({ type: 'string', fieldName: 'blog_post_id' })
+  blogPostId: string;
 
-  @Property({ type: 'int', nullable: true, fieldName: 'UserId' })
-  userId?: number;
+  @Property({ type: 'string', nullable: true, fieldName: 'user_id' })
+  userId?: string;
 
-  @Property({ type: 'string', length: 200, nullable: true, fieldName: 'GuestName' })
+  @Property({ type: 'string', length: 200, nullable: true, fieldName: 'guest_name' })
   guestName?: string;
 
-  @Property({ type: 'text', fieldName: 'Content' })
+  @Property({ type: 'text', fieldName: 'content' })
   content: string;
 
-  @Property({ type: 'boolean', default: false, fieldName: 'IsApproved' })
+  @Property({ type: 'boolean', default: false, fieldName: 'is_approved' })
   isApproved: boolean = false;
 }

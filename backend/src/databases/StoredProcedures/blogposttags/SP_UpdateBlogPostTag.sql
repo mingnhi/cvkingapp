@@ -8,8 +8,8 @@ CREATE OR ALTER PROCEDURE dbo.SP_UpdateBlogPostTag
 AS
 BEGIN
     UPDATE BlogPostTags
-    SET blog_post_id = @BlogPostId,
-        blog_tag_id = @BlogTagId,
+    SET BlogPostId = @BlogPostId,
+        BlogTagId = @BlogTagId,
         updated_at = SYSDATETIMEOFFSET()
     WHERE id = @BlogPostTagId;
 

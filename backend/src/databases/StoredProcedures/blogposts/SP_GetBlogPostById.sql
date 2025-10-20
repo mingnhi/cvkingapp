@@ -10,10 +10,10 @@ BEGIN
     -- Return the blog post data as properly formatted JSON
     SELECT CAST((
         SELECT
-            bp.id, bp.title, bp.slug, bp.content, bp.excerpt, bp.cover_image_url,
-            bp.author_user_id, bp.category_id, bp.is_published, bp.published_at,
-            bp.created_at, bp.updated_at, bp.status, bp.views_count, bp.posted_at,
-            bp.expires_at, bp.short_description,
+            bp.id, bp.Title, bp.Slug, bp.Content, bp.Excerpt, bp.CoverImageUrl,
+            bp.AuthorUserId, bp.category_id, bp.IsPublished, bp.PublishedAt,
+            bp.created_at, bp.updated_at, bp.Status, bp.ViewsCount, bp.PostedAt,
+            bp.ExpiresAt, bp.ShortDescription,
 
             (
                 SELECT bc.id, bc.Name
@@ -26,16 +26,16 @@ BEGIN
                 SELECT bt.id, bt.Name
                 FROM BlogTags bt
                 JOIN BlogPostTags bpt ON bt.id = bpt.blog_tag_id
-                WHERE bpt.blog_post_id = bp.id
+                WHERE bpt.BlogPostId = bp.id
                 FOR JSON PATH
             ) AS tags,
 
             (
                 SELECT
-                    bc.id, bc.content, bc.user_id, bc.guest_name,
-                    bc.is_approved, bc.created_at
+                    bc.id, bc.Content as content, bc.UserId as user_id, bc.GuestName as guest_name,
+                    bc.IsApproved as is_approved, bc.created_at
                 FROM BlogComments bc
-                WHERE bc.blog_post_id = bp.id AND bc.is_approved = 1
+                WHERE bc.BlogPostId = bp.id AND bc.IsApproved = 1
                 ORDER BY bc.created_at DESC
                 FOR JSON PATH
             ) AS comments

@@ -13,25 +13,37 @@ export class BlogCommentsRepository {
    * @returns List of blog comments
    */
   async findAll(filters?: { blogPostId?: string; userId?: string; isApproved?: boolean }): Promise<any[]> {
-    const result = await this.em.getConnection().execute('EXEC dbo.SP_GetAllBlogComments');
+    const result = await this.em.getConnection().execute('EXEC dbo.SP_GetAllBlogComments ?', [filters?.blogPostId || null]);
     const allComments = extractJsonArray(result);
 
     // Apply filters in memory since SP doesn't have filters
     let filtered = allComments;
 
     if (filters?.blogPostId) {
-      filtered = filtered.filter(c => c.blogPostId === filters.blogPostId);
+      filtered = filtered.filter(c => c.blog_post_id === filters.blogPostId);
     }
 
     if (filters?.userId) {
-      filtered = filtered.filter(c => c.userId === filters.userId);
+      filtered = filtered.filter(c => c.user_id === filters.userId);
     }
 
     if (filters?.isApproved !== undefined) {
-      filtered = filtered.filter(c => c.isApproved === filters.isApproved);
+      filtered = filtered.filter(c => c.is_approved === filters.isApproved);
     }
 
-    return filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    // Map database field names to DTO field names for frontend
+    const mappedComments = filtered.map(comment => ({
+      id: comment.id,
+      blogPostId: comment.blog_post_id,
+      userId: comment.user_id,
+      guestName: comment.guest_name,
+      content: comment.content,
+      isApproved: comment.is_approved,
+      createdAt: comment.created_at,
+      updatedAt: comment.updated_at
+    }));
+
+    return mappedComments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
   /**
@@ -41,7 +53,23 @@ export class BlogCommentsRepository {
    */
   async findById(id: string): Promise<any | null> {
     const result = await this.em.getConnection().execute('EXEC dbo.SP_GetBlogCommentById ?', [id]);
-    return extractJson(result[0]) || null;
+    const comment = extractJson(result[0]);
+
+    // Map database field names to DTO field names for frontend
+    if (comment) {
+      return {
+        id: comment.id,
+        blogPostId: comment.blog_post_id,
+        userId: comment.user_id,
+        guestName: comment.guest_name,
+        content: comment.content,
+        isApproved: comment.is_approved,
+        createdAt: comment.created_at,
+        updatedAt: comment.updated_at
+      };
+    }
+
+    return comment;
   }
 
   /**
@@ -77,6 +105,21 @@ export class BlogCommentsRepository {
       console.warn('ParentCommentId is not supported in current stored procedure');
     }
 
+    // Map database field names to DTO field names for frontend
+    if (comment) {
+      return {
+        id: comment.id,
+        blogPostId: comment.blog_post_id,
+        userId: comment.user_id,
+        guestName: comment.guest_name,
+        content: comment.content,
+        isApproved: comment.is_approved,
+        createdAt: comment.created_at,
+        updatedAt: comment.updated_at,
+        parentCommentId: data.ParentCommentId // Add this since SP doesn't return it
+      };
+    }
+
     return comment;
   }
 
@@ -91,7 +134,23 @@ export class BlogCommentsRepository {
       'EXEC dbo.SP_UpdateBlogComment ?,?',
       [id, data.Content]
     );
-    return extractJson(result[0]);
+    const comment = extractJson(result[0]);
+
+    // Map database field names to DTO field names for frontend
+    if (comment) {
+      return {
+        id: comment.id,
+        blogPostId: comment.blog_post_id,
+        userId: comment.user_id,
+        guestName: comment.guest_name,
+        content: comment.content,
+        isApproved: comment.is_approved,
+        createdAt: comment.created_at,
+        updatedAt: comment.updated_at
+      };
+    }
+
+    return comment;
   }
 
   /**
@@ -114,7 +173,23 @@ export class BlogCommentsRepository {
       'EXEC dbo.SP_SetBlogCommentApproval ?,?',
       [id, 1]
     );
-    return extractJson(result[0]);
+    const comment = extractJson(result[0]);
+
+    // Map database field names to DTO field names for frontend
+    if (comment) {
+      return {
+        id: comment.id,
+        blogPostId: comment.blog_post_id,
+        userId: comment.user_id,
+        guestName: comment.guest_name,
+        content: comment.content,
+        isApproved: comment.is_approved,
+        createdAt: comment.created_at,
+        updatedAt: comment.updated_at
+      };
+    }
+
+    return comment;
   }
 
   /**
@@ -127,7 +202,23 @@ export class BlogCommentsRepository {
       'EXEC dbo.SP_SetBlogCommentApproval ?,?',
       [id, 0]
     );
-    return extractJson(result[0]);
+    const comment = extractJson(result[0]);
+
+    // Map database field names to DTO field names for frontend
+    if (comment) {
+      return {
+        id: comment.id,
+        blogPostId: comment.blog_post_id,
+        userId: comment.user_id,
+        guestName: comment.guest_name,
+        content: comment.content,
+        isApproved: comment.is_approved,
+        createdAt: comment.created_at,
+        updatedAt: comment.updated_at
+      };
+    }
+
+    return comment;
   }
 
   /**
@@ -159,6 +250,7 @@ export class BlogCommentsRepository {
    * @returns List of user's comments
    */
   async getCommentsByUser(userId: string, approvedOnly: boolean = true): Promise<any[]> {
-    return this.findAll({ userId, isApproved: approvedOnly ? true : undefined });
+    const comments = await this.findAll({ userId, isApproved: approvedOnly ? true : undefined });
+    return comments.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   }
 }

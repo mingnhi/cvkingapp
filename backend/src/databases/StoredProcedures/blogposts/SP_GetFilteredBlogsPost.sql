@@ -43,25 +43,25 @@ BEGIN
     -- Đưa dữ liệu đã lọc vào bảng tạm
     INSERT INTO #TempResults
     SELECT
-        bp.id, bp.title, bp.slug, bp.excerpt, bp.cover_image_url,
-        bp.author_user_id, bp.category_id, bp.is_published, bp.published_at,
-        bp.created_at, bp.updated_at, bp.status, bp.views_count, bp.posted_at,
-        bp.expires_at, bp.short_description
+        bp.id, bp.Title, bp.Slug, bp.Excerpt, bp.CoverImageUrl,
+        bp.AuthorUserId, bp.category_id, bp.IsPublished, bp.PublishedAt,
+        bp.created_at, bp.updated_at, bp.Status, bp.ViewsCount, bp.PostedAt,
+        bp.ExpiresAt, bp.ShortDescription
     FROM dbo.BlogPosts bp
-    LEFT JOIN dbo.BlogPostTags bpt ON bp.id = bpt.blog_post_id
+    LEFT JOIN dbo.BlogPostTags bpt ON bp.id = bpt.BlogPostId
     LEFT JOIN dbo.BlogTags bt ON bpt.blog_tag_id = bt.id
     WHERE
         (
           @Keyword IS NULL OR
-          bp.title   LIKE N'%' + @Keyword + N'%' OR
-          bp.excerpt LIKE N'%' + @Keyword + N'%' OR
-          bp.content LIKE N'%' + @Keyword + N'%'
+          bp.Title   LIKE N'%' + @Keyword + N'%' OR
+          bp.Excerpt LIKE N'%' + @Keyword + N'%' OR
+          bp.Content LIKE N'%' + @Keyword + N'%'
         )
         AND (@CategoryId    IS NULL OR bp.category_id    = @CategoryId)
-        AND (@AuthorId      IS NULL OR bp.author_user_id = @AuthorId)
-        AND (@IsPublished   IS NULL OR bp.is_published   = @IsPublished)
-        AND (@Status        IS NULL OR bp.status         = @Status)
-        AND (@ViewsCountMin IS NULL OR bp.views_count   >= @ViewsCountMin)
+        AND (@AuthorId      IS NULL OR bp.AuthorUserId = @AuthorId)
+        AND (@IsPublished   IS NULL OR bp.IsPublished   = @IsPublished)
+        AND (@Status        IS NULL OR bp.Status         = @Status)
+        AND (@ViewsCountMin IS NULL OR bp.ViewsCount   >= @ViewsCountMin)
         AND (@DateFrom      IS NULL OR bp.created_at    >= @DateFrom)
         AND (@DateTo        IS NULL OR bp.created_at    <= @DateTo)
         AND (
@@ -72,10 +72,10 @@ BEGIN
                  )
         )
     GROUP BY
-        bp.id, bp.title, bp.slug, bp.excerpt, bp.cover_image_url,
-        bp.author_user_id, bp.category_id, bp.is_published, bp.published_at,
-        bp.created_at, bp.updated_at, bp.status, bp.views_count, bp.posted_at,
-        bp.expires_at, bp.short_description;
+        bp.id, bp.Title, bp.Slug, bp.Excerpt, bp.CoverImageUrl,
+        bp.AuthorUserId, bp.category_id, bp.IsPublished, bp.PublishedAt,
+        bp.created_at, bp.updated_at, bp.Status, bp.ViewsCount, bp.PostedAt,
+        bp.ExpiresAt, bp.ShortDescription;
 
     -- Tổng số bản ghi sau khi lọc
     DECLARE @TotalCount INT = (SELECT COUNT(*) FROM #TempResults);
@@ -104,7 +104,7 @@ BEGIN
                         SELECT bt.id, bt.Name
                         FROM dbo.BlogTags bt
                         JOIN dbo.BlogPostTags bpt ON bt.id = bpt.blog_tag_id
-                        WHERE bpt.blog_post_id = tr.id
+                        WHERE bpt.BlogPostId = tr.id
                         FOR JSON PATH
                     ) AS tags
                 FROM #TempResults tr

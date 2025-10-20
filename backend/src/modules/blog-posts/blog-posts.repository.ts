@@ -28,7 +28,7 @@ export class BlogPostsRepository {
   constructor(private readonly em: EntityManager) {}
 
   /**
-   * Find all blog posts with optional filtering
+   * Find all blog posts with optional filtering (legacy method)
    * @param filters Optional filters for the query
    * @returns List of blog posts
    */
@@ -48,6 +48,17 @@ export class BlogPostsRepository {
         filters?.tagId ?? null,
       ]);
 
+    return extractJsonArray(raw);
+  }
+
+  /**
+   * Find all blog posts (similar to JobsRepository)
+   * @returns List of all blog posts
+   */
+  async findAllBlogs(): Promise<any[]> {
+    const raw = await this.em.getConnection().execute('EXEC dbo.SP_GetAllBlogPosts ?,?,?,?,?,?', [
+      1, 10, null, null, null, null
+    ]);
     return extractJsonArray(raw);
   }
 

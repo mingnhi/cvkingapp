@@ -39,7 +39,7 @@ BEGIN
         0 AS growth,
         MAX(CAST(bv.viewed_at AS DATE)) AS peakDay
     FROM dbo.BlogViews bv
-    WHERE bv.viewer_user_id >= @StartDate
+    WHERE bv.ViewedAt >= @StartDate
       AND (@DateTo IS NULL OR bv.viewed_at <= @DateTo);
 END;
 GO

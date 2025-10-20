@@ -15,13 +15,13 @@ BEGIN
     END
 
     -- Delete related blog post tags first
-    DELETE FROM dbo.BlogPostTags WHERE blog_post_id = @Id;
+    DELETE FROM dbo.BlogPostTags WHERE BlogPostId = @Id;
 
     -- Delete related blog comments
-    DELETE FROM dbo.BlogComments WHERE blog_post_id = @Id;
+    DELETE FROM dbo.BlogComments WHERE BlogPostId = @Id;
 
     -- Delete related blog views
-    DELETE FROM dbo.BlogViews WHERE blog_post_id = @Id;
+    DELETE FROM dbo.BlogViews WHERE BlogPostId = @Id;
 
     -- Delete the blog post
     DELETE FROM dbo.BlogPosts WHERE id = @Id;

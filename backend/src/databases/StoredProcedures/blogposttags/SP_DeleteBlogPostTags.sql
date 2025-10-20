@@ -18,7 +18,7 @@ BEGIN
         IF @BlogPostId IS NOT NULL AND @BlogTagId IS NOT NULL
         BEGIN
             DELETE FROM dbo.BlogPostTags
-            WHERE blog_post_id = @BlogPostId AND blog_tag_id = @BlogTagId;
+            WHERE BlogPostId = @BlogPostId AND BlogTagId = @BlogTagId;
             SET @DeletedCount = @@ROWCOUNT;
         END
     END
@@ -26,21 +26,21 @@ BEGIN
     BEGIN
         -- Delete specific relationship between BlogPost and BlogTag
         DELETE FROM dbo.BlogPostTags
-        WHERE blog_post_id = @BlogPostId AND blog_tag_id = @BlogTagId;
+        WHERE BlogPostId = @BlogPostId AND BlogTagId = @BlogTagId;
         SET @DeletedCount = @@ROWCOUNT;
     END
     ELSE IF @BlogPostId IS NOT NULL
     BEGIN
         -- Delete all relationships for a specific BlogPost
         DELETE FROM dbo.BlogPostTags
-        WHERE blog_post_id = @BlogPostId;
+        WHERE BlogPostId = @BlogPostId;
         SET @DeletedCount = @@ROWCOUNT;
     END
     ELSE IF @BlogTagId IS NOT NULL
     BEGIN
         -- Delete all relationships for a specific BlogTag
         DELETE FROM dbo.BlogPostTags
-        WHERE blog_tag_id = @BlogTagId;
+        WHERE BlogTagId = @BlogTagId;
         SET @DeletedCount = @@ROWCOUNT;
     END
     ELSE

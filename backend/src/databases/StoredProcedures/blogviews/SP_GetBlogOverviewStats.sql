@@ -19,7 +19,7 @@ BEGIN
     SELECT @TotalViews = SUM(views_count)
     FROM dbo.BlogPosts;
 
-    SELECT @TotalUniqueViews = COUNT(DISTINCT COALESCE(viewer_user_id, session_id))
+    SELECT @TotalUniqueViews = COUNT(DISTINCT COALESCE(ViewerUserId, SessionId))
     FROM dbo.BlogViews;
 
     SELECT @PostCount = COUNT(*)

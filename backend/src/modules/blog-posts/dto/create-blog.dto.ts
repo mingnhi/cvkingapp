@@ -11,6 +11,18 @@ export class CreateBlogDto {
   TagIds?: string[];
   ShortDescription?: string;
 
+  // Đồng bộ với Job entity - thêm các trường nâng cao
+  Requirements?: string;
+  Benefits?: string;
+
+  // Các trường khác từ Job entity (tùy chọn cho blog)
+  SalaryMin?: number;
+  SalaryMax?: number;
+  Currency?: string;
+  JobType?: string;
+  Location?: string;
+  ExpiresAt?: Date;
+
   // Keep backwards compatibility
   title?: string;
   slug?: string;
@@ -22,4 +34,12 @@ export class CreateBlogDto {
   tagIds?: string[];
   shortDescription?: string;
   categoryId?: string;
+  requirements?: string;
+  benefits?: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  currency?: string;
+  jobType?: string;
+  location?: string;
+  expiresAt?: Date;
 }
