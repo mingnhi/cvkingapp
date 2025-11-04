@@ -18,6 +18,13 @@ import { JobCategoryModule } from './modules/job-category/job-category.module';
 import { CompanyModule } from './modules/company/company.module';
 import { JobSeekerProfileModule } from './modules/job-seeker-profile/job-seeker-profile.module';
 import { EmployerProfileModule } from './modules/employer-profile/employer-profile.module';
+import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
+import { BlogPostsModule } from '@modules/blog-posts/blog-posts.module';
+import { BlogTagsModule } from '@modules/blog-tags/blog-tags.module';
+import { BlogCommentsModule } from '@modules/Blog-comments/blog-comments.module';
+import { BlogCategoriesModule } from '@modules/blog-categories/blog-categories.module';
+import { BlogViewsModule } from './modules/blog-views/blog-views.module';
+import { SavedBlogsModule } from './modules/saved-blogs/saved-blogs.module';
 
 @Module({
   imports: [
@@ -45,6 +52,16 @@ import { EmployerProfileModule } from './modules/employer-profile/employer-profi
     CompanyModule,
     JobSeekerProfileModule,
     EmployerProfileModule,
+<<<<<<< HEAD
+    CloudinaryModule,
+=======
+    BlogPostsModule,
+    BlogTagsModule,
+    BlogCommentsModule,
+    BlogCategoriesModule,
+    BlogViewsModule,
+    SavedBlogsModule,
+>>>>>>> feat/hoangtuanphong/BE-Blog
   ],
   controllers: [AppController],
   providers: [AppService],
