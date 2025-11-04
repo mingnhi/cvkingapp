@@ -8,7 +8,6 @@ import { UsersModule } from '@modules/users/users.module';
 import { RolesModule } from '@modules/roles/roles.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserRolesModule } from './modules/user_roles/user_roles.module';
-import { BlogsModule } from './modules/blogs/blogs.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { JobApplicationsModule } from './modules/job-applications/job-applications.module';
 import { SavedJobsModule } from './modules/saved-jobs/saved-jobs.module';
@@ -19,7 +18,6 @@ import { JobCategoryModule } from './modules/job-category/job-category.module';
 import { CompanyModule } from './modules/company/company.module';
 import { JobSeekerProfileModule } from './modules/job-seeker-profile/job-seeker-profile.module';
 import { EmployerProfileModule } from './modules/employer-profile/employer-profile.module';
-import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -37,7 +35,6 @@ import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
     RolesModule,
     AuthModule,
     UserRolesModule,
-    BlogsModule,
     JobsModule,
     JobApplicationsModule,
     SavedJobsModule,
@@ -48,7 +45,6 @@ import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
     CompanyModule,
     JobSeekerProfileModule,
     EmployerProfileModule,
-    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

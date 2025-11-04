@@ -1,8 +1,10 @@
 import { Entity, PrimaryKey, Property, Unique } from '@mikro-orm/core';
-import { AuditableEntity } from './base/auditable_entity';
 
 @Entity({ tableName: 'Companies' })
-export class Company extends AuditableEntity {
+export class Company {
+  @PrimaryKey({ type: 'string' })
+  id: string;
+
   @Property({ length: 300 })
   name!: string;
 
@@ -35,4 +37,5 @@ export class Company extends AuditableEntity {
 
   @Property({ default: false })
   isVerified: boolean = false;
+
 }

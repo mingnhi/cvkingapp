@@ -3,9 +3,9 @@ import { AuditableEntity } from './base/auditable_entity';
 
 @Entity({ tableName: 'BlogPostTags' })
 export class BlogPostTags extends AuditableEntity {
-  @Property({ type: 'string', length: 500, nullable: true })
-  blogPostId?: string;
+  @Property({ type: 'string', fieldName: 'blog_post_id' })
+  blogPostId: string;
 
-  @Property({ type: 'string', length: 500, nullable: true })
-  blogTagId?: string;
+  @Property({ type: 'string', fieldName: 'blog_tag_id' })
+  blogTagId: string;
 }
