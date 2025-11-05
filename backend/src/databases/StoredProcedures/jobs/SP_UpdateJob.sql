@@ -1,4 +1,4 @@
-use cvkingapp
+use JOB_DB
 go
 
 CREATE PROCEDURE SP_InsertJobFull

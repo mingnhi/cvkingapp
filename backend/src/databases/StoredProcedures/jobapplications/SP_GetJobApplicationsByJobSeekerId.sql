@@ -1,7 +1,6 @@
-USE cvkingapp;
+USE JOB_DB;
 GO
 
--- 📌 Lấy danh sách Job Applications theo JobSeekerId
 CREATE OR ALTER PROCEDURE SP_GetJobApplicationsByJobSeekerId
   @JobSeekerId UNIQUEIDENTIFIER
 AS

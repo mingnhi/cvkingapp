@@ -1,4 +1,4 @@
-USE cvkingapp;
+USE JOB_DB;
 GO
 
 CREATE OR ALTER PROCEDURE SP_GetJobApplicationsByCompanyId
