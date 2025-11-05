@@ -15,6 +15,85 @@
           "nullable": false,
           "length": 255
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "name": {
+          "name": "name",
+          "type": "nvarchar(200)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 200
+        }
+      },
+      "name": "BlogCategories",
+      "schema": "dbo",
+      "indexes": [
+        {
+          "columnNames": [
+            "name"
+          ],
+          "composite": false,
+          "keyName": "BlogCategories_name_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "BlogCategories_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "date"
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "date",
@@ -27,21 +106,30 @@
         },
         "blog_post_id": {
           "name": "blog_post_id",
-          "type": "nvarchar(500)",
+          "type": "nvarchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
-          "length": 500
+          "nullable": false,
+          "length": 255
         },
         "user_id": {
           "name": "user_id",
-          "type": "nvarchar(500)",
+          "type": "nvarchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": 500
+          "length": 255
+        },
+        "guest_name": {
+          "name": "guest_name",
+          "type": "nvarchar(200)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 200
         },
         "content": {
           "name": "content",
@@ -61,17 +149,6 @@
           "nullable": false,
           "default": "0",
           "mappedType": "boolean"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "date",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 0,
-          "default": "'SYSDATETIME'",
-          "mappedType": "date"
         }
       },
       "name": "BlogComments",
@@ -168,8 +245,35 @@
           "nullable": true,
           "length": 1000
         },
-        "author_id": {
-          "name": "author_id",
+        "short_description": {
+          "name": "short_description",
+          "type": "nvarchar(1000)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 1000
+        },
+        "requirements": {
+          "name": "requirements",
+          "type": "nvarchar(max)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": -1
+        },
+        "benefits": {
+          "name": "benefits",
+          "type": "nvarchar(max)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": -1
+        },
+        "author_user_id": {
+          "name": "author_user_id",
           "type": "nvarchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -189,13 +293,54 @@
         },
         "published_at": {
           "name": "published_at",
-          "type": "date",
+          "type": "datetime2",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": 0,
-          "mappedType": "date"
+          "length": 7,
+          "mappedType": "datetime"
+        },
+        "status": {
+          "name": "status",
+          "type": "nvarchar(50)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 50,
+          "default": "'Active'"
+        },
+        "views_count": {
+          "name": "views_count",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
+          "mappedType": "integer"
+        },
+        "posted_at": {
+          "name": "posted_at",
+          "type": "datetime2",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 7,
+          "default": "SYSUTCDATETIME()",
+          "mappedType": "datetime"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "datetime2",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 7,
+          "mappedType": "datetime"
         }
       },
       "name": "BlogPosts",
@@ -259,21 +404,21 @@
         },
         "blog_post_id": {
           "name": "blog_post_id",
-          "type": "nvarchar(500)",
+          "type": "nvarchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
-          "length": 500
+          "nullable": false,
+          "length": 255
         },
         "blog_tag_id": {
           "name": "blog_tag_id",
-          "type": "nvarchar(500)",
+          "type": "nvarchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
-          "length": 500
+          "nullable": false,
+          "length": 255
         }
       },
       "name": "BlogPostTags",
@@ -305,6 +450,16 @@
           "nullable": false,
           "length": 255
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "date"
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "date",
@@ -323,17 +478,6 @@
           "primary": false,
           "nullable": false,
           "length": 200
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "date",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 0,
-          "default": "'SYSDATETIME'",
-          "mappedType": "date"
         }
       },
       "name": "BlogTags",
@@ -351,6 +495,94 @@
         },
         {
           "keyName": "BlogTags_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "blog_post_id": {
+          "name": "blog_post_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "viewer_user_id": {
+          "name": "viewer_user_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "integer"
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255
+        },
+        "viewed_at": {
+          "name": "viewed_at",
+          "type": "datetime2",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 7,
+          "default": "SYSUTCDATETIME()",
+          "mappedType": "datetime"
+        }
+      },
+      "name": "BlogViews",
+      "schema": "dbo",
+      "indexes": [
+        {
+          "keyName": "BlogViews_pkey",
           "columnNames": [
             "id"
           ],
@@ -1414,6 +1646,85 @@
         },
         {
           "keyName": "Roles_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        },
+        "blog_post_id": {
+          "name": "blog_post_id",
+          "type": "nvarchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255
+        }
+      },
+      "name": "saved_blogs",
+      "schema": "dbo",
+      "indexes": [
+        {
+          "keyName": "saved_blogs_user_id_blog_post_id_unique",
+          "columnNames": [
+            "user_id",
+            "blog_post_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "saved_blogs_pkey",
           "columnNames": [
             "id"
           ],

@@ -29,6 +29,10 @@ const CompanyProfile = ({ onEdit }: CompanyProfileProps) => {
     isLoading: loadingCompany,
     isError: errorCompany,
     } = useCompanyByIdQuery(companyId, { enabled: Boolean(companyId) });
+    console.log("CompanyId:", companyId);
+    console.log("Company data:", company);
+    console.log("Loading company:", loadingCompany);
+    console.log("Error company:", errorCompany);
     if (loadingProfiles || loadingCompany)
         return <Typography>Đang tải thông tin công ty...</Typography>;
     if (err || !employerProfile)

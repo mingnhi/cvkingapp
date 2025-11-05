@@ -52,16 +52,13 @@ import { SavedBlogsModule } from './modules/saved-blogs/saved-blogs.module';
     CompanyModule,
     JobSeekerProfileModule,
     EmployerProfileModule,
-<<<<<<< HEAD
     CloudinaryModule,
-=======
     BlogPostsModule,
     BlogTagsModule,
     BlogCommentsModule,
     BlogCategoriesModule,
     BlogViewsModule,
     SavedBlogsModule,
->>>>>>> feat/hoangtuanphong/BE-Blog
   ],
   controllers: [AppController],
   providers: [AppService],

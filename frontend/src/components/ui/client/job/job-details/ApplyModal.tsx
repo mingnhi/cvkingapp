@@ -40,6 +40,11 @@ const ApplyModal = memo(function ApplyModal({ jobTitle, onClose, jobId, jobSeeke
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!jobId || !jobSeekerId) {
+      toast.error("Thiếu thông tin công việc hoặc người dùng. Vui lòng thử lại!");
+      return;
+    }
+
     if (!coverLetter) {
       toast.error("Vui lòng chọn cv trước khi nộp!");
       return;
@@ -52,6 +57,12 @@ const ApplyModal = memo(function ApplyModal({ jobTitle, onClose, jobId, jobSeeke
         folder: "cover_letters",
       });
 
+      if (!uploadRes?.url) {
+      toast.error("Không thể tải lên file. Vui lòng thử lại!");
+      return;
+      }
+      console.log("🧾 jobId:", jobId);
+      console.log("🧾 jobSeekerId:", jobSeekerId);
       const payload: JobApplicationCreateRequest = {
         jobId: job?.id ?? "",
         jobSeekerId: myProfile?.id ?? "",
@@ -117,7 +128,7 @@ const ApplyModal = memo(function ApplyModal({ jobTitle, onClose, jobId, jobSeeke
 
               {coverLetter && (
                 <p className="mt-3 text-sm text-orange-700 font-medium">
-                  ✅ {coverLetter.name}
+                   {coverLetter.name}
                 </p>
               )}
             </div>
@@ -127,6 +138,7 @@ const ApplyModal = memo(function ApplyModal({ jobTitle, onClose, jobId, jobSeeke
           <div className="flex justify-end items-center gap-3 pt-4 border-t">
             <button
               type="button"
+              onClick={onClose}
               disabled={isLoading}
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition"
             >

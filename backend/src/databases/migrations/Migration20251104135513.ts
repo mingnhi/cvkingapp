@@ -1,24 +1,24 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251016055031_init extends Migration {
+export class Migration20251104135513 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`CREATE TABLE [BlogCategories] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [name] nvarchar(200) not null, CONSTRAINT [BlogCategories_pkey] PRIMARY KEY ([id]));`);
     this.addSql(`CREATE UNIQUE INDEX [BlogCategories_name_unique] ON [BlogCategories] ([name]) WHERE [name] IS NOT NULL;`);
 
-    this.addSql(`CREATE TABLE [BlogComments] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [BlogPostId] int not null, [UserId] int null, [GuestName] nvarchar(200) null, [Content] text not null, [IsApproved] bit not null CONSTRAINT [blogcomments_isapproved_default] DEFAULT 0, CONSTRAINT [BlogComments_pkey] PRIMARY KEY ([id]));`);
+    this.addSql(`CREATE TABLE [BlogComments] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [blog_post_id] nvarchar(255) not null, [user_id] nvarchar(255) null, [guest_name] nvarchar(200) null, [content] text not null, [is_approved] bit not null CONSTRAINT [blogcomments_is_approved_default] DEFAULT 0, CONSTRAINT [BlogComments_pkey] PRIMARY KEY ([id]));`);
 
-    this.addSql(`CREATE TABLE [BlogPosts] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [Title] nvarchar(500) not null, [Slug] nvarchar(500) not null, [Content] text not null, [Excerpt] nvarchar(1000) null, [CoverImageUrl] nvarchar(1000) null, [AuthorUserId] int not null, [IsPublished] bit not null CONSTRAINT [blogposts_ispublished_default] DEFAULT 0, [PublishedAt] datetime2 null, [Status] nvarchar(50) not null CONSTRAINT [blogposts_status_default] DEFAULT 'Active', [ViewsCount] int not null CONSTRAINT [blogposts_viewscount_default] DEFAULT 0, [PostedAt] datetime2 not null CONSTRAINT [blogposts_postedat_default] DEFAULT SYSUTCDATETIME(), [ExpiresAt] datetime2 null, CONSTRAINT [BlogPosts_pkey] PRIMARY KEY ([id]));`);
-    this.addSql(`CREATE UNIQUE INDEX [BlogPosts_Slug_unique] ON [BlogPosts] ([Slug]) WHERE [Slug] IS NOT NULL;`);
+    this.addSql(`CREATE TABLE [BlogPosts] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [title] nvarchar(500) not null, [slug] nvarchar(500) not null, [content] text not null, [excerpt] nvarchar(1000) null, [cover_image_url] nvarchar(1000) null, [short_description] nvarchar(1000) null, [requirements] nvarchar(max) null, [benefits] nvarchar(max) null, [author_user_id] nvarchar(255) not null, [is_published] bit not null CONSTRAINT [blogposts_is_published_default] DEFAULT 0, [published_at] datetime2 null, [status] nvarchar(50) not null CONSTRAINT [blogposts_status_default] DEFAULT 'Active', [views_count] int not null CONSTRAINT [blogposts_views_count_default] DEFAULT 0, [posted_at] datetime2 not null CONSTRAINT [blogposts_posted_at_default] DEFAULT SYSUTCDATETIME(), [expires_at] datetime2 null, CONSTRAINT [BlogPosts_pkey] PRIMARY KEY ([id]));`);
+    this.addSql(`CREATE UNIQUE INDEX [BlogPosts_slug_unique] ON [BlogPosts] ([slug]) WHERE [slug] IS NOT NULL;`);
 
-    this.addSql(`CREATE TABLE [BlogPostTags] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [BlogPostId] int not null, [BlogTagId] int not null, CONSTRAINT [BlogPostTags_pkey] PRIMARY KEY ([id]));`);
+    this.addSql(`CREATE TABLE [BlogPostTags] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [blog_post_id] nvarchar(255) not null, [blog_tag_id] nvarchar(255) not null, CONSTRAINT [BlogPostTags_pkey] PRIMARY KEY ([id]));`);
 
     this.addSql(`CREATE TABLE [BlogTags] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [name] nvarchar(200) not null, CONSTRAINT [BlogTags_pkey] PRIMARY KEY ([id]));`);
     this.addSql(`CREATE UNIQUE INDEX [BlogTags_name_unique] ON [BlogTags] ([name]) WHERE [name] IS NOT NULL;`);
 
-    this.addSql(`CREATE TABLE [BlogViews] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [BlogPostId] int not null, [ViewerUserId] int null, [SessionId] nvarchar(255) null, [ViewedAt] datetime2 not null CONSTRAINT [blogviews_viewedat_default] DEFAULT SYSUTCDATETIME(), CONSTRAINT [BlogViews_pkey] PRIMARY KEY ([id]));`);
+    this.addSql(`CREATE TABLE [BlogViews] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [blog_post_id] int not null, [viewer_user_id] int null, [session_id] nvarchar(255) null, [viewed_at] datetime2 not null CONSTRAINT [blogviews_viewed_at_default] DEFAULT SYSUTCDATETIME(), CONSTRAINT [BlogViews_pkey] PRIMARY KEY ([id]));`);
 
-    this.addSql(`CREATE TABLE [Companies] ([id] nvarchar(255) not null, [name] nvarchar(300) not null, [slug] nvarchar(300) null, [logo_url] nvarchar(1000) null, [banner_url] nvarchar(1000) null, [industry] nvarchar(200) null, [company_size] nvarchar(50) null, [website] nvarchar(500) null, [location] nvarchar(300) null, [description] text null, [is_verified] bit not null CONSTRAINT [companies_is_verified_default] DEFAULT 0, CONSTRAINT [Companies_pkey] PRIMARY KEY ([id]));`);
+    this.addSql(`CREATE TABLE [Companies] ([id] nvarchar(255) not null, [name] nvarchar(300) not null, [slug] nvarchar(300) null, [logo_url] nvarchar(1000) null, [banner_url] nvarchar(1000) null, [industry] nvarchar(200) null, [company_size] nvarchar(50) null, [website] nvarchar(500) null, [location] nvarchar(300) null, [description] text null, [benefits] nvarchar(max) null, [is_verified] bit not null CONSTRAINT [companies_is_verified_default] DEFAULT 0, CONSTRAINT [Companies_pkey] PRIMARY KEY ([id]));`);
 
     this.addSql(`CREATE TABLE [EmployerProfiles] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [user_id] nvarchar(200) null, [company] nvarchar(200) null, [title] nvarchar(200) null, [phone] nvarchar(50) null, CONSTRAINT [EmployerProfiles_pkey] PRIMARY KEY ([id]));`);
 
@@ -43,7 +43,7 @@ export class Migration20251016055031_init extends Migration {
     this.addSql(`CREATE TABLE [Roles] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [role_name] nvarchar(255) not null, [description] nvarchar(255) null, CONSTRAINT [Roles_pkey] PRIMARY KEY ([id]));`);
     this.addSql(`CREATE UNIQUE INDEX [Roles_role_name_unique] ON [Roles] ([role_name]) WHERE [role_name] IS NOT NULL;`);
 
-    this.addSql(`CREATE TABLE [saved_blogs] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [user_id] nvarchar(255) not null, [blog_post_id] int not null, CONSTRAINT [saved_blogs_pkey] PRIMARY KEY ([id]));`);
+    this.addSql(`CREATE TABLE [saved_blogs] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [user_id] nvarchar(255) not null, [blog_post_id] nvarchar(255) not null, CONSTRAINT [saved_blogs_pkey] PRIMARY KEY ([id]));`);
     this.addSql(`CREATE UNIQUE INDEX [saved_blogs_user_id_blog_post_id_unique] ON [saved_blogs] ([user_id], [blog_post_id]) WHERE [user_id] IS NOT NULL AND [blog_post_id] IS NOT NULL;`);
 
     this.addSql(`CREATE TABLE [saved_jobs] ([id] nvarchar(255) not null, [created_at] date not null, [updated_at] date null, [job_seeker_id] nvarchar(255) not null, [job_id] nvarchar(255) not null, CONSTRAINT [saved_jobs_pkey] PRIMARY KEY ([id]));`);

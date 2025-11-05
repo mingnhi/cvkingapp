@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from "zod";
 import httpInstance, { getSuccessResponse } from "@/api/axios";
 import {
@@ -11,6 +12,7 @@ import type { CompanyResponse, CompanyCreateRequest, CompanyUpdateRequest } from
 export async function getCompaniesRequest(): Promise<CompanyResponse[]> {
   const res = await httpInstance.get("/companies");
   const data = getSuccessResponse<CompanyResponse[]>(res);
+  console.log(data);
   return z.array(CompanyResponseSchema).parse(data);
 }
 
@@ -18,8 +20,34 @@ export async function getCompaniesRequest(): Promise<CompanyResponse[]> {
 export async function getCompanyByIdRequest(id: string): Promise<CompanyResponse> {
   const res = await httpInstance.get(`/companies/${id}`);
   const data = getSuccessResponse<CompanyResponse>(res);
-  return CompanyResponseSchema.parse(data);
+  const company = (data as any).data ?? data;
+
+  // 🔧 Chuẩn hóa field benefits
+  if (typeof company.benefits === "string") {
+    // Nếu là chuỗi bình thường (VD: "dãi ng? t?t"), convert sang mảng 1 phần tử
+    if (company.benefits.trim().startsWith("[") && company.benefits.trim().endsWith("]")) {
+      try {
+        company.benefits = JSON.parse(company.benefits);
+      } catch {
+        company.benefits = [company.benefits];
+      }
+    } else {
+      company.benefits = [company.benefits];
+    }
+  } else if (!Array.isArray(company.benefits)) {
+    company.benefits = [];
+  }
+
+  try {
+    const parsed = CompanyResponseSchema.parse(company);
+    return parsed;
+  } catch (err) {
+    console.error("Zod parse error:", err);
+    console.log("Received company object before parse:", company);
+    throw err;
+  }
 }
+
 
 /** POST /companies  body: PascalCase → Company */
 export async function createCompanyRequest(input: CompanyCreateRequest): Promise<CompanyResponse> {

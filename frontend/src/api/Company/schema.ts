@@ -32,7 +32,7 @@ export const CompanyUpdateRequestSchema = z.object({
 
 /** ====== RESPONSE (camel đầu thường) ====== */
 export const CompanyResponseSchema = z.object({
-  id: z.string(),                        // không ràng buộc
+  id: z.string(),
   name: z.string(),
   slug: z.string().nullable().optional(),
   logoUrl: z.string().nullable().optional(),
@@ -42,8 +42,8 @@ export const CompanyResponseSchema = z.object({
   website: z.string().nullable().optional(),
   location: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
-  benefits: z.array(z.string()).optional(),
+  benefits: z.union([z.string(), z.array(z.string()), z.null()]).optional(), 
   isVerified: z.boolean().optional(),
-  created_at: z.union([z.string(), z.date()]).nullable().optional(),
-  updated_at: z.union([z.string(), z.date()]).nullable().optional(),
+  createdAt: z.union([z.string(), z.date()]).nullable().optional(),
+  updatedAt: z.union([z.string(), z.date()]).nullable().optional(),
 });

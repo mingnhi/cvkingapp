@@ -83,6 +83,7 @@ export default function PostJobPage() {
   const { data: categoriesData, isLoading: categoriesLoading } =
     useJobCategoriesQuery();
 
+
   const companies: Option[] = useMemo(
     () => (companiesData ?? []).map((c) => ({ id: c.id, name: c.name })),
     [companiesData]
