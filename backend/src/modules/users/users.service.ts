@@ -16,7 +16,7 @@ export class UsersService {
    * @returns List of all users
    */
   async getAllUsers(): Promise<any> {
-    return this.usersRepository.findAll();
+    return this.em.find(Users, {});
   }
 
   /**
@@ -60,10 +60,8 @@ export class UsersService {
     );
 
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
-    return user; 
+    return user;
   }
-
-
 
   // async getUserById(id: string): Promise<Omit<Users, 'password' | 'refreshToken'>> {
   //   const user = await this.usersRepository.findOne(id);

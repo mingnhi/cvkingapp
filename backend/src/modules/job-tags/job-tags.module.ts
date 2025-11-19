@@ -8,5 +8,6 @@ import { JobTag } from '@entities/job-tag.entity';
   imports: [MikroOrmModule.forFeature([JobTag])],
   providers: [JobTagsRepository],
   controllers: [JobTagsController],
+  exports: [JobTagsRepository]
 })
-export class JobTagsModule {}
+export class JobTagsModule { }

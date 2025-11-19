@@ -9,6 +9,6 @@ import { Skill } from '@entities/skill.entity';
   imports: [MikroOrmModule.forFeature([Skill])],
   providers: [JobSkillsRepository, JobSkillsService],
   controllers: [JobSkillsController],
-  exports: [JobSkillsService],
+  exports: [JobSkillsService, JobSkillsRepository],
 })
 export class JobSkillsModule {} 

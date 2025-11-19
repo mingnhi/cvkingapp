@@ -25,6 +25,7 @@ import { BlogCommentsModule } from '@modules/Blog-comments/blog-comments.module'
 import { BlogCategoriesModule } from '@modules/blog-categories/blog-categories.module';
 import { BlogViewsModule } from './modules/blog-views/blog-views.module';
 import { SavedBlogsModule } from './modules/saved-blogs/saved-blogs.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { SavedBlogsModule } from './modules/saved-blogs/saved-blogs.module';
     BlogCategoriesModule,
     BlogViewsModule,
     SavedBlogsModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

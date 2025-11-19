@@ -18,7 +18,7 @@ import {
   CreateEmployerProfileDto,
   UpdateEmployerProfileDto,
 } from './dtos/employer-profile.dto';
-import { Roles } from '@modules/auth/guards/roles.decorator';
+import { Roless } from '@modules/auth/guards/roles.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@modules/auth/guards/roles.guard';
 import { UpdateEmployerCompanyDto } from './dtos/updateEmployer-Company.dto';
@@ -26,7 +26,7 @@ import { UpdateEmployerCompanyDto } from './dtos/updateEmployer-Company.dto';
 
 @ApiTags('employer-profiles')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('Employer')
+@Roless('Employer')
 @Controller('employer-profiles')
 export class EmployerProfilesController {
   constructor(private readonly repo: EmployerProfilesRepository) { }

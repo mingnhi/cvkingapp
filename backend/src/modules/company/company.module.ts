@@ -8,5 +8,6 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
   imports: [MikroOrmModule.forFeature([Company])],
   providers: [CompaniesRepository],
   controllers: [CompaniesController],
+  exports:[CompaniesRepository],
 })
 export class CompanyModule { }
