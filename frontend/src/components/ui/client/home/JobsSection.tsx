@@ -246,7 +246,7 @@ const JobsSection = () => {
         </div>
 
         <div className="text-center">
-          <Link href="/jobs" passHref>
+          <Link href="/job" passHref>
             <Button
               variant="outline"
               size="lg"

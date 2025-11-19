@@ -10,7 +10,7 @@ import {
 export const navItems = [
   {
     name: "Việc làm",
-    href: "/vieclam",
+    href: "/job",
     icon: <ChevronDown />,
     menu: {
       menuLeft: {
@@ -133,7 +133,7 @@ export const navItems = [
 export const actionItems = [
   {
     name: "Việc làm",
-    href: "/vieclam",
+    href: "/job",
     icon: <ChevronDown />,
     subAction: {
       item: [
