@@ -35,6 +35,7 @@ export class AdminController {
     private readonly repoCom: CompaniesRepository
   ) { }
 
+  //Users
   @Get('users')
   async findAllUser(): Promise<ApiResponse<Users[]>> {
     const users = await this.usersService.getAllUsers();
