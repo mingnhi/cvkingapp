@@ -1,11 +1,7 @@
 import React from "react";
 import info from "@/assets/images/company1.png";
-import CompanyContact from "@/components/ui/client/company/companyContact";
 import CompanyBanner from "@/components/ui/client/company/companyBanner";
 import CompanyInfoCard from "@/components/ui/client/company/companyInfoCard";
-import CompanyTags from "@/components/ui/client/company/companyTags";
-import CompanyIntro from "@/components/ui/client/company/companyIntro";
-import CompanyJobs from "@/components/ui/client/company/companyJobs";
 import CompanyTabs from "@/components/ui/client/company/CompanyTabs";
 import BreadcrumbTabActive from "@/components/ui/common/breadcrumb/BreadcrumbTabActive";
 

@@ -1,11 +1,11 @@
 import { z } from "zod";
-import httpInstance, { getSuccessResponse } from "@/api/axios"; 
+import httpInstance, { getSuccessResponse } from "@/api/axios";
 import {
   JobTagCreateRequestSchema,
   JobTagUpdateRequestSchema,
   JobTagSchema,
 } from "./schema";
-import type { JobTag, JobTagCreateRequest, JobTagUpdateRequest} from "./type";
+import type { JobTag, JobTagCreateRequest, JobTagUpdateRequest } from "./type";
 
 /** GET /job-tags → JobTag[] */
 export async function getJobTagsRequest(): Promise<JobTag[]> {

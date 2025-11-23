@@ -27,11 +27,18 @@ const Login: React.FC = () => {
       localStorage.setItem("refreshToken", data.refreshToken ?? "");
       // const roles = data.user?.roles ?? [];
       alert(" Đăng nhập thành công");
-      if (data.user.roles?.includes("Employer")) {
-        router.push("/hr");
-      } else {
-        router.push("/");
+
+      const roles = data.user.roles ?? [];
+
+      if (roles.includes("Admin")) {
+        router.push("/admin");
+        return;
       }
+      if (roles.includes("Employer")) {
+        router.push("/hr");
+        return;
+      }
+        router.push("/");
     },
     onError: () => alert("Sai email hoặc mật khẩu"),
   });
