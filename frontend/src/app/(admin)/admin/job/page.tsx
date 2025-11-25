@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import {
   Box,
   Button,
@@ -40,13 +40,19 @@ export default function JobsPage() {
   const totalPages = Math.max(1, Math.ceil(total / (filter.limit || 10)));
 
   // ===== Row Actions =====
-  const onView = (id: string) => router.push(`/admin/job/view/${id}`);
-  const onEdit = (id: string) => router.push(`/admin/job/edit/${id}`);
-  const onDelete = async (id: string) => {
+  const onView = useCallback((id: string) => {
+    router.push(`/admin/job/view/${id}`);
+  }, [router]);
+  
+  const onEdit = useCallback((id: string) => {
+    router.push(`/admin/job/edit/${id}`);
+  }, [router]);
+  
+  const onDelete = useCallback(async (id: string) => {
     await deleteMutation.mutateAsync(id);
     toast.success("Đã xoá tin tuyển dụng");
     refetch();
-  };
+  }, [deleteMutation, refetch]);
 
   // ===== Base columns cho Job =====
   const baseColumns: ColumnDef<Job>[] = useMemo(
