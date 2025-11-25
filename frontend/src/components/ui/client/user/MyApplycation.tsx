@@ -1,5 +1,6 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from '../../common/card/card';
+import { Card, CardContent } from '../../common/card/card';
+import type { Job } from '@/types/job.type';
 import {
     Edit,
     Eye,
@@ -14,7 +15,6 @@ import { Avatar , AvatarImage , AvatarFallback} from '../../common/avatar/avatar
 import { Button } from '../../common/button/button';
 import { useApp } from '@/components/AppContext';
 import { XCircle } from 'lucide-react';
-import { Badge } from '@mui/material';
 const MyApplycation = ()=> {
 
     const { navigateTo } = useApp();
@@ -57,32 +57,84 @@ const mockApplications = [
       notes: 'Thank you for your interest. Unfortunately, we have moved forward with other candidates.'
     }
   ];
- const handleViewJob = (application: any) => {
-        const jobDetail = {
-            id: application.id,
+ const handleViewJob = (application: typeof mockApplications[number]) => {
+        const jobDetail: Job = {
+            id: String(application.id),
+            companyId: '',
+            postedByUserId: '',
             title: application.jobTitle,
-            company: application.company,
-            location: application.location,
-            salary: application.salary,
+            slug: application.jobTitle.toLowerCase().replace(/\s+/g, '-'),
+            shortDescription: application.description.substring(0, 200),
             description: application.description,
-            posted: application.appliedDate,
-            type: 'Full-time',
-            experience: '2-5 years'
+            requirements: '',
+            benefits: '',
+            salaryMin: 0,
+            salaryMax: 0,
+            currency: 'USD',
+            jobType: 'Full-time',
+            location: application.location,
+            categoryId: '',
+            status: 'Open',
+            viewsCount: 0,
+            postedAt: new Date(application.appliedDate).toISOString(),
+            expiresAt: new Date().toISOString(),
+            createdAt: new Date(application.appliedDate).toISOString(),
+            updatedAt: new Date(application.appliedDate).toISOString(),
+            category: { id: '', name: '' },
+            skills: [],
+            tags: [],
+            company: {
+                id: '',
+                name: application.company,
+                logo: application.logo || '',
+                description: '',
+                industry: '',
+                size: '',
+                website: '',
+                location: application.location,
+                founded: 0,
+                rating: 0,
+                reviewCount: 0
+            }
         };
         navigateTo('job-detail', { job: jobDetail });
     };
  const getStatusBadge = (status: string) => {
         switch (status) {
             case 'pending':
-                return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800"><AlertCircle className="w-3 h-3 mr-1" />Pending</Badge>;
+                return (
+                    <span className="bg-yellow-100 text-yellow-800 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium">
+                        <AlertCircle className="w-3 h-3" />
+                        Pending
+                    </span>
+                );
             case 'interview':
-                return <Badge variant="secondary" className="bg-blue-100 text-blue-800"><Calendar className="w-3 h-3 mr-1" />Interview</Badge>;
+                return (
+                    <span className="bg-blue-100 text-blue-800 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium">
+                        <Calendar className="w-3 h-3" />
+                        Interview
+                    </span>
+                );
             case 'rejected':
-                return <Badge variant="secondary" className="bg-red-100 text-red-800"><XCircle className="w-3 h-3 mr-1" />Rejected</Badge>;
+                return (
+                    <span className="bg-red-100 text-red-800 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium">
+                        <XCircle className="w-3 h-3" />
+                        Rejected
+                    </span>
+                );
             case 'accepted':
-                return <Badge variant="secondary" className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Accepted</Badge>;
+                return (
+                    <span className="bg-green-100 text-green-800 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium">
+                        <CheckCircle className="w-3 h-3" />
+                        Accepted
+                    </span>
+                );
             default:
-                return <Badge variant="secondary">{status}</Badge>;
+                return (
+                    <span className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        {status}
+                    </span>
+                );
         }
     };
 

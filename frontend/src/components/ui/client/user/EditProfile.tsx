@@ -16,7 +16,7 @@ import { Label } from '../../common/label/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../common/select/select';
 import { Avatar, AvatarFallback, AvatarImage } from '../../common/avatar/avatar';
 import { Badge } from '@mui/material';
-import { Separator } from '../../common/separator';
+// Separator not used, removed
 import { useApp } from '@/components/AppContext';
 import { useRouter } from 'next/navigation';
 // Simple toast function
@@ -106,17 +106,17 @@ const EditProfilePage = () => {
             if (isEmployer) {
                 setEmployerData(prev => ({
                     ...prev,
-                    contactName: state.user.name || prev.contactName,
-                    email: state.user.email || prev.email,
-                    companyName: state.user.company || prev.companyName,
-                    avatar: state.user.avatar || prev.avatar
+                    contactName: state.user?.name || prev.contactName,
+                    email: state.user?.email || prev.email,
+                    companyName: state.user?.company || prev.companyName,
+                    avatar: state.user?.avatar || prev.avatar
                 }));
             } else {
                 setJobSeekerData(prev => ({
                     ...prev,
-                    name: state.user.name || prev.name,
-                    email: state.user.email || prev.email,
-                    avatar: state.user.avatar || prev.avatar
+                    name: state.user?.name || prev.name,
+                    email: state.user?.email || prev.email,
+                    avatar: state.user?.avatar || prev.avatar
                 }));
             }
         }
@@ -252,7 +252,7 @@ const EditProfilePage = () => {
 
             // Navigate back to appropriate dashboard
             navigateTo(isEmployer ? 'employer-dashboard' : '/user/a');
-        } catch (error) {
+        } catch {
             toast('Error updating profile. Please try again.');
         } finally {
             setIsLoading(false);
@@ -264,7 +264,7 @@ const EditProfilePage = () => {
             const confirmLeave = window.confirm('You have unsaved changes. Are you sure you want to leave?');
             if (!confirmLeave) return;
         }
-        router.back(isEmployer ? '/user/a' : 'user/a');
+        router.back();
     };
 
     return (
@@ -359,9 +359,8 @@ const EditProfilePage = () => {
                                 <CardContent className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <Label htmlFor="companyName">Company Name</Label>
                                             <Input
-                                                id="companyName"
+                                                label="Company Name"
                                                 value={employerData.companyName}
                                                 onChange={(e) => handleEmployerChange('companyName', e.target.value)}
                                                 placeholder="Enter company name"
@@ -371,7 +370,7 @@ const EditProfilePage = () => {
                                             <Label htmlFor="industry">Industry</Label>
                                             <Select
                                                 value={employerData.industry}
-                                                onValueChange={(value) => handleEmployerChange('industry', value)}
+                                                onSelectionChange={(value: string | number) => handleEmployerChange('industry', String(value))}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select industry" />
@@ -392,7 +391,7 @@ const EditProfilePage = () => {
                                             <Label htmlFor="companySize">Company Size</Label>
                                             <Select
                                                 value={employerData.companySize}
-                                                onValueChange={(value) => handleEmployerChange('companySize', value)}
+                                                onSelectionChange={(value: string | number) => handleEmployerChange('companySize', String(value))}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select company size" />
@@ -408,9 +407,8 @@ const EditProfilePage = () => {
                                             </Select>
                                         </div>
                                         <div>
-                                            <Label htmlFor="foundedYear">Founded Year</Label>
                                             <Input
-                                                id="foundedYear"
+                                                label="Founded Year"
                                                 value={employerData.foundedYear}
                                                 onChange={(e) => handleEmployerChange('foundedYear', e.target.value)}
                                                 placeholder="e.g., 2015"
@@ -420,7 +418,6 @@ const EditProfilePage = () => {
                                     <div>
                                         <Label htmlFor="description">Company Description</Label>
                                         <Textarea
-                                            id="description"
                                             value={employerData.description}
                                             onChange={(e) => handleEmployerChange('description', e.target.value)}
                                             placeholder="Describe your company..."
@@ -438,18 +435,16 @@ const EditProfilePage = () => {
                                 <CardContent className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <Label htmlFor="contactName">Contact Person Name</Label>
                                             <Input
-                                                id="contactName"
+                                                label="Contact Person Name"
                                                 value={employerData.contactName}
                                                 onChange={(e) => handleEmployerChange('contactName', e.target.value)}
                                                 placeholder="Enter contact person name"
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="email">Email Address</Label>
                                             <Input
-                                                id="email"
+                                                label="Email Address"
                                                 type="email"
                                                 value={employerData.email}
                                                 onChange={(e) => handleEmployerChange('email', e.target.value)}
@@ -457,18 +452,16 @@ const EditProfilePage = () => {
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="phone">Phone Number</Label>
                                             <Input
-                                                id="phone"
+                                                label="Phone Number"
                                                 value={employerData.phone}
                                                 onChange={(e) => handleEmployerChange('phone', e.target.value)}
                                                 placeholder="Enter phone number"
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="website">Website</Label>
                                             <Input
-                                                id="website"
+                                                label="Website"
                                                 value={employerData.website}
                                                 onChange={(e) => handleEmployerChange('website', e.target.value)}
                                                 placeholder="www.company.com"
@@ -476,9 +469,8 @@ const EditProfilePage = () => {
                                         </div>
                                     </div>
                                     <div>
-                                        <Label htmlFor="address">Office Address</Label>
                                         <Input
-                                            id="address"
+                                            label="Office Address"
                                             value={employerData.address}
                                             onChange={(e) => handleEmployerChange('address', e.target.value)}
                                             placeholder="Enter office address"
@@ -495,7 +487,7 @@ const EditProfilePage = () => {
                                 <CardContent className="space-y-4">
                                     <div className="flex flex-wrap gap-2">
                                         {benefits.map((benefit) => (
-                                            <Badge key={benefit} variant="secondary" className="pr-1">
+                                            <Badge key={benefit} variant="standard" className="pr-1 bg-gray-100 text-gray-700">
                                                 {benefit}
                                                 <Button
                                                     variant="ghost"
@@ -513,7 +505,6 @@ const EditProfilePage = () => {
                                             value={newBenefit}
                                             onChange={(e) => setNewBenefit(e.target.value)}
                                             placeholder="Add a benefit..."
-                                            onKeyPress={(e) => e.key === 'Enter' && addBenefit()}
                                         />
                                         <Button onClick={addBenefit} variant="outline">
                                             <Plus className="h-4 w-4" />
@@ -533,18 +524,16 @@ const EditProfilePage = () => {
                                 <CardContent className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <Label htmlFor="name">Full Name</Label>
                                             <Input
-                                                id="name"
+                                                label="Full Name"
                                                 value={jobSeekerData.name}
                                                 onChange={(e) => handleJobSeekerChange('name', e.target.value)}
                                                 placeholder="Enter your full name"
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="email">Email Address</Label>
                                             <Input
-                                                id="email"
+                                                label="Email Address"
                                                 type="email"
                                                 value={jobSeekerData.email}
                                                 onChange={(e) => handleJobSeekerChange('email', e.target.value)}
@@ -552,9 +541,8 @@ const EditProfilePage = () => {
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="phone">Phone Number</Label>
                                             <Input
-                                                id="phone"
+                                                label="Phone Number"
                                                 value={jobSeekerData.phone}
                                                 onChange={(e) => handleJobSeekerChange('phone', e.target.value)}
                                                 placeholder="Enter your phone number"
@@ -564,7 +552,7 @@ const EditProfilePage = () => {
                                             <Label htmlFor="location">Location</Label>
                                             <Select
                                                 value={jobSeekerData.location}
-                                                onValueChange={(value) => handleJobSeekerChange('location', value)}
+                                                onSelectionChange={(value: string | number) => handleJobSeekerChange('location', String(value))}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select location" />
@@ -591,9 +579,8 @@ const EditProfilePage = () => {
                                 <CardContent className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <Label htmlFor="title">Job Title</Label>
                                             <Input
-                                                id="title"
+                                                label="Job Title"
                                                 value={jobSeekerData.title}
                                                 onChange={(e) => handleJobSeekerChange('title', e.target.value)}
                                                 placeholder="e.g., Senior Frontend Developer"
@@ -603,7 +590,7 @@ const EditProfilePage = () => {
                                             <Label htmlFor="experience">Experience Level</Label>
                                             <Select
                                                 value={jobSeekerData.experience}
-                                                onValueChange={(value) => handleJobSeekerChange('experience', value)}
+                                                onSelectionChange={(value: string | number) => handleJobSeekerChange('experience', String(value))}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select experience level" />
@@ -618,18 +605,16 @@ const EditProfilePage = () => {
                                             </Select>
                                         </div>
                                         <div>
-                                            <Label htmlFor="expectedSalary">Expected Salary</Label>
                                             <Input
-                                                id="expectedSalary"
+                                                label="Expected Salary"
                                                 value={jobSeekerData.expectedSalary}
                                                 onChange={(e) => handleJobSeekerChange('expectedSalary', e.target.value)}
                                                 placeholder="e.g., $2000 - $3000"
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="education">Education</Label>
                                             <Input
-                                                id="education"
+                                                label="Education"
                                                 value={jobSeekerData.education}
                                                 onChange={(e) => handleJobSeekerChange('education', e.target.value)}
                                                 placeholder="Your highest education"
@@ -657,7 +642,7 @@ const EditProfilePage = () => {
                                 <CardContent className="space-y-4">
                                     <div className="flex flex-wrap gap-2">
                                         {skills.map((skill) => (
-                                            <Badge key={skill} variant="secondary" className="pr-1">
+                                            <Badge key={skill} variant="standard" className="pr-1 bg-gray-100 text-gray-700">
                                                 {skill}
                                                 <Button
                                                     variant="ghost"
@@ -675,7 +660,6 @@ const EditProfilePage = () => {
                                             value={newSkill}
                                             onChange={(e) => setNewSkill(e.target.value)}
                                             placeholder="Add a skill..."
-                                            onKeyPress={(e) => e.key === 'Enter' && addSkill()}
                                         />
                                         <Button onClick={addSkill} variant="outline">
                                             <Plus className="h-4 w-4" />
@@ -692,27 +676,24 @@ const EditProfilePage = () => {
                                 <CardContent className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div>
-                                            <Label htmlFor="linkedin">LinkedIn</Label>
                                             <Input
-                                                id="linkedin"
+                                                label="LinkedIn"
                                                 value={jobSeekerData.linkedin}
                                                 onChange={(e) => handleJobSeekerChange('linkedin', e.target.value)}
                                                 placeholder="linkedin.com/in/username"
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="github">GitHub</Label>
                                             <Input
-                                                id="github"
+                                                label="GitHub"
                                                 value={jobSeekerData.github}
                                                 onChange={(e) => handleJobSeekerChange('github', e.target.value)}
                                                 placeholder="github.com/username"
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="portfolio">Portfolio</Label>
                                             <Input
-                                                id="portfolio"
+                                                label="Portfolio"
                                                 value={jobSeekerData.portfolio}
                                                 onChange={(e) => handleJobSeekerChange('portfolio', e.target.value)}
                                                 placeholder="https://yourportfolio.com"

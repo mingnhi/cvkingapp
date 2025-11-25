@@ -56,25 +56,21 @@ const JobSeekerDashboard = () => {
             )}
             <div className='flex'>
                 {/* Sidebar */}
-                <div className={`fixed inset-y-0 mt-8 ml-4 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                    }
-sx={{ maxHeight: 'none', overflow: 'visible' }}
-
-`}
+                <div className={`fixed inset-y-0 mt-8 ml-4 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
                 >
                     <div className="flex items-center justify-between p-6 border-b">
                         <div className="flex items-center space-x-2">
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => router.back('')}
+                                onClick={() => router.back()}
                                 className="mr-2">
                                 <ArrowLeft className="w-4 h-4" />
                             </Button>
                             <h2>Dashboard</h2>
                         </div>
-                                          </div>
-                    <nav sx={{ position: "fixed", top: 20, left: 20, width: 256, p: 2 }}>
+                    </div>
+                    <nav className="mt-4">
                         {navigationItems.map((item) => {
                             const Icon = item.icon;
                             return (
@@ -110,7 +106,7 @@ sx={{ maxHeight: 'none', overflow: 'visible' }}
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => router.back('home')}
+                            onClick={() => router.back()}
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </Button>

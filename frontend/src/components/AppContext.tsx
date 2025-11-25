@@ -1,5 +1,8 @@
 "use client";
 import { createContext, useContext, useReducer, ReactNode } from 'react';
+import type { Job } from '@/types/job.type';
+import type { Company } from '@/types/company.type';
+import type { BlogPost } from '@/types/blog.type';
 
 interface User {
   id: string;
@@ -12,30 +15,38 @@ interface User {
 
 interface AppState {
   currentPage: string;
-  selectedJob?: any;
-  selectedCompany?: any;
-  selectedArticle?: any;
+  selectedJob?: Job;
+  selectedCompany?: Company;
+  selectedArticle?: BlogPost;
   user?: User;
   isLoggedIn: boolean;
   searchQuery?: string;
-  filters?: any;
+  filters?: Record<string, unknown>;
 }
 
 type AppAction =
   | { type: 'SET_PAGE'; payload: string }
-  | { type: 'SET_JOB'; payload: any }
-  | { type: 'SET_COMPANY'; payload: any }
-  | { type: 'SET_ARTICLE'; payload: any }
+  | { type: 'SET_JOB'; payload: Job }
+  | { type: 'SET_COMPANY'; payload: Company }
+  | { type: 'SET_ARTICLE'; payload: BlogPost }
   | { type: 'SET_USER'; payload: User }
   | { type: 'SET_SEARCH'; payload: string }
-  | { type: 'SET_FILTERS'; payload: any }
+  | { type: 'SET_FILTERS'; payload: Record<string, unknown> }
   | { type: 'LOGOUT' }
   | { type: 'LOGIN'; payload: { user: User; redirectTo?: string } };
+
+interface NavigateData {
+  job?: Job;
+  company?: Company;
+  article?: BlogPost;
+  search?: string;
+  filters?: Record<string, unknown>;
+}
 
 interface AppContextType {
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
-  navigateTo: (page: string, data?: any) => void;
+  navigateTo: (page: string, data?: NavigateData) => void;
   setUser: (user: User) => void;
   logout: () => void;
 }
@@ -103,7 +114,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     isLoggedIn: false,
   });
 
-  const navigateTo = (page: string, data?: any) => {
+  const navigateTo = (page: string, data?: NavigateData) => {
     // Handle page navigation with data
     if (data?.job) {
       dispatch({ type: 'SET_JOB', payload: data.job });
