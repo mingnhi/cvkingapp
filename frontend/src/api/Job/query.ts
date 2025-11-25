@@ -7,7 +7,7 @@ import {
 //   useQuery,
 //   useQueryClient,
 } from '@tanstack/react-query';
-import { CreateJobFormData, Job, JobApiResponse, JobFilter } from './type';
+import { CreateJobRequest, Job, JobApiResponse, JobFilter } from './type';
 import { createJobRequest, getJobByIdRequest, getJobsRequest,deleteJobRequest,updateJobRequest  } from './request';
 import { onMutateError } from '@/lib/utils';
 
@@ -16,7 +16,7 @@ export const JobQueryKey = {
   detail: (id: string) => ["jobs", "detail", id] as const,
 };
 
-export const useCreateJobMutation = (options?: UseMutationOptions<JobApiResponse, Error, CreateJobFormData, unknown>) =>
+export const useCreateJobMutation = (options?: UseMutationOptions<JobApiResponse, Error, CreateJobRequest, unknown>) =>
   useMutation({
     mutationFn: createJobRequest,
     onError: onMutateError,

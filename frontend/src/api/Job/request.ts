@@ -5,9 +5,9 @@ import {
   JobSchema,
   JobsSchema,
 } from "./schema";
-import { CreateJobFormData, Job, JobApiResponse, JobFilter } from "./type";
+import { CreateJobRequest, Job, JobApiResponse, JobFilter } from "./type";
 
-export const createJobRequest = async (data: CreateJobFormData) => {
+export const createJobRequest = async (data: CreateJobRequest) => {
   const response = await instance.post("/jobs", data);
   return getSuccessResponse<JobApiResponse>(response);
 };
