@@ -1,4 +1,4 @@
-"use-client";
+"use client";
 import {
     Download,
     Edit,
@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../common/card/card';
 import { Button } from '../../common/button/button';
-import { Badge } from '@mui/material';
+// Badge replaced with span for better styling control
 import { useApp } from '@/components/AppContext';
 const MyCv = () => {
 
@@ -33,7 +33,7 @@ const MyCv = () => {
                     <CardHeader>
                         <CardTitle className="flex items-center justify-between">
                             <span>Frontend Developer CV</span>
-                            <Badge variant="secondary" className="bg-green-100 text-green-800">Đang hoạt động </Badge>
+                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Đang hoạt động</span>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -63,7 +63,7 @@ const MyCv = () => {
                     <CardHeader>
                         <CardTitle className="flex items-center justify-between">
                             <span>Full Stack Developer CV</span>
-                            <Badge variant="secondary">Draft</Badge>
+                            <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">Draft</span>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -129,7 +129,5 @@ const MyCv = () => {
             </Card>
         </div>
     );
-    ;
-
 };
 export default MyCv;

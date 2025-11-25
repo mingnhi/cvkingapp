@@ -1,4 +1,4 @@
-"use-client";
+"use client";
 import {
     Download,
     Edit,
@@ -6,10 +6,10 @@ import {
     DollarSign,
     Share2
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../common/card/card';
+import { Card, CardContent } from '../../common/card/card';
 import { Separator } from '../../common/separator/separator';
-import { Badge } from '@mui/material';
-import { Avatar, AvatarFallback, AvatarImage } from '../../common/avatar//avatar';
+// Badge replaced with span for better styling control
+import { Avatar, AvatarImage } from '../../common/avatar//avatar';
 import { Button } from '../../common/button/button';
 import { useApp } from '@/components/AppContext';
 import { useRouter } from 'next/navigation';
@@ -81,9 +81,9 @@ const MyProfile = () => {
                             <h3 className="mb-3">Kĩ năng</h3>
                             <div className="flex flex-wrap gap-2">
                                 {['React', 'TypeScript', 'Node.js', 'MongoDB', 'AWS', 'Docker'].map((skill) => (
-                                    <Badge key={skill} variant="secondary" className="cursor-pointer hover:bg-primary hover:text-white transition-colors">
+                                    <span key={skill} className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium cursor-pointer hover:bg-primary hover:text-white transition-colors">
                                         {skill}
-                                    </Badge>
+                                    </span>
                                 ))}
                             </div>
                         </div>
@@ -107,13 +107,13 @@ const MyProfile = () => {
 
             {/* Quick Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('applications')}>
+                <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigateTo('applications')}>
                     <CardContent className="p-4 text-center">
                         <div className="text-2xl font-bold text-primary">12</div>
                         <div className="text-sm text-gray-600">Applications Sent</div>
                     </CardContent>
                 </Card>
-                <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('saved')}>
+                <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigateTo('saved-jobs')}>
                     <CardContent className="p-4 text-center">
                         <div className="text-2xl font-bold text-blue-600">8</div>
                         <div className="text-sm text-gray-600">Saved Jobs</div>

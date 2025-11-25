@@ -5,12 +5,11 @@ Box,
     Typography,
 
 } from "@mui/material";
-import { ArrowBack, Save, Cancel, Add, PhotoCamera } from "@mui/icons-material";
-import { useRef, useState } from "react";
 import ProfilePhoto from "../company/ProfilePhoto";
 import CompanyInformation from "../company/CompanyInformation";
 import ContactInformation from "../company/ContactInformation";
 import CompanyBenifits from "../company/CompanyBenifits";
+import { ChevronLeft, Save } from "lucide-react";
 
 type EditCompanyProfileProps = {
     onBack: () => void;
@@ -21,7 +20,7 @@ export default function EditCompanyProfile({ onBack }: EditCompanyProfileProps) 
             <Box p={3}>
                 {/* Header */}
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                    <Button startIcon={<ArrowBack />} onClick={onBack}>
+                    <Button startIcon={<ChevronLeft />} onClick={onBack}>
                         Back to Dashboard
                     </Button>
                     <Box>

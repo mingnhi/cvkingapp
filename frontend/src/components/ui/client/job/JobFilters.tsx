@@ -44,11 +44,11 @@ export function JobFilters({ filters, categories, onFiltersChange, onSearch }: J
   useEffect(() => {
     onFiltersChange({ ...filters, keyword: debouncedSearchQuery });
     onSearch(debouncedSearchQuery);
-  }, [debouncedSearchQuery, onFiltersChange, onSearch]);
+  }, [debouncedSearchQuery, filters, onFiltersChange, onSearch]);
 
   useEffect(() => {
     onFiltersChange({ ...filters, location: debouncedLocation });
-  }, [debouncedLocation, onFiltersChange]);
+  }, [debouncedLocation, filters, onFiltersChange]);
 
   const show = isExpanded || isDesktop;
   const hasActiveFilters = useMemo(

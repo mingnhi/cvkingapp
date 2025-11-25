@@ -6,14 +6,12 @@ import {
     Typography,
     Card,
     CardContent,
-    Grid,
     TextField,
     InputAdornment,
     Avatar,
     Chip,
     Button,
-    Divider,
-    Paper
+    Divider
 } from '@mui/material';
 import {
     Search,
@@ -30,16 +28,18 @@ import {
     UserCheck
 } from 'lucide-react';
 
-const statusMap = {
-    moi: { label: 'Mới', icon: <AlertCircle size={14} />, color: 'primary' as 'primary' },
-    dat_yeu_cau: { label: 'Đạt yêu cầu', icon: <Star size={14} />, color: 'info' as 'info' },
-    da_phong_van: { label: 'Đã phỏng vấn', icon: <UserCheck size={14} />, color: 'secondary' as 'secondary' },
-    tu_choi: { label: 'Từ chối', icon: <XCircle size={14} />, color: 'error' as 'error' },
-    da_tuyen: { label: 'Đã tuyển', icon: <CheckCircle size={14} />, color: 'success' as 'success' }
+type StatusKey = 'moi' | 'dat_yeu_cau' | 'da_phong_van' | 'tu_choi' | 'da_tuyen';
+
+const statusMap: Record<StatusKey, { label: string; icon: React.ReactElement; color: 'primary' | 'info' | 'secondary' | 'error' | 'success' | 'default' }> = {
+    moi: { label: 'Mới', icon: <AlertCircle size={14} />, color: 'primary' },
+    dat_yeu_cau: { label: 'Đạt yêu cầu', icon: <Star size={14} />, color: 'info' },
+    da_phong_van: { label: 'Đã phỏng vấn', icon: <UserCheck size={14} />, color: 'secondary' },
+    tu_choi: { label: 'Từ chối', icon: <XCircle size={14} />, color: 'error' },
+    da_tuyen: { label: 'Đã tuyển', icon: <CheckCircle size={14} />, color: 'success' }
 };
 
 const getStatusChip = (status: string) => {
-    const statusInfo = statusMap[status] || { label: status, icon: null, color: 'default' as 'default' };
+    const statusInfo = (statusMap[status as StatusKey] || { label: status, icon: <AlertCircle size={14} />, color: 'default' as const });
     return <Chip label={statusInfo.label} icon={statusInfo.icon} color={statusInfo.color} size="small" />;
 };
 
@@ -59,7 +59,7 @@ const CandidateManagement = () => {
         dat_yeu_cau: mockCandidates.filter(c => c.status === 'dat_yeu_cau').length,
         da_phong_van: mockCandidates.filter(c => c.status === 'da_phong_van').length,
         da_tuyen: mockCandidates.filter(c => c.status === 'da_tuyen').length,
-    }), [mockCandidates]);
+    }), []);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -84,20 +84,12 @@ const CandidateManagement = () => {
             </Box>
 
             {/* 5. Các thẻ thống kê */}
-            <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card><CardContent sx={{ textAlign: 'center' }}><Typography variant="h5" color="primary.main">{stats.moi}</Typography><Typography color="text.secondary">Hồ sơ mới</Typography></CardContent></Card>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card><CardContent sx={{ textAlign: 'center' }}><Typography variant="h5" color="info.main">{stats.dat_yeu_cau}</Typography><Typography color="text.secondary">Đạt yêu cầu</Typography></CardContent></Card>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card><CardContent sx={{ textAlign: 'center' }}><Typography variant="h5" color="secondary.main">{stats.da_phong_van}</Typography><Typography color="text.secondary">Đã phỏng vấn</Typography></CardContent></Card>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card><CardContent sx={{ textAlign: 'center' }}><Typography variant="h5" color="success.main">{stats.da_tuyen}</Typography><Typography color="text.secondary">Đã tuyển</Typography></CardContent></Card>
-                </Grid>
-            </Grid>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 2 }}>
+                <Card><CardContent sx={{ textAlign: 'center' }}><Typography variant="h5" color="primary.main">{stats.moi}</Typography><Typography color="text.secondary">Hồ sơ mới</Typography></CardContent></Card>
+                <Card><CardContent sx={{ textAlign: 'center' }}><Typography variant="h5" color="info.main">{stats.dat_yeu_cau}</Typography><Typography color="text.secondary">Đạt yêu cầu</Typography></CardContent></Card>
+                <Card><CardContent sx={{ textAlign: 'center' }}><Typography variant="h5" color="secondary.main">{stats.da_phong_van}</Typography><Typography color="text.secondary">Đã phỏng vấn</Typography></CardContent></Card>
+                <Card><CardContent sx={{ textAlign: 'center' }}><Typography variant="h5" color="success.main">{stats.da_tuyen}</Typography><Typography color="text.secondary">Đã tuyển</Typography></CardContent></Card>
+            </Box>
 
             {/* 6. Danh sách ứng viên */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>

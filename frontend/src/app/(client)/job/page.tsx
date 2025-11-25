@@ -37,7 +37,7 @@ const JobsPage = () => {
     (jobId: string) => {
       router.push(`/job/${jobId}`);
     },
-    [jobs]
+    [router]
   );
 
   const handleSave = useCallback(

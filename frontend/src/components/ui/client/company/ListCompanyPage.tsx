@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, MapPin, Grid as GridIcon, List as ListIcon, Users, Star } from 'lucide-react';
 import {
@@ -67,13 +67,41 @@ const ratingOptions = [
     { value: 'all', label: 'Tất cả' }
 ];
 
+// Types
+interface Company {
+    id: number;
+    name: string;
+    logo: string;
+    industry: string;
+    location: string;
+    employees: string;
+    jobs: number;
+    rating: number;
+    reviews: number;
+    isTopCompany: boolean;
+    benefits: string[];
+    description: string;
+}
+
+interface MainFilterInputs {
+    keyword: string;
+    location: string;
+    industry: string;
+}
+
+interface SidebarFilters {
+    companySizes: string[];
+    benefits: string[];
+    rating: string;
+}
+
 const ListCompanyPage = () => {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [currentPage, setCurrentPage] = useState(1);
     const router = useRouter();
     const companiesPerPage = 9;
 
-    const allCompanies = [
+    const allCompanies: Company[] = [
         { id: 1, name: 'Tập đoàn Sáng tạo TechCorp', logo: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=120&h=120&fit=crop&crop=face', industry: 'Công nghệ', location: 'TP. Hồ Chí Minh', employees: '500-1000', jobs: 15, rating: 2.8, reviews: 125, isTopCompany: true, benefits: ['Bảo hiểm sức khỏe', 'Làm việc từ xa', 'Lương tháng 13'], description: 'Đi đầu trong lĩnh vực chuyển đổi số và các giải pháp phần mềm cho doanh nghiệp.' },
         { id: 2, name: 'Giải pháp FinaBank', logo: 'https://images.unsplash.com/photo-1549924231-f97d98355f1d?w=120&h=120&fit=crop&crop=face', industry: 'Tài chính', location: 'Hà Nội', employees: '1000+', jobs: 8, rating: 4.5, reviews: 98, isTopCompany: false, benefits: ['Bảo hiểm sức khỏe', 'Trợ cấp ăn trưa'], description: 'Cung cấp các dịch vụ tài chính, ngân hàng số và bảo hiểm uy tín hàng đầu.' },
         { id: 3, name: 'EcoPower Việt Nam', logo: 'https://images.unsplash.com/photo-1557862921-37829c790f19?w=120&h=120&fit=crop&crop=face', industry: 'Năng lượng', location: 'Đà Nẵng', employees: '200-500', jobs: 12, rating: 4.7, reviews: 76, isTopCompany: false, benefits: ['Ngày nghỉ linh hoạt', 'Làm việc từ xa'], description: 'Phát triển các dự án năng lượng tái tạo, vì một tương lai xanh và bền vững.' },
@@ -95,29 +123,36 @@ const ListCompanyPage = () => {
     ];
 
     // 1. State cho các input của thanh tìm kiếm chính
-    const [mainFilterInputs, setMainFilterInputs] = useState({ keyword: '', location: '', industry: '' });
+    const [mainFilterInputs, setMainFilterInputs] = useState<MainFilterInputs>({ keyword: '', location: '', industry: '' });
     // 2. State cho các input của bộ lọc chi tiết (sidebar)
-    const [sidebarFilters, setSidebarFilters] = useState({ companySizes: [], benefits: [], rating: 'all' });
+    const [sidebarFilters, setSidebarFilters] = useState<SidebarFilters>({ companySizes: [], benefits: [], rating: 'all' });
     // 3. State để lưu kết quả SAU KHI bấm nút "Tìm kiếm"
-    const [searchedCompanies, setSearchedCompanies] = useState(allCompanies);
+    const [searchedCompanies, setSearchedCompanies] = useState<Company[]>(allCompanies);
     // 4. State để lưu kết quả cuối cùng hiển thị ra giao diện
-    const [displayedCompanies, setDisplayedCompanies] = useState(allCompanies);
+    const [displayedCompanies, setDisplayedCompanies] = useState<Company[]>(allCompanies);
 
-    const handleMainFilterChange = (e) => {
+    const handleMainFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: unknown } }) => {
         const { name, value } = e.target;
-        setMainFilterInputs(prev => ({ ...prev, [name]: value }));
+        setMainFilterInputs(prev => ({ ...prev, [name]: String(value) }));
     };
 
-    const handleSidebarCheckboxChange = (e) => {
+    const handleSidebarCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, checked } = e.target;
         setSidebarFilters(prev => {
-            const list = prev[name];
-            if (checked) return { ...prev, [name]: [...list, value] };
-            return { ...prev, [name]: list.filter(item => item !== value) };
+            if (name === 'companySizes') {
+                const list = prev.companySizes;
+                if (checked) return { ...prev, companySizes: [...list, value] };
+                return { ...prev, companySizes: list.filter((item: string) => item !== value) };
+            } else if (name === 'benefits') {
+                const list = prev.benefits;
+                if (checked) return { ...prev, benefits: [...list, value] };
+                return { ...prev, benefits: list.filter((item: string) => item !== value) };
+            }
+            return prev;
         });
     };
 
-    const handleSidebarRadioChange = (e) => {
+    const handleSidebarRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSidebarFilters(prev => ({ ...prev, rating: e.target.value }));
     };
 
@@ -250,7 +285,7 @@ const ListCompanyPage = () => {
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><Users size={16} /><Typography variant="body2">{company.employees} nhân viên</Typography></Box>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><Star size={16} /><Typography variant="body2">{company.rating} sao</Typography></Box>
                                                 </Box>
-                                                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>"{company.description}"</Typography>
+                                                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>&quot;{company.description}&quot;</Typography>
                                             </Box>
                                             <Button variant="contained" onClick={() => router.push(`/company/${company.id}/jobs`)} sx={{ mt: { xs: 2, sm: 0 }, textTransform: 'none', bgcolor: '#000', '&:hover': { bgcolor: '#333' }, flexShrink: 0 }}>Xem {company.jobs} việc làm</Button>
                                         </CardContent>

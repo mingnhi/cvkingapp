@@ -1,4 +1,3 @@
-import { useApp } from "@/components/AppContext";
 import {
     Card,
     CardContent,
@@ -7,13 +6,11 @@ import {
     Typography,
 } from "@mui/material";
 import { CheckCircle, Edit } from "lucide-react";
-import EditCompanyProfile from "./Editcompany";
 type CompanyProfileProps = {
     onEdit: () => void;
 };
 
 const CompanyProfile = ({onEdit}: CompanyProfileProps) => {
-    const { navigateTo } = useApp();
     return (
         <div className="space-y-6">
             {/* Header */}

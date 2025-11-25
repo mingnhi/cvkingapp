@@ -1,34 +1,118 @@
 "use client";
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ArrowLeft, MapPin, DollarSign, Clock, Users, Building, Heart, Share2, Flag, CheckCircle } from 'lucide-react';
-import { Button } from '../../common/button';
+import { Button } from '../../common/button/button';
 import { useApp } from '@/components/AppContext';
-import { Badge } from '../../common/badge';
-import { Separator } from '../../common/separator';
+import { Badge } from '@/lib/badge';
+import { Separator } from '../../common/separator/separator';
 import { ImageWithFallback } from '@/lib/ImageWithFallback';
-import { Card , CardContent } from '../../common/card';
-import { Breadcrumb } from '../../common/breadcrumb';
+import { Card , CardContent } from '../../common/card/card';
+import BreadcrumbTabActive from '../../common/breadcrumb/BreadcrumbTabActive';
+import type { Job } from '@/types/job.type';
+
+interface DisplayJob {
+  id: string | number;
+  title: string;
+  company: string;
+  logo: string;
+  location: string;
+  salary: string;
+  type: string;
+  experience: string;
+  posted: string;
+  deadline: string;
+  tags: string[];
+  urgent: boolean;
+  views: number;
+  applicants: number;
+}
+
+// Helper function to normalize Job type to DisplayJob
+function normalizeJob(job: Job | DisplayJob | undefined): DisplayJob {
+  if (!job) {
+    return {
+      id: 1,
+      title: 'Senior Frontend Developer',
+      company: 'TechCorp Innovation',
+      logo: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=120&h=120&fit=crop&crop=face',
+      location: 'Ho Chi Minh City',
+      salary: '$2,000 - $3,000',
+      type: 'Full-time',
+      experience: '3-5 years',
+      posted: '2 days ago',
+      deadline: 'Jan 15, 2025',
+      tags: ['React', 'TypeScript', 'Remote', 'Senior Level'],
+      urgent: false,
+      views: 1250,
+      applicants: 45
+    };
+  }
+
+  // Check if it's already a DisplayJob (has logo property)
+  if ('logo' in job) {
+    return job as DisplayJob;
+  }
+
+  // It's a Job type, normalize it
+  const apiJob = job as Job;
+  const formatSalary = () => {
+    if (apiJob.salaryMin && apiJob.salaryMax) {
+      return `${apiJob.currency || 'USD'} ${apiJob.salaryMin.toLocaleString()} - ${apiJob.salaryMax.toLocaleString()}`;
+    }
+    if (apiJob.salaryMin) {
+      return `${apiJob.currency || 'USD'} ${apiJob.salaryMin.toLocaleString()}+`;
+    }
+    return 'Negotiable';
+  };
+
+  const formatDate = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const getRelativeTime = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return '1 day ago';
+      if (diffDays < 7) return `${diffDays} days ago`;
+      return formatDate(dateStr);
+    } catch {
+      return dateStr;
+    }
+  };
+
+  return {
+    id: apiJob.id,
+    title: apiJob.title,
+    company: apiJob.company?.name || 'Unknown Company',
+    logo: apiJob.company?.logo || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=120&h=120&fit=crop&crop=face',
+    location: apiJob.location,
+    salary: formatSalary(),
+    type: apiJob.jobType || 'Full-time',
+    experience: 'Not specified',
+    posted: getRelativeTime(apiJob.postedAt),
+    deadline: formatDate(apiJob.expiresAt),
+    tags: apiJob.tags?.map(t => t.name) || [],
+    urgent: false,
+    views: apiJob.viewsCount || 0,
+    applicants: 0
+  };
+}
+
 const JobDetailPage = () => {
   const { state, navigateTo } = useApp();
   const [isSaved, setIsSaved] = useState(false);
   const [hasApplied, setHasApplied] = useState(false);
 
-  const job = state.selectedJob || {
-    id: 1,
-    title: 'Senior Frontend Developer',
-    company: 'TechCorp Innovation',
-    logo: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=120&h=120&fit=crop&crop=face',
-    location: 'Ho Chi Minh City',
-    salary: '$2,000 - $3,000',
-    type: 'Full-time',
-    experience: '3-5 years',
-    posted: '2 days ago',
-    deadline: 'Jan 15, 2025',
-    tags: ['React', 'TypeScript', 'Remote', 'Senior Level'],
-    urgent: false,
-    views: 1250,
-    applicants: 45
-  };
+  const job = useMemo(() => normalizeJob(state.selectedJob), [state.selectedJob]);
 
   const companyInfo = {
     name: 'TechCorp Innovation',
@@ -104,15 +188,15 @@ const JobDetailPage = () => {
   };
 
   const breadcrumbItems = [
-    { label: 'Jobs', page: 'jobs' },
-    { label: job.title }
+    { name: 'Jobs', link: '/jobs' },
+    { name: job.title }
   ];
 
     
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Breadcrumb items={breadcrumbItems} />
+        <BreadcrumbTabActive items={breadcrumbItems} />
         
         {/* Back Button */}
         <Button 
@@ -141,7 +225,7 @@ const JobDetailPage = () => {
                       <div className="flex items-center gap-3 mb-2">
                         <h1 className="text-2xl text-gray-900">{job.title}</h1>
                         {job.urgent && (
-                          <Badge className="bg-red-100 text-red-700">URGENT</Badge>
+                          <Badge label="URGENT" variant="destructive" className="bg-red-100 text-red-700" />
                         )}
                       </div>
                       <p className="text-lg text-gray-600 mb-1">{job.company}</p>
@@ -202,10 +286,8 @@ const JobDetailPage = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {(job.tags || []).map((tag: string) => (
-                    <Badge key={tag} variant="secondary" className="bg-orange-100 text-orange-700">
-                      {tag}
-                    </Badge>
+                  {job.tags.map((tag: string) => (
+                    <Badge key={tag} label={tag} variant="secondary" className="bg-orange-100 text-orange-700" />
                   ))}
                 </div>
               </CardContent>
@@ -286,9 +368,7 @@ const JobDetailPage = () => {
                   <h3 className="font-medium mb-3 text-gray-900">Benefits & Perks</h3>
                   <div className="flex flex-wrap gap-2">
                     {companyInfo.benefits.map((benefit) => (
-                      <Badge key={benefit} variant="outline" className="border-green-200 text-green-700">
-                        {benefit}
-                      </Badge>
+                      <Badge key={benefit} label={benefit} variant="outline" className="border-green-200 text-green-700" />
                     ))}
                   </div>
                 </div>
@@ -339,7 +419,22 @@ const JobDetailPage = () => {
                 <Button 
                   variant="outline" 
                   className="w-full"
-                  onClick={() => navigateTo('company-detail', { company: companyInfo })}
+                  onClick={() => {
+                    const companyData: import('@/types/company.type').Company = {
+                      id: '1',
+                      name: companyInfo.name,
+                      logo: '',
+                      description: companyInfo.description,
+                      industry: companyInfo.industry,
+                      size: companyInfo.size,
+                      website: companyInfo.website,
+                      location: '',
+                      founded: 0,
+                      rating: 0,
+                      reviewCount: 0
+                    };
+                    navigateTo('company-detail', { company: companyData });
+                  }}
                 >
                   View Company
                 </Button>
@@ -355,7 +450,48 @@ const JobDetailPage = () => {
                     <div 
                       key={similarJob.id}
                       className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                      onClick={() => navigateTo('job-detail', { job: similarJob })}
+                      onClick={() => {
+                        const jobData: Job = {
+                          id: String(similarJob.id),
+                          companyId: '',
+                          postedByUserId: '',
+                          title: similarJob.title,
+                          slug: similarJob.title.toLowerCase().replace(/\s+/g, '-'),
+                          shortDescription: '',
+                          description: '',
+                          requirements: '',
+                          benefits: '',
+                          salaryMin: 0,
+                          salaryMax: 0,
+                          currency: 'USD',
+                          jobType: similarJob.type,
+                          location: similarJob.location,
+                          categoryId: '',
+                          status: 'Open',
+                          viewsCount: 0,
+                          postedAt: new Date().toISOString(),
+                          expiresAt: new Date().toISOString(),
+                          createdAt: new Date().toISOString(),
+                          updatedAt: new Date().toISOString(),
+                          category: { id: '', name: '' },
+                          skills: [],
+                          tags: [],
+                          company: {
+                            id: '',
+                            name: similarJob.company,
+                            logo: '',
+                            description: '',
+                            industry: '',
+                            size: '',
+                            website: '',
+                            location: similarJob.location,
+                            founded: 0,
+                            rating: 0,
+                            reviewCount: 0
+                          }
+                        };
+                        navigateTo('job-detail', { job: jobData });
+                      }}
                     >
                       <h4 className="font-medium text-sm text-gray-900 mb-1">{similarJob.title}</h4>
                       <p className="text-xs text-gray-500 mb-2">{similarJob.company}</p>
