@@ -21,7 +21,7 @@ import { JobTag } from '@entities/job-tag.entity';
 @ApiTags('job-tags')
 @Controller('job-tags')
 export class JobTagsController {
-  constructor(private readonly JobTagsRepo: JobTagsRepository) {}
+  constructor(private readonly JobTagsRepo: JobTagsRepository) { }
 
   /**
    * Retrieve all job tags

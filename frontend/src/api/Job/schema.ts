@@ -64,69 +64,76 @@ export const CreateJobSchema = z
 
 export const JobSchema = z.object({
   id: z.string(),
-
-  created_at: z.string(), // 'yyyy-MM-dd' từ DB
+  created_at: z.string(),
   company_id: z.string(),
   posted_by_user_id: z.string().nullable().optional(),
-
   title: z.string(),
   slug: z.string(),
   short_description: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
   requirements: z.string().nullable().optional(),
   benefits: z.string().nullable().optional(),
-
   salary_min: z.number().nullable().optional(),
   salary_max: z.number().nullable().optional(),
   currency: z.string().nullable().optional(),
   job_type: z.string().nullable().optional(),
   location: z.string().nullable().optional(),
-
   category_id: z.string().nullable().optional(),
   status: z.string(),
   views_count: z.number().nullable().optional(),
-
-  posted_at: z.string().nullable().optional(), // ISO datetime
-  expires_at: z.string().nullable().optional(), // ISO datetime
-
-  // Có trong list (SP_GetFilteredJobs)
+  posted_at: z.string().nullable().optional(),
+  expires_at: z.string().nullable().optional(),
   total: z.number().optional(),
 
-  // === NESTED FIELDS ===
-  // category object
+  // ✅ Cho phép category là string hoặc object, và tự parse JSON nếu cần
   category: z
-    .object({
-      id: z.string(),
-      Name: z.string(),
-    })
-    .nullable()
+    .union([
+      z
+        .string()
+        .transform((str) => {
+          try {
+            return JSON.parse(str);
+          } catch {
+            return null;
+          }
+        }),
+      z
+        .object({
+          id: z.string(),
+          Name: z.string(),
+        })
+        .nullable(),
+      z.null(),
+    ])
     .optional(),
 
-  // skills array
   skills: z
-    .array(
-      z.object({
-        id: z.string(),
-        Name: z.string(),
-      })
-    )
-    .default([]),
+    .preprocess(
+      (v) => (v === null || v === undefined ? [] : v),
+      z.array(
+        z.object({
+          id: z.string(),
+          Name: z.string(),
+        })
+      )
+    ),
 
-  // tags array
   tags: z
-    .array(
-      z.object({
-        id: z.string(),
-        Name: z.string(),
-      })
-    )
-    .default([]),
+    .preprocess(
+      (v) => (v === null || v === undefined ? [] : v),
+      z.array(
+        z.object({
+          id: z.string(),
+          Name: z.string(),
+        })
+      )
+    ),
 
-  // company object (thêm mới)
+
   company: z
     .object({
       id: z.string(),
-      Name: z.string(), // giữ "Name" (N hoa) để đồng nhất với backend
+      Name: z.string(),
       slug: z.string().nullable().optional(),
       logo_url: z.string().nullable().optional(),
       banner_url: z.string().nullable().optional(),
@@ -140,6 +147,7 @@ export const JobSchema = z.object({
     .nullable()
     .optional(),
 });
+
 
 export const JobsSchema = z.array(JobSchema);
 

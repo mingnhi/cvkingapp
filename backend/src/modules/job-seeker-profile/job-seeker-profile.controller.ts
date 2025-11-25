@@ -21,7 +21,7 @@ import {
 @ApiTags('job-seeker-profiles')
 @Controller('job-seeker-profiles')
 export class JobSeekerProfilesController {
-  constructor(private readonly repo: JobSeekerProfilesRepository) {}
+  constructor(private readonly repo: JobSeekerProfilesRepository) { }
 
   @Get()
   async findAll(): Promise<ApiResponse<JobSeekerProfile[]>> {
@@ -40,6 +40,17 @@ export class JobSeekerProfilesController {
   ): Promise<ApiResponse<JobSeekerProfile>> {
     const data = await this.repo.findOne(id);
     return { status: 'success', message: 'Job seeker profile found', data };
+  }
+  @Get('by-user/:userId')
+  async findByUserId(
+    @Param('userId', ParseUUIDPipe) userId: string
+  ): Promise<ApiResponse<JobSeekerProfile>> {
+    const data = await this.repo.findByUserId(userId);
+    return {
+      status: 'success',
+      message: `Job seeker profile of user ${userId}`,
+      data,
+    };
   }
 
   @Post()

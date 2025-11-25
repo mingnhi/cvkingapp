@@ -1,4 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
+
+"use client";
 import { useRef, useState } from "react";
 const ProfilePhoto = () => {
     const fileRef = useRef<HTMLInputElement>(null);

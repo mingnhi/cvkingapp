@@ -3,10 +3,11 @@ import { AuditableEntity } from './base/auditable_entity';
 
 @Entity({ tableName: 'Companies' })
 export class Company extends AuditableEntity {
-  @Property({ length: 300 })
+
+  @Property({ type: 'nvarchar' })
   name!: string;
 
-  @Property({ length: 300, nullable: true })
+  @Property({ length: 300, nullable: true, type: 'nvarchar' })
   slug?: string;
 
   @Property({ length: 1000, nullable: true })
@@ -24,12 +25,16 @@ export class Company extends AuditableEntity {
   @Property({ length: 500, nullable: true })
   website?: string;
 
-  @Property({ length: 300, nullable: true })
+  @Property({ length: 300, nullable: true, type: 'nvarchar' })
   location?: string;
 
-  @Property({ type: 'text', nullable: true })
+  @Property({ type: 'nvarchar', nullable: true })
   description?: string;
+
+  @Property({ type: 'json', nullable: true })
+  benefits?: string[];
 
   @Property({ default: false })
   isVerified: boolean = false;
+
 }

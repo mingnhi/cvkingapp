@@ -159,7 +159,6 @@ export function FeaturedCompanies({ companies }: FeaturedCompaniesProps) {
                         variant="outlined"
                         color="warning" // ✅ viền + text cam/vàng
                         className="w-full transition-all duration-200"
-                      
                       >
                         <Building2 className="w-4 h-4 mr-2" />
                         Xem việc làm

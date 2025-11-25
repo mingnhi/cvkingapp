@@ -45,12 +45,12 @@ const PostCard: React.FC<PostCardProps> = ({
   const readingTime = readMinutes(post.excerpt);
 
   return (
-    <article className="rounded-xl border bg-white shadow-sm hover:shadow-md transition">
+    <article className="rounded-xl border bg-white shadow-sm hover:shadow-md transition h-full flex flex-col">
       <div
         className={
           variant === "featured"
             ? "grid grid-cols-1 md:[grid-template-columns:260px_1fr]"
-            : ""
+            : "flex flex-col h-full"
         }
       >
         <div
@@ -77,11 +77,11 @@ const PostCard: React.FC<PostCardProps> = ({
           )}
         </div>
 
-        <div className={variant === "featured" ? "p-4 md:p-5" : "p-5"}>
+        <div className={variant === "featured" ? "p-4 md:p-5" : "p-5 flex-1 flex flex-col"}>
           <h3 className="text-lg md:text-xl font-semibold text-gray-900 leading-snug line-clamp-2">
             {post.title}
           </h3>
-          <p className="text-gray-600 text-sm mt-2 line-clamp-2">
+          <p className="text-gray-600 text-sm mt-2 line-clamp-2 flex-1">
             {post.excerpt}
           </p>
 

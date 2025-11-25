@@ -8,5 +8,6 @@ import { JobsRepository } from './jobs.repository';
   imports: [MikroOrmModule.forFeature([Job])],
   controllers: [JobsController],
   providers: [JobsRepository],
+  exports:[JobsRepository],
 })
 export class JobsModule {}

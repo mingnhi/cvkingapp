@@ -13,7 +13,7 @@ export class JobSeekerProfilesRepository {
     @InjectRepository(JobSeekerProfile)
     private readonly repo: EntityRepository<JobSeekerProfile>,
     private readonly em: EntityManager
-  ) {}
+  ) { }
 
   async findAll(): Promise<JobSeekerProfile[]> {
     return this.repo.findAll();
@@ -22,6 +22,12 @@ export class JobSeekerProfilesRepository {
   async findOne(id: string): Promise<JobSeekerProfile> {
     const profile = await this.repo.findOne({ id });
     if (!profile) throw new NotFoundException('JobSeekerProfile not found');
+    return profile;
+  }
+
+  async findByUserId(userId: string): Promise<JobSeekerProfile> {
+    const profile = await this.repo.findOne({ userId });
+    if (!profile) throw new NotFoundException('Job seeker profile not found');
     return profile;
   }
 

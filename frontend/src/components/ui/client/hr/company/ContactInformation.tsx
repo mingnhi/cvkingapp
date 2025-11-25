@@ -1,13 +1,20 @@
-import { useState } from "react";
+"use client";
+import { Dispatch, SetStateAction, useState } from "react";
 
-const ContactInformation = () => {
-    const [form, setForm] = useState({
-        contactName: "abc",
-        email: "danangcity@gmail.com",
-        phone: "+84 123 456 789",
-        website: "www.techcorp.vn",
-        address: "District 1, Ho Chi Minh City",
-    });
+type ContactForm = {
+  contactName: string;
+//   email: string;
+  phone: string;
+  website: string;
+  address: string;
+};
+
+type Props = {
+  form: ContactForm;                              
+  setForm: Dispatch<SetStateAction<ContactForm>>;   
+};
+
+export default function ContactInformation({ form, setForm }: Props) {
 
     const onChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -34,7 +41,7 @@ const ContactInformation = () => {
                         placeholder="Your name"
                     />
                 </div>
-                <div>
+                {/* <div>
                     <label className={label}>Email Address</label>
                     <input
                         name="email"
@@ -43,7 +50,7 @@ const ContactInformation = () => {
                         className={field}
                         placeholder="name@company.com"
                     />
-                </div>
+                </div> */}
                 <div>
                     <label className={label}>Phone Number</label>
                     <input
@@ -79,4 +86,3 @@ const ContactInformation = () => {
         </section>
     );
 }
-export default ContactInformation;

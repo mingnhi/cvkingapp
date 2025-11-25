@@ -1,6 +1,6 @@
 import { type UseMutationOptions, useMutation } from '@tanstack/react-query';
 import { loginRequest, logoutRequest, registerEmployerRequest, registerRequest } from './request';
-import type { LoginRequest, LoginResponse, RegisterEmployerRequest, RegisterEmployerResponse, RegisterRequest, RegisterResponse} from './type';
+import type { LoginRequest, LoginResponse, RegisterEmployerRequest, RegisterEmployerResponse, RegisterRequest, RegisterResponse } from './type';
 
 export const useLoginMutation = (options?: UseMutationOptions<LoginResponse, Error, LoginRequest, unknown>) =>
   useMutation({

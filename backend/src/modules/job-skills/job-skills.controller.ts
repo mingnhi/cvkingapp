@@ -20,7 +20,7 @@ import { JobSkillsRepository } from './job-skills.repository';
 @ApiTags('skills')
 @Controller('skills')
 export class JobSkillsController {
-  constructor(private readonly jobSkillRepo: JobSkillsRepository) {}
+  constructor(private readonly jobSkillRepo: JobSkillsRepository) { }
 
   /**
    * Retrieve all skills

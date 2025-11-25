@@ -7,7 +7,7 @@ import extractJson, { extractJsonArray } from 'src/utils/extractJson';
 
 @Injectable()
 export class JobsRepository {
-  constructor(private readonly em: EntityManager) {}
+  constructor(private readonly em: EntityManager) { }
 
   async findAll(): Promise<any[]> {
     const raw = await this.em.getConnection().execute('EXEC SP_GetAllJobs');
@@ -65,6 +65,7 @@ export class JobsRepository {
     if (!jsonText) return { data: [], total: 0 };
     const list = JSON.parse(jsonText) as any[];
     const total = list?.[0]?.total ?? 0;
+
 
     return { data: list ?? [], total };
   }

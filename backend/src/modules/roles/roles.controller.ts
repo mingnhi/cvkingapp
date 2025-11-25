@@ -19,7 +19,7 @@ import { RolesService } from './roles.service';
 @ApiTags('roles')
 @Controller('roles')
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) {}
+  constructor(private readonly rolesService: RolesService) { }
 
   /**
    * Retrieve all roles

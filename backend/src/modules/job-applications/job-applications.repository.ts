@@ -6,7 +6,7 @@ import { UpdateJobApplicationDto } from './dtos/update-job-application.dto';
 
 @Injectable()
 export class JobApplicationsRepository {
-  constructor(private readonly em: EntityManager) {}
+  constructor(private readonly em: EntityManager) { }
 
   async findAll(): Promise<any[]> {
     const raw = await this.em
@@ -20,6 +20,20 @@ export class JobApplicationsRepository {
       .getConnection()
       .execute('EXEC SP_GetJobApplicationById ?', [id]);
     return extractJson(raw);
+  }
+
+  async findByJobSeekerId(jobSeekerId: string): Promise<any[]> {
+    const raw = await this.em
+      .getConnection()
+      .execute('EXEC SP_GetJobApplicationsByJobSeekerId ?', [jobSeekerId]);
+    return extractJsonArray(raw) ?? [];
+  }
+
+  async findByCompanyId(companyId: string): Promise<any[]> {
+    const raw = await this.em
+      .getConnection()
+      .execute('EXEC SP_GetJobApplicationsByCompanyId ?', [companyId]);
+    return raw;
   }
 
   async create(dto: CreateJobApplicationDto): Promise<any> {

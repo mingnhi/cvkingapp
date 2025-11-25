@@ -30,7 +30,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  const port = configService.get<number>('APP_PORT', 3000);
+  const port = configService.get<number>('APP_PORT', 3003);
   await app.listen(port);
 }
 bootstrap();

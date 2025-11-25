@@ -14,8 +14,8 @@ interface RefreshTokenResponse {
 let refreshTokenPromise: Promise<string | null> | null = null;
 
 const instance = axios.create({
-  baseURL: env.API_URL,
-  timeout: 10000,
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
@@ -109,6 +109,15 @@ instance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+// instance.interceptors.request.use((config) => {
+//   if (typeof window !== "undefined") {
+//     const token = localStorage.getItem("accessToken");
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//   }
+//   return config;
+// });
 
 // Response interceptor
 instance.interceptors.response.use(

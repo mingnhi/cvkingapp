@@ -21,13 +21,13 @@ import { FilterJobsDto } from './dtos/filter-jobs.dto';
 @ApiTags('jobs')
 @Controller('jobs')
 export class JobsController {
-  constructor(private readonly repo: JobsRepository) {}
+  constructor(private readonly repo: JobsRepository) { }
 
   @Get()
   async findAll(
     @Query(
       new ValidationPipe({
-        transform: true, 
+        transform: true,
         transformOptions: { enableImplicitConversion: true },
         whitelist: true,
       })
@@ -114,4 +114,7 @@ export class JobsController {
     await this.repo.delete(id);
     return { status: 'success', message: 'Deleted job', data: null };
   }
+
+  //Jobs
+  
 }

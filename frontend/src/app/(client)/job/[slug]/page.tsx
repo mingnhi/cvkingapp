@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useParams } from "next/navigation";
 import BreadcrumbTabActive from "@/components/ui/common/breadcrumb/BreadcrumbTabActive";
 import JobHeader from "@/components/ui/client/job/job-details/JobHeader";
@@ -10,11 +10,13 @@ import ApplyModal from "@/components/ui/client/job/job-details/ApplyModal";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useJobByIdQuery } from "@/api/Job/query";
+import { useMyProfileQuery } from "@/api/user/query";
 
 export default function JobDetailPage() {
   const [showApplyModal, setShowApplyModal] = useState(false);
   const { slug } = useParams<{ slug: string }>();
-
+  
+  const { data: myProfile} = useMyProfileQuery();
   // Lấy chi tiết công việc
   const { data: job, isLoading, isError } = useJobByIdQuery(slug);
 
@@ -132,8 +134,9 @@ export default function JobDetailPage() {
       {showApplyModal && (
         <ApplyModal
           jobTitle={job.title || "Công việc"}
+          jobId={job.id}
+          jobSeekerId={myProfile?.id??""}
           onClose={() => setShowApplyModal(false)}
-          onConfirm={handleApply}
         />
       )}
     </div>

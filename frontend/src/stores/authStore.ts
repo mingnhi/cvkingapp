@@ -1,15 +1,15 @@
-import type { UserResponseData } from '@/api/user/type';
+import type { UserResponse } from '@/api/user/type';
 import { createSelectorHooks } from 'auto-zustand-selectors-hook';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface AuthState {
-  user: UserResponseData | null;
+  user: UserResponse | null;
   token: string | null;
   refreshToken: string | null;
   setToken: (token: string) => void;
   setRefreshToken: (refreshToken: string) => void;
-  setUser: (user: UserResponseData) => void;
+  setUser: (user: UserResponse) => void;
   clearAuth: () => void;
 }
 

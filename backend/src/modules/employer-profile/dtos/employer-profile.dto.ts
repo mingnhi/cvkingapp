@@ -24,4 +24,4 @@ export class CreateEmployerProfileDto {
 
 export class UpdateEmployerProfileDto extends PartialType(
   CreateEmployerProfileDto
-) {}
+) { }
