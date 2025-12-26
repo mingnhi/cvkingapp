@@ -1,4 +1,5 @@
 import z from "zod";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     JobApplicationCreateRequest,
     JobApplicationResponse,

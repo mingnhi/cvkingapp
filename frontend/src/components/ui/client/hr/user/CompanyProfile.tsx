@@ -1,5 +1,4 @@
 "use client"; 
-import { useApp } from "@/components/AppContext";
 import {
     Card,
     CardContent,
@@ -8,18 +7,18 @@ import {
     Typography,
 } from "@mui/material";
 import { CheckCircle, Edit } from "lucide-react";
-import EditCompanyProfile from "@/app/(client)/hr/[slug]/edit-companyprofile/page";
+// import EditCompanyProfile from "@/app/(client)/hr/[slug]/edit-companyprofile/page";
 import { useEmployerProfilesQuery } from "@/api/employer-profile/query";
-import { useCompaniesQuery, useCompanyByIdQuery } from "@/api/Company/query";
+import { useCompanyByIdQuery } from "@/api/Company/query";
 import { useRouter } from "next/navigation";
 import slugify from "slugify";
 
-type CompanyProfileProps = {
-    onEdit: () => void;
-};
+// type CompanyProfileProps = {
+//     onEdit: () => void;
+// };
 
-const CompanyProfile = ({ onEdit }: CompanyProfileProps) => {
-    const { navigateTo } = useApp();
+const CompanyProfile = () => {
+    // const { navigateTo } = useApp();
     const router = useRouter();
     const { data: employerProfiles, isLoading: loadingProfiles, isError: err } = useEmployerProfilesQuery();
     const employerProfile = employerProfiles?.items?.[0];
@@ -28,7 +27,7 @@ const CompanyProfile = ({ onEdit }: CompanyProfileProps) => {
     data: company,
     isLoading: loadingCompany,
     isError: errorCompany,
-    } = useCompanyByIdQuery(companyId, { enabled: Boolean(companyId) });
+    } = useCompanyByIdQuery(companyId);
     console.log("CompanyId:", companyId);
     console.log("Company data:", company);
     console.log("Loading company:", loadingCompany);
@@ -40,6 +39,12 @@ const CompanyProfile = ({ onEdit }: CompanyProfileProps) => {
     if (errorCompany || !company)
         return <Typography>Không tìm thấy công ty</Typography>;
 
+    const benefitsArray =
+        Array.isArray(company.benefits)
+            ? company.benefits
+            : company.benefits
+            ? [company.benefits]
+            : [];
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -146,7 +151,7 @@ const CompanyProfile = ({ onEdit }: CompanyProfileProps) => {
                 />
                 <CardContent>
                     <div className="grid md:grid-cols-2 gap-4">
-                    {(company.benefits || []).map((benefit, idx) => (
+                    {benefitsArray.map((benefit, idx) => (
                         <div key={idx} className="flex items-center space-x-2">
                         <CheckCircle className="w-4 h-4 text-green-600" />
                         <Typography variant="body2">{benefit}</Typography>

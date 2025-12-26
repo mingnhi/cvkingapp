@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useMemo, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
+
 import {
   Search,
   MapPin,
@@ -218,6 +219,7 @@ const ListCompanyPage = () => {
   };
 
   // Select (location, industry)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSelectChange = (e: any) => {
     const { name, value } = e.target as { name: string; value: string };
     setMainFilterInputs((prev) => ({ ...prev, [name]: value }));

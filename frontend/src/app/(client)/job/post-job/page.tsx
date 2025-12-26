@@ -76,12 +76,12 @@ export default function PostJobPage() {
     () => (tagsData ?? []).map((t) => ({ id: t.id, name: t.name })),
     [tagsData]
   );
+
   // ===== ✅ fetch companies & categories bằng query =====
   const { data: companiesData, isLoading: companiesLoading } =
     useCompaniesQuery();
   const { data: categoriesData, isLoading: categoriesLoading } =
     useJobCategoriesQuery();
-
 
   const companies: Option[] = useMemo(
     () => (companiesData ?? []).map((c) => ({ id: c.id, name: c.name })),
@@ -97,14 +97,15 @@ export default function PostJobPage() {
     skillsLoading || tagsLoading || companiesLoading || categoriesLoading;
   const onSubmit = (draft: boolean) => (data: CreateJobFormData) => {
     const slug = slugify(data.Title, { lower: true, strict: true });
-    
+
     // Ensure ExpiresAt is always a Date (required by schema)
-    const expiresAt = data.ExpiresAt instanceof Date 
-      ? data.ExpiresAt 
-      : data.ExpiresAt 
-        ? new Date(data.ExpiresAt) 
+    const expiresAt =
+      data.ExpiresAt instanceof Date
+        ? data.ExpiresAt
+        : data.ExpiresAt
+        ? new Date(data.ExpiresAt)
         : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Default to 30 days from now
-    
+
     const payload: CreateJobRequest = {
       CompanyId: data.CompanyId,
       PostedByUserId: data.PostedByUserId,
@@ -114,8 +115,10 @@ export default function PostJobPage() {
       Description: data.Description,
       Requirements: data.Requirements,
       Benefits: data.Benefits,
-      SalaryMin: data.SalaryMin !== undefined ? Number(data.SalaryMin) : undefined,
-      SalaryMax: data.SalaryMax !== undefined ? Number(data.SalaryMax) : undefined,
+      SalaryMin:
+        data.SalaryMin !== undefined ? Number(data.SalaryMin) : undefined,
+      SalaryMax:
+        data.SalaryMax !== undefined ? Number(data.SalaryMax) : undefined,
       Currency: data.Currency,
       JobType: data.JobType,
       Location: data.Location,

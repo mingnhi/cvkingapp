@@ -50,12 +50,14 @@ export default function PostBlogPage() {
   const formData = watch();
 
   // Auto-generate slug from title
+  
   useEffect(() => {
     const title = watch("title");
     if (title) {
       const generatedSlug = slugify(title, { lower: true, strict: true });
       setValue("slug", generatedSlug, { shouldValidate: true });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch("title"), setValue]);
 
   // Debug form

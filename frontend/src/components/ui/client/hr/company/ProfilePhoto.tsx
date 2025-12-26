@@ -1,6 +1,7 @@
 
 "use client";
 import { useRef, useState } from "react";
+import Image from "next/image";
 const ProfilePhoto = () => {
     const fileRef = useRef<HTMLInputElement>(null);
     const [preview, setPreview] = useState<string | null>(null);
@@ -20,9 +21,15 @@ return (
             <div className="relative">
                 <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 text-xl overflow-hidden">
                     {preview ? (
-                        // avatar preview
-                        <img src={preview} alt="avatar" className="w-full h-full object-cover" />
-                    ) : (
+                        // avatar preview dùng next/image
+                        <Image
+                            src={preview}
+                            alt="avatar"
+                            width={80}
+                            height={80}
+                            className="w-full h-full object-cover"
+                        />
+                        ) : (
                         "a"
                     )}
                 </div>
@@ -61,7 +68,7 @@ return (
                         type="file"
                         accept="image/*"
                         onChange={onFileChange}
-                        className="hidden"
+                        hidden
                     />
                     <button
                         type="button"

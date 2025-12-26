@@ -1,11 +1,17 @@
 "use client";
-import { Controller, Control, FieldErrors } from "react-hook-form";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { Controller } from "react-hook-form";
 import { TextField } from "@mui/material";
 import { CreateJobFormData } from "@/api/Job/type";
 
+type FormErrors = Partial<
+  Record<keyof CreateJobFormData, { message?: string }>
+>;
+
 interface Props {
-  control: Control<CreateJobFormData>;
-  errors: FieldErrors<CreateJobFormData>;
+  control: any; // control từ useForm
+  errors: FormErrors;
 }
 
 export default function JobDetailsSection({ control, errors }: Props) {
@@ -28,9 +34,9 @@ export default function JobDetailsSection({ control, errors }: Props) {
       <h2 className="text-xl font-semibold text-gray-900">Chi tiết công việc</h2>
 
       <Controller
-        name="ShortDescription"
+        name={"ShortDescription" as any}
         control={control}
-        render={({ field }) => (
+        render={({ field }: { field: any }) => (
           <TextField
             {...field}
             className="w-full"
@@ -40,15 +46,15 @@ export default function JobDetailsSection({ control, errors }: Props) {
             variant="outlined"
             sx={areaSx}
             error={!!errors.ShortDescription}
-            helperText={errors.ShortDescription?.message}
+            helperText={errors.ShortDescription?.message ?? ""}
           />
         )}
       />
 
       <Controller
-        name="Description"
+        name={"Description" as any}
         control={control}
-        render={({ field }) => (
+        render={({ field }: { field: any }) => (
           <TextField
             {...field}
             className="w-full"
@@ -58,15 +64,15 @@ export default function JobDetailsSection({ control, errors }: Props) {
             variant="outlined"
             sx={areaSx}
             error={!!errors.Description}
-            helperText={errors.Description?.message}
+            helperText={errors.Description?.message ?? ""}
           />
         )}
       />
 
       <Controller
-        name="Requirements"
+        name={"Requirements" as any}
         control={control}
-        render={({ field }) => (
+        render={({ field }: { field: any }) => (
           <TextField
             {...field}
             className="w-full"
@@ -76,15 +82,15 @@ export default function JobDetailsSection({ control, errors }: Props) {
             variant="outlined"
             sx={areaSx}
             error={!!errors.Requirements}
-            helperText={errors.Requirements?.message}
+            helperText={errors.Requirements?.message ?? ""}
           />
         )}
       />
 
       <Controller
-        name="Benefits"
+        name={"Benefits" as any}
         control={control}
-        render={({ field }) => (
+        render={({ field }: { field: any }) => (
           <TextField
             {...field}
             className="w-full"
@@ -94,7 +100,7 @@ export default function JobDetailsSection({ control, errors }: Props) {
             variant="outlined"
             sx={areaSx}
             error={!!errors.Benefits}
-            helperText={errors.Benefits?.message}
+            helperText={errors.Benefits?.message ?? ""}
           />
         )}
       />

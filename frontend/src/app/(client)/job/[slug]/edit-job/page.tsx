@@ -29,9 +29,15 @@ type Option = { id: string; name: string };
 
 // Helper function to convert MockJob (from faker data) to CreateJobFormData
 function mockJobToFormData(job: MockJob): CreateJobFormData {
-  const jobType = job.type as "Toàn thời gian" | "Bán thời gian" | "Hợp đồng" | "Freelance";
-  const expiresAt = job.expires ? new Date(job.expires) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Default to 30 days from now
-  
+  const jobType = job.type as
+    | "Toàn thời gian"
+    | "Bán thời gian"
+    | "Hợp đồng"
+    | "Freelance";
+  const expiresAt = job.expires
+    ? new Date(job.expires)
+    : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Default to 30 days from now
+
   return {
     CompanyId: "", // MockJob doesn't have companyId, will need to be set manually
     PostedByUserId: "", // MockJob doesn't have postedByUserId, will need to be set manually
@@ -54,7 +60,10 @@ function mockJobToFormData(job: MockJob): CreateJobFormData {
 
 export default function EditJobPage() {
   const params = useParams<{ slug: string }>();
-  const job = useMemo(() => jobs.find((j) => j.slug === params.slug), [params.slug]);
+  const job = useMemo(
+    () => jobs.find((j) => j.slug === params.slug),
+    [params.slug]
+  );
 
   const {
     control,
@@ -98,8 +107,10 @@ export default function EditJobPage() {
   // Fetch data
   const { data: skillsData, isLoading: skillsLoading } = useSkillsQuery();
   const { data: tagsData, isLoading: tagsLoading } = useJobTagsQuery();
-  const { data: companiesData, isLoading: companiesLoading } = useCompaniesQuery();
-  const { data: categoriesData, isLoading: categoriesLoading } = useJobCategoriesQuery();
+  const { data: companiesData, isLoading: companiesLoading } =
+    useCompaniesQuery();
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    useJobCategoriesQuery();
 
   const suggestedSkills: Option[] = useMemo(
     () => (skillsData ?? []).map((s) => ({ id: s.id, name: s.name })),
@@ -119,7 +130,8 @@ export default function EditJobPage() {
   );
 
   const { mutateAsync: updateJob } = useUpdateJobMutation();
-  const anyLoading = skillsLoading || tagsLoading || companiesLoading || categoriesLoading;
+  const anyLoading =
+    skillsLoading || tagsLoading || companiesLoading || categoriesLoading;
 
   if (!job) notFound();
 
@@ -142,21 +154,27 @@ export default function EditJobPage() {
         JobType: data.JobType || null,
         Location: data.Location || null,
         CategoryId: data.CategoryId || null,
-        ExpiresAt: data.ExpiresAt ? new Date(data.ExpiresAt).toISOString() : null,
+        ExpiresAt: data.ExpiresAt
+          ? new Date(data.ExpiresAt).toISOString()
+          : null,
         Status: draft ? "draft" : "active",
         skillIds: data.skillIds || [],
         tagIds: data.tagIds || [],
       };
 
       updateJob({ id: String(job.id), data: payload });
-      toast.success(draft ? "Lưu nháp thành công!" : "Cập nhật tin thành công!");
+      toast.success(
+        draft ? "Lưu nháp thành công!" : "Cập nhật tin thành công!"
+      );
     };
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Chỉnh sửa Tin Tuyển Dụng</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          Chỉnh sửa Tin Tuyển Dụng
+        </h1>
 
         {anyLoading ? (
           <div className="flex justify-center py-16">

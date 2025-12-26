@@ -19,6 +19,7 @@ import {
   Stack,
   CircularProgress,
 } from "@mui/material";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // import { Avatar , AvatarImage , AvatarFallback} from '../../common/avatar/avatar';
 // import { Button } from '../../common/button/button';
 import { useApp } from '@/components/AppContext';
@@ -42,8 +43,9 @@ const MyApplication = ()=> {
         );
     }
 
- const handleViewJob = (application: any) => {
-    navigateTo("job-detail", { jobId: application.jobId });
+  const handleViewJob = (application: any) => {
+    if (!application.jobId) return;
+    navigateTo("job-detail", { job: application.jobId });
   };
  const getStatusChip = (status: string) => {
     const styles: Record<string, any> = {
@@ -122,7 +124,7 @@ const MyApplication = ()=> {
 
       {/* Summary Cards */}
       <Grid container spacing={2} mb={2}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent sx={{ textAlign: "center", py: 4 }}>
               <Typography variant="h4" color="primary">
@@ -134,7 +136,7 @@ const MyApplication = ()=> {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent sx={{ textAlign: "center", py: 4 }}>
               <Typography variant="h4" sx={{ color: "#CA8A04" }}>
@@ -146,7 +148,7 @@ const MyApplication = ()=> {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent sx={{ textAlign: "center", py: 4 }}>
               <Typography variant="h4" sx={{ color: "#2563EB" }}>
@@ -158,7 +160,7 @@ const MyApplication = ()=> {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent sx={{ textAlign: "center", py: 4 }}>
               <Typography variant="h4" sx={{ color: "#16A34A" }}>
@@ -175,86 +177,95 @@ const MyApplication = ()=> {
       {/* Application List */}
       {applications.length === 0 ? (
         <Typography variant="body1" textAlign="center" color="text.secondary" mt={4}>
-          You haven't applied for any jobs yet.
+          You have not applied for any jobs yet.
         </Typography>
       ) : (
         <Stack spacing={3}>
-          {applications.map((application) => (
-            <Card key={application.id} elevation={2}>
-              <CardContent sx={{ p: 3 }}>
-                <Stack direction="row" spacing={2} alignItems="flex-start">
-                  <Avatar sx={{ width: 56, height: 56 }}>
-                    {application.jobId.charAt(0)}
-                  </Avatar>
+          {applications.map((application) => {
+            const jobId = application.jobId ?? "N/A"; // 👈 luôn là string
+            const appliedDate = application.appliedAt
+              ? new Date(application.appliedAt)     // 👈 chỉ tạo Date khi có giá trị
+              : null;
 
-                  <Box flex={1}>
-                    <Stack
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="flex-start"
-                      mb={1}
-                    >
-                      <Box>
-                        <Typography
-                          variant="subtitle1"
-                          fontWeight={600}
-                          sx={{
-                            cursor: "pointer",
-                            "&:hover": { color: "primary.main" },
-                          }}
+            return (
+              <Card key={application.id} elevation={2}>
+                <CardContent sx={{ p: 3 }}>
+                  <Stack direction="row" spacing={2} alignItems="flex-start">
+                    <Avatar sx={{ width: 56, height: 56 }}>
+                      {jobId.charAt(0)} {/* dùng jobId đã chuẩn hóa */}
+                    </Avatar>
+
+                    <Box flex={1}>
+                      <Stack
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="flex-start"
+                        mb={1}
+                      >
+                        <Box>
+                          <Typography
+                            variant="subtitle1"
+                            fontWeight={600}
+                            sx={{
+                              cursor: "pointer",
+                              "&:hover": { color: "primary.main" },
+                            }}
+                            onClick={() => handleViewJob(application)}
+                          >
+                            Job ID: {jobId}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Cover Letter:{" "}
+                            {application.coverLetter || "No cover letter provided"}
+                          </Typography>
+                        </Box>
+                        {getStatusChip(application.status)}
+                      </Stack>
+
+                      <Stack
+                        direction="row"
+                        spacing={3}
+                        alignItems="center"
+                        color="text.secondary"
+                        mb={2}
+                        sx={{ flexWrap: "wrap" }}
+                      >
+                        <Box display="flex" alignItems="center">
+                          <Calendar size={16} style={{ marginRight: 4 }} />
+                          Applied:{" "}
+                          {appliedDate
+                            ? appliedDate.toLocaleDateString()
+                            : "Unknown"}
+                        </Box>
+                      </Stack>
+
+                      <Stack direction="row" spacing={1.5} flexWrap="wrap">
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={<Eye size={16} />}
                           onClick={() => handleViewJob(application)}
                         >
-                          Job ID: {application.jobId}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Cover Letter:{" "}
-                          {application.coverLetter || "No cover letter provided"}
-                        </Typography>
-                      </Box>
-                      {getStatusChip(application.status)}
-                    </Stack>
-
-                    <Stack
-                      direction="row"
-                      spacing={3}
-                      alignItems="center"
-                      color="text.secondary"
-                      mb={2}
-                      sx={{ flexWrap: "wrap" }}
-                    >
-                      <Box display="flex" alignItems="center">
-                        <Calendar size={16} style={{ marginRight: 4 }} />
-                        Applied:{" "}
-                        {new Date(application.appliedAt).toLocaleDateString()}
-                      </Box>
-                    </Stack>
-
-                    <Stack direction="row" spacing={1.5} flexWrap="wrap">
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        startIcon={<Eye size={16} />}
-                        onClick={() => handleViewJob(application)}
-                      >
-                        View Job
+                          View Job
                         </Button>
                         {application.status === "Pending" && (
-                            <Button
+                          <Button
                             variant="outlined"
                             size="small"
                             startIcon={<Edit size={16} />}
-                            >
+                          >
                             Update Application
-                            </Button>
-                      )}       
-                    </Stack>
-                  </Box>
-                </Stack>
-              </CardContent>
-            </Card>
-          ))}
+                          </Button>
+                        )}
+                      </Stack>
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+            );
+          })}
         </Stack>
-      )}
+            )}
     </Box>
   );
 };

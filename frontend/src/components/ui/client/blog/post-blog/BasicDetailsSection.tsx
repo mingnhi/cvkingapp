@@ -1,11 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { Controller, Control, FieldErrors } from "react-hook-form";
+import { Controller} from "react-hook-form";
 import { FormControl, FormHelperText, MenuItem, Select, TextField } from "@mui/material";
 import { CreateBlogPostFormData } from "@/api/BlogPosts/type";
 
+type FormErrors = Partial<
+  Record<keyof CreateBlogPostFormData, { message?: string }>
+>;
 interface Props {
-  control: Control<CreateBlogPostFormData>;
-  errors: FieldErrors<CreateBlogPostFormData>;
+  control: any; // dùng any cho nhẹ đầu, vẫn ổn với Controller
+  errors: FormErrors;
   categories: { id: string; name: string }[];
 }
 
@@ -90,7 +94,7 @@ export default function BasicDetailsSection({ control, errors, categories }: Pro
             <Controller
               name={name}
               control={control}
-              render={({ field }) => (
+              render={({ field }: { field: any }) => (
                 <TextField
                   {...field}
                   type={type}
@@ -115,7 +119,7 @@ export default function BasicDetailsSection({ control, errors, categories }: Pro
           <Controller
             name="categoryId"
             control={control}
-            render={({ field }) => (
+            render={({ field }: { field: any }) => (
               <FormControl sx={selectFormControlStyles} fullWidth error={!!errors.categoryId}>
                 <Select
                   {...field}

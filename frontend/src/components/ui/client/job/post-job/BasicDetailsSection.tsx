@@ -1,16 +1,33 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { Controller, Control, FieldErrors } from "react-hook-form";
-import { FormControl, FormHelperText, MenuItem, Select, TextField } from "@mui/material";
+
+import { Controller } from "react-hook-form";
+import {
+  FormControl,
+  FormHelperText,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import { CreateJobFormData } from "@/api/Job/type";
 
+type FormErrors = Partial<
+  Record<keyof CreateJobFormData, { message?: string }>
+>;
+
 interface Props {
-  control: Control<CreateJobFormData>;
-  errors: FieldErrors<CreateJobFormData>;
+  control: any; // control từ useForm
+  errors: FormErrors;
   companies: { id: string; name: string }[];
   categories: { id: string; name: string }[];
 }
 
-export default function BasicDetailsSection({ control, errors, companies, categories }: Props) {
+export default function BasicDetailsSection({
+  control,
+  errors,
+  companies,
+  categories,
+}: Props) {
   const inputStyles = {
     "& .MuiInputBase-root": {
       backgroundColor: "#f5f5f5",
@@ -101,76 +118,93 @@ export default function BasicDetailsSection({ control, errors, companies, catego
     <section className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
       <h2 className="text-xl font-semibold text-gray-900">Thông tin công việc</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
-        {fields.map(({ name, label, placeholder, type = "text", options, required }) => (
-          <div key={name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {label} {required && <span className="text-red-500">*</span>}
-            </label>
-            <Controller
-              name={name}
-              control={control}
-              render={({ field }) =>
-                type === "select" && options ? (
-                  <FormControl sx={selectFormControlStyles} fullWidth error={!!errors[name]}>
-                    <Select
-                      {...field}
-                      value={(field.value as string) ?? ""}
-                      onChange={(e) => field.onChange(e.target.value)}
-                      displayEmpty
-                      renderValue={(selected: string) => (
-                        <span>
-                          {selected === "" ? (
-                            <span className="text-gray-400">{placeholder}</span>
-                          ) : (
-                            options.find((opt) => opt.value === selected)?.label || selected
-                          )}
-                        </span>
-                      )}
-                      MenuProps={menuProps}
-                      sx={selectStyles}
+        {fields.map(
+          ({ name, label, placeholder, type = "text", options, required }) => (
+            <div key={name}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {label} {required && <span className="text-red-500">*</span>}
+              </label>
+              <Controller
+                name={name as any}
+                control={control}
+                render={({ field }: { field: any }) =>
+                  type === "select" && options ? (
+                    <FormControl
+                      sx={selectFormControlStyles}
+                      fullWidth
+                      error={!!errors[name]}
                     >
-                      <MenuItem value="">
-                        <span className="text-gray-400">{placeholder}</span>
-                      </MenuItem>
-                      {options.map((opt) => (
-                        <MenuItem key={opt.value} value={opt.value}>
-                          {opt.label}
+                      <Select
+                        {...field}
+                        value={(field.value as string) ?? ""}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        displayEmpty
+                        renderValue={(selected: string) => (
+                          <span>
+                            {selected === "" ? (
+                              <span className="text-gray-400">{placeholder}</span>
+                            ) : (
+                              options.find((opt) => opt.value === selected)?.label ||
+                              selected
+                            )}
+                          </span>
+                        )}
+                        MenuProps={menuProps}
+                        sx={selectStyles}
+                      >
+                        <MenuItem value="">
+                          <span className="text-gray-400">{placeholder}</span>
                         </MenuItem>
-                      ))}
-                    </Select>
-                    {errors[name]?.message && (
-                      <FormHelperText sx={{ color: "#ef4444" }}>
-                        {errors[name]?.message}
-                      </FormHelperText>
-                    )}
-                  </FormControl>
-                ) : (
-                  <TextField
-                    {...field}
-                    type={type}
-                    className="w-full"
-                    placeholder={placeholder}
-                    variant="outlined"
-                    sx={inputStyles}
-                    error={!!errors[name]}
-                    helperText={errors[name]?.message}
-                    onChange={(e) =>
-                      field.onChange(type === "number" ? (e.target.value ? Number(e.target.value) : undefined) : e.target.value)
-                    }
-                    value={field.value ?? ""}
-                  />
-                )
-              }
-            />
-          </div>
-        ))}
+                        {options.map((opt) => (
+                          <MenuItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {errors[name]?.message && (
+                        <FormHelperText sx={{ color: "#ef4444" }}>
+                          {errors[name]?.message}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  ) : (
+                    <TextField
+                      {...field}
+                      type={type}
+                      className="w-full"
+                      placeholder={placeholder}
+                      variant="outlined"
+                      sx={inputStyles}
+                      error={!!errors[name]}
+                      helperText={errors[name]?.message ?? ""}
+                      onChange={(e) =>
+                        field.onChange(
+                          type === "number"
+                            ? e.target.value
+                              ? Number(e.target.value)
+                              : undefined
+                            : e.target.value
+                        )
+                      }
+                      value={field.value ?? ""}
+                    />
+                  )
+                }
+              />
+            </div>
+          )
+        )}
+
+        {/* Mức lương */}
         <div className="col-span-full">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Mức lương</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Mức lương
+          </label>
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 items-center">
             <Controller
-              name="SalaryMin"
+              name={"SalaryMin" as any}
               control={control}
-              render={({ field }) => (
+              render={({ field }: { field: any }) => (
                 <TextField
                   {...field}
                   type="number"
@@ -179,17 +213,21 @@ export default function BasicDetailsSection({ control, errors, companies, catego
                   variant="outlined"
                   sx={inputStyles}
                   error={!!errors.SalaryMin}
-                  helperText={errors.SalaryMin?.message}
-                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                  helperText={errors.SalaryMin?.message ?? ""}
+                  onChange={(e) =>
+                    field.onChange(
+                      e.target.value ? Number(e.target.value) : undefined
+                    )
+                  }
                   value={field.value ?? ""}
                 />
               )}
             />
             <span className="flex justify-center text-gray-600">đến</span>
             <Controller
-              name="SalaryMax"
+              name={"SalaryMax" as any}
               control={control}
-              render={({ field }) => (
+              render={({ field }: { field: any }) => (
                 <TextField
                   {...field}
                   type="number"
@@ -198,17 +236,25 @@ export default function BasicDetailsSection({ control, errors, companies, catego
                   variant="outlined"
                   sx={inputStyles}
                   error={!!errors.SalaryMax}
-                  helperText={errors.SalaryMax?.message}
-                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                  helperText={errors.SalaryMax?.message ?? ""}
+                  onChange={(e) =>
+                    field.onChange(
+                      e.target.value ? Number(e.target.value) : undefined
+                    )
+                  }
                   value={field.value ?? ""}
                 />
               )}
             />
             <Controller
-              name="Currency"
+              name={"Currency" as any}
               control={control}
-              render={({ field }) => (
-                <FormControl sx={selectFormControlStyles} fullWidth error={!!errors.Currency}>
+              render={({ field }: { field: any }) => (
+                <FormControl
+                  sx={selectFormControlStyles}
+                  fullWidth
+                  error={!!errors.Currency}
+                >
                   <Select
                     {...field}
                     value={(field.value as string) ?? ""}
@@ -219,7 +265,8 @@ export default function BasicDetailsSection({ control, errors, companies, catego
                         {selected === "" ? (
                           <span className="text-gray-400">Chọn đơn vị</span>
                         ) : (
-                          currencies.find((opt) => opt.value === selected)?.label || selected
+                          currencies.find((opt) => opt.value === selected)?.label ||
+                          selected
                         )}
                       </span>
                     )}
@@ -244,7 +291,9 @@ export default function BasicDetailsSection({ control, errors, companies, catego
               )}
             />
           </div>
-          <span className="text-sm text-gray-500 mt-2 inline-block">/ mỗi tháng</span>
+          <span className="text-sm text-gray-500 mt-2 inline-block">
+            / mỗi tháng
+          </span>
         </div>
       </div>
     </section>

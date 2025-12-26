@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import {useState } from "react";
-import { FieldErrors } from "react-hook-form";
+import { useState } from "react";
 import { TextField, CircularProgress } from "@mui/material";
-import { CreateJobFormData } from "@/api/Job/type";
+// import { CreateJobFormData } from "@/api/Job/type";
 import { useCreateSkillMutation } from "@/api/Skill/query";
 import { useCreateJobTagMutation } from "@/api/Tag/query";
 
 // chỉ mutation ở đây
-
 
 type Option = { id: string; name: string };
 
@@ -17,9 +15,13 @@ interface Props {
   tags: string[];
   onSkillsChange: (skills: string[]) => void;
   onTagsChange: (tags: string[]) => void;
-  errors: FieldErrors<CreateJobFormData>;
-  suggestedSkills: Option[]; // nhận từ parent
-  suggestedTags: Option[];   // nhận từ parent
+  // 👇 chỉ cần đúng những field đang dùng trong component này
+  errors: {
+    skillIds?: { message?: string };
+    tagIds?: { message?: string };
+  };
+  suggestedSkills: Option[];
+  suggestedTags: Option[];
 }
 
 export default function SkillsSection({
@@ -36,8 +38,10 @@ export default function SkillsSection({
   const [skillError, setSkillError] = useState<string | null>(null);
   const [tagError, setTagError] = useState<string | null>(null);
 
-  const { mutateAsync: createSkillAsync, isPending: creatingSkill } = useCreateSkillMutation();
-  const { mutateAsync: createTagAsync, isPending: creatingTag } = useCreateJobTagMutation();
+  const { mutateAsync: createSkillAsync, isPending: creatingSkill } =
+    useCreateSkillMutation();
+  const { mutateAsync: createTagAsync, isPending: creatingTag } =
+    useCreateJobTagMutation();
 
   const textSx = {
     "& .MuiInputBase-root": {
@@ -77,7 +81,6 @@ export default function SkillsSection({
     if (!trimmed) return;
     setSkillError(null);
 
-    // 1) nếu đã có theo name -> add ngay
     const exist = suggestedSkills.find((s) => norm(s.name) === norm(trimmed));
     if (exist) {
       addExistingSkillById(exist.id);
@@ -85,7 +88,6 @@ export default function SkillsSection({
       return;
     }
 
-    // 2) tạo mới -> add vào form
     try {
       const created = await createSkillAsync({ Name: trimmed });
       addExistingSkillById(created.id);
@@ -118,7 +120,8 @@ export default function SkillsSection({
     }
   };
 
-  const removeSkill = (id: string) => onSkillsChange(skills.filter((s) => s !== id));
+  const removeSkill = (id: string) =>
+    onSkillsChange(skills.filter((s) => s !== id));
   const removeTag = (id: string) => onTagsChange(tags.filter((t) => t !== id));
 
   return (
@@ -127,7 +130,9 @@ export default function SkillsSection({
 
       {/* Skills */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Kỹ năng</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Kỹ năng
+        </label>
         <div className="flex gap-3">
           <div className="flex-grow relative">
             <TextField
@@ -149,7 +154,10 @@ export default function SkillsSection({
               disabled={creatingSkill}
             />
             {creatingSkill && (
-              <CircularProgress size={24} className="absolute right-3 top-1/2 -translate-y-1/2 text-orange-600" />
+              <CircularProgress
+                size={24}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-orange-600"
+              />
             )}
           </div>
           <button
@@ -166,9 +174,13 @@ export default function SkillsSection({
         {!!skills.length && (
           <div className="flex flex-wrap gap-2 mt-3">
             {skills.map((id) => {
-              const skill = suggestedSkills.find((s) => s.id === id) || { id, name: id };
+              const skill =
+                suggestedSkills.find((s) => s.id === id) || { id, name: id };
               return (
-                <span key={id} className="px-3 py-1 text-sm bg-orange-100 border border-orange-200 rounded-full flex items-center">
+                <span
+                  key={id}
+                  className="px-3 py-1 text-sm bg-orange-100 border border-orange-200 rounded-full flex items-center"
+                >
                   {skill.name}
                   <button
                     className="ml-2 text-orange-600 hover:text-orange-800"
@@ -185,7 +197,9 @@ export default function SkillsSection({
         )}
 
         <div className="mt-3">
-          <p className="text-sm font-medium text-gray-700 mb-2">Kỹ năng gợi ý</p>
+          <p className="text-sm font-medium text-gray-700 mb-2">
+            Kỹ năng gợi ý
+          </p>
           <div className="flex flex-wrap gap-2">
             {suggestedSkills.map((skill) => (
               <button
@@ -208,7 +222,9 @@ export default function SkillsSection({
 
       {/* Tags */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Thẻ</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Thẻ
+        </label>
         <div className="flex gap-3">
           <div className="flex-grow relative">
             <TextField
@@ -230,7 +246,10 @@ export default function SkillsSection({
               disabled={creatingTag}
             />
             {creatingTag && (
-              <CircularProgress size={24} className="absolute right-3 top-1/2 -translate-y-1/2 text-orange-600" />
+              <CircularProgress
+                size={24}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-orange-600"
+              />
             )}
           </div>
           <button
@@ -247,9 +266,13 @@ export default function SkillsSection({
         {!!tags.length && (
           <div className="flex flex-wrap gap-2 mt-3">
             {tags.map((id) => {
-              const tag = suggestedTags.find((t) => t.id === id) || { id, name: id };
+              const tag =
+                suggestedTags.find((t) => t.id === id) || { id, name: id };
               return (
-                <span key={id} className="px-3 py-1 text-sm bg-orange-100 border border-orange-200 rounded-full flex items-center">
+                <span
+                  key={id}
+                  className="px-3 py-1 text-sm bg-orange-100 border border-orange-200 rounded-full flex items-center"
+                >
                   {tag.name}
                   <button
                     className="ml-2 text-orange-600 hover:text-orange-800"

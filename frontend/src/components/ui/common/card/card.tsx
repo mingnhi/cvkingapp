@@ -1,6 +1,13 @@
 // card.tsx
 import * as React from "react";
-import { Card as MuiCard, CardHeader as MuiCardHeader, CardContent as MuiCardContent, CardActions as MuiCardActions, Typography, Box } from "@mui/material";
+import {
+  Card as MuiCard,
+  CardHeader as MuiCardHeader,
+  CardContent as MuiCardContent,
+  CardActions as MuiCardActions,
+  Typography,
+  Box,
+} from "@mui/material";
 import { cn } from "@/lib/utils"; // Giả sử bạn vẫn giữ hàm cn để nối className
 
 // Component Card

@@ -48,6 +48,7 @@ const MyProfile = () => {
         ];
 
         const filledCount = fieldsToCheck.reduce((count, field) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const value = (jobSeekerProfile as any)[field];
             if (Array.isArray(value)) return count + (value.length > 0 ? 1 : 0);
             return count + (value ? 1 : 0);

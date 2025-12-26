@@ -6,7 +6,6 @@ import {
   Typography,
   Card,
   CardContent,
-  Grid,
   TextField,
   InputAdornment,
   Avatar,
@@ -38,11 +37,13 @@ import {
   UserCheck,
   UserPlus,
 } from "lucide-react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
+import Grid from "@mui/material/Grid";
 import { useMyProfileQuery } from "@/api/user/query";
 import { useJobApplicationsByCompanyQuery, useUpdateJobApplicationMutation } from "@/api/JobApplication/query";
 import { useEmployerProfileByUserIdQuery } from "@/api/employer-profile/query";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { useJobSeekerProfileByUserIdQuery } from "@/api/jobseeker-profile/query";
 import { getJobSeekerProfileByUserIdRequest } from "@/api/jobseeker-profile/request";
 
@@ -92,6 +93,7 @@ const CandidateManagement = () => {
   });
 
   const jobSeekerId = selectedCandidate?.jobSeekerId;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: jobSeekerProfile, isLoading: loadingProfile } =
     useJobSeekerProfileByUserIdQuery(jobSeekerId);
   
@@ -210,7 +212,7 @@ const CandidateManagement = () => {
           { label: "Đã phỏng vấn", value: stats.da_phong_van, color: "#8b5cf6", icon: <UserCheck size={18} /> },
           { label: "Đã tuyển", value: stats.da_tuyen, color: "#10b981", icon: <CheckCircle size={18} /> },
         ].map((s, i) => (
-          <Grid item xs={12} sm={6} md={3} key={i}>
+          <Grid key={i} size={{ xs: 12, sm: 6, md: 3 }}>
             <Card
               sx={{
                 height: 120,
@@ -250,6 +252,7 @@ const CandidateManagement = () => {
           </Grid>
         ))}
       </Grid>
+
 
       {/* Candidate Cards */}
       <Stack spacing={2}>

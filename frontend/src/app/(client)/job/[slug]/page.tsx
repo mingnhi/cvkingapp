@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import BreadcrumbTabActive from "@/components/ui/common/breadcrumb/BreadcrumbTabActive";
 import JobHeader from "@/components/ui/client/job/job-details/JobHeader";
@@ -21,9 +21,9 @@ export default function JobDetailPage() {
   const { data: job, isLoading, isError } = useJobByIdQuery(slug);
 
   // Xử lý sự kiện ứng tuyển
-  const handleApply = useCallback(() => {
-    setShowApplyModal(false);
-  }, []);
+  // const handleApply = useCallback(() => {
+  //   setShowApplyModal(false);
+  // }, []);
 
   // Xử lý trạng thái tải
   if (isLoading) {

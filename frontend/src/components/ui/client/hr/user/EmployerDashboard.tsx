@@ -10,13 +10,11 @@ import JobPostings from './JobPostings';
 import CandidateManagement from './CandidateManagement';
 import SavedCandidates from './SavedCandidates';
 import Overview from './Overview';
-import EditCompanyProfile from '@/app/(client)/hr/[slug]/edit-companyprofile/page';
-
 const EmployerDashboard = () => {
   const { navigateTo } = useApp();
   const [activeTab, setActiveTab] = useState<'overview'|'company'|'jobs'|'candidates'|'saved'|'settings'>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isEditingCompany, setIsEditingCompany] = useState(false);
+  // const [isEditingCompany, setIsEditingCompany] = useState(false);
 
   const navigationItems = [
     { id: 'overview', label: 'Tổng quan', icon: TrendingUp },
@@ -32,9 +30,7 @@ const EmployerDashboard = () => {
       case 'overview':
         return <Overview />;
       case 'company':
-        return isEditingCompany
-          ? <EditCompanyProfile onBack={() => setIsEditingCompany(false)} />
-          : <CompanyProfile onEdit={() => setIsEditingCompany(true)} />;
+        return <CompanyProfile/>
       case 'jobs':
         return <JobPostings />;
       case 'candidates':

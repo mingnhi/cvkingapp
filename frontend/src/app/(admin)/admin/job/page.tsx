@@ -40,19 +40,28 @@ export default function JobsPage() {
   const totalPages = Math.max(1, Math.ceil(total / (filter.limit || 10)));
 
   // ===== Row Actions =====
-  const onView = useCallback((id: string) => {
-    router.push(`/admin/job/view/${id}`);
-  }, [router]);
-  
-  const onEdit = useCallback((id: string) => {
-    router.push(`/admin/job/edit/${id}`);
-  }, [router]);
-  
-  const onDelete = useCallback(async (id: string) => {
-    await deleteMutation.mutateAsync(id);
-    toast.success("Đã xoá tin tuyển dụng");
-    refetch();
-  }, [deleteMutation, refetch]);
+  const onView = useCallback(
+    (id: string) => {
+      router.push(`/admin/job/view/${id}`);
+    },
+    [router]
+  );
+
+  const onEdit = useCallback(
+    (id: string) => {
+      router.push(`/admin/job/edit/${id}`);
+    },
+    [router]
+  );
+
+  const onDelete = useCallback(
+    async (id: string) => {
+      await deleteMutation.mutateAsync(id);
+      toast.success("Đã xoá tin tuyển dụng");
+      refetch();
+    },
+    [deleteMutation, refetch]
+  );
 
   // ===== Base columns cho Job =====
   const baseColumns: ColumnDef<Job>[] = useMemo(
@@ -275,7 +284,11 @@ export default function JobsPage() {
           size="small"
           value={filter.sortOrder ?? "DESC"}
           onChange={(e) =>
-            setFilter((f) => ({ ...f, sortOrder: e.target.value as any, page: 1 }))
+            setFilter((f) => ({
+              ...f,
+              sortOrder: e.target.value as any,
+              page: 1,
+            }))
           }
         >
           {["ASC", "DESC"].map((o) => (
@@ -330,9 +343,7 @@ export default function JobsPage() {
               ? "0 8px 24px rgba(0,0,0,0.06)"
               : "none",
           background: (theme) =>
-            theme.palette.mode === "light"
-              ? "#fff"
-              : "rgba(255,255,255,0.04)",
+            theme.palette.mode === "light" ? "#fff" : "rgba(255,255,255,0.04)",
         }}
       >
         {isLoading ? (
@@ -356,7 +367,10 @@ export default function JobsPage() {
           <div className="flex items-center gap-2">
             <Button
               onClick={() =>
-                setFilter((f) => ({ ...f, page: Math.max((f.page || 1) - 1, 1) }))
+                setFilter((f) => ({
+                  ...f,
+                  page: Math.max((f.page || 1) - 1, 1),
+                }))
               }
               disabled={(filter.page || 1) <= 1}
               size="small"

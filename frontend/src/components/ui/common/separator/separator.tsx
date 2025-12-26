@@ -2,24 +2,24 @@ import * as React from "react";
 import { Divider, DividerProps } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-interface SeparatorProps extends Omit<DividerProps, 'orientation'> {
+interface SeparatorProps extends Omit<DividerProps, "orientation"> {
   className?: string;
   orientation?: "horizontal" | "vertical";
   decorative?: boolean;
 }
 
 const StyledDivider = styled(Divider, {
-  shouldForwardProp: (prop) => prop !== 'decorative',
+  shouldForwardProp: (prop) => prop !== "decorative",
 })<{ decorative?: boolean }>(({ orientation }) => ({
-  backgroundColor: 'hsl(var(--border))', // Giữ nguyên màu border từ shadcn/ui
+  backgroundColor: "hsl(var(--border))", // Giữ nguyên màu border từ shadcn/ui
   flexShrink: 0,
-  ...(orientation === 'horizontal' && {
-    height: '1px',
-    width: '100%',
+  ...(orientation === "horizontal" && {
+    height: "1px",
+    width: "100%",
   }),
-  ...(orientation === 'vertical' && {
-    height: '100%',
-    width: '1px',
+  ...(orientation === "vertical" && {
+    height: "100%",
+    width: "1px",
   }),
 }));
 

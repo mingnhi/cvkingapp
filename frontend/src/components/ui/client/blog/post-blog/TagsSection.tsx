@@ -1,13 +1,17 @@
 "use client";
-import { FieldErrors } from "react-hook-form";
-import { CreateBlogPostFormData } from "@/api/BlogPosts/type";
+// import { FieldErrors } from "react-hook-form";
+// import { CreateBlogPostFormData } from "@/api/BlogPosts/type";
 
 type Option = { id: string; name: string };
+
+type FormErrors = {
+  tagIds?: { message?: string };
+};
 
 interface Props {
   tags: string[];
   onTagsChange: (tags: string[]) => void;
-  errors: FieldErrors<CreateBlogPostFormData>;
+  errors: FormErrors
   suggestedTags: Option[];
 }
 

@@ -28,13 +28,10 @@ const JobsPage = () => {
     ...filters,
     keyword: debouncedSearchQuery,
   });
-  console.log("data", jobs);
-  
   const { data: categories = [], isLoading: isCategoriesLoading } =
     useJobCategoriesQuery();
 
   const totalJobs = jobs.length;
-  
 
   const handleApply = useCallback(
     (jobId: string) => {

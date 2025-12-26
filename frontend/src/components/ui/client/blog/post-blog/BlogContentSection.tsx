@@ -1,11 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { Controller, Control, FieldErrors } from "react-hook-form";
+
+import { Controller } from "react-hook-form";
 import { TextField } from "@mui/material";
 import { CreateBlogPostFormData } from "@/api/BlogPosts/type";
 
+type FormErrors = Partial<
+  Record<keyof CreateBlogPostFormData, { message?: string }>
+>;
+
 interface Props {
-  control: Control<CreateBlogPostFormData>;
-  errors: FieldErrors<CreateBlogPostFormData>;
+  control: any;         // react-hook-form control
+  errors: FormErrors;   // lỗi theo từng field trong form
 }
 
 export default function BlogContentSection({ control, errors }: Props) {
@@ -28,14 +34,15 @@ export default function BlogContentSection({ control, errors }: Props) {
       <h2 className="text-xl font-semibold text-gray-900">Nội dung bài viết</h2>
 
       <div className="space-y-4">
+        {/* Nội dung chính */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Nội dung chính <span className="text-red-500">*</span>
           </label>
           <Controller
-            name="content"
+            name={"content" as any}
             control={control}
-            render={({ field }) => (
+            render={({ field }: { field: any }) => (
               <TextField
                 {...field}
                 className="w-full"
@@ -45,20 +52,21 @@ export default function BlogContentSection({ control, errors }: Props) {
                 variant="outlined"
                 sx={areaSx}
                 error={!!errors.content}
-                helperText={errors.content?.message}
+                helperText={errors.content?.message ?? ""}
               />
             )}
           />
         </div>
 
+        {/* Mô tả ngắn */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Mô tả ngắn
           </label>
           <Controller
-            name="shortDescription"
+            name={"shortDescription" as any}
             control={control}
-            render={({ field }) => (
+            render={({ field }: { field: any }) => (
               <TextField
                 {...field}
                 className="w-full"
@@ -68,20 +76,21 @@ export default function BlogContentSection({ control, errors }: Props) {
                 variant="outlined"
                 sx={areaSx}
                 error={!!errors.shortDescription}
-                helperText={errors.shortDescription?.message}
+                helperText={errors.shortDescription?.message ?? ""}
               />
             )}
           />
         </div>
 
+        {/* Yêu cầu kiến thức */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Yêu cầu kiến thức
           </label>
           <Controller
-            name="requirements"
+            name={"requirements" as any}
             control={control}
-            render={({ field }) => (
+            render={({ field }: { field: any }) => (
               <TextField
                 {...field}
                 className="w-full"
@@ -91,20 +100,21 @@ export default function BlogContentSection({ control, errors }: Props) {
                 variant="outlined"
                 sx={areaSx}
                 error={!!errors.requirements}
-                helperText={errors.requirements?.message}
+                helperText={errors.requirements?.message ?? ""}
               />
             )}
           />
         </div>
 
+        {/* Lợi ích */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Lợi ích
           </label>
           <Controller
-            name="benefits"
+            name={"benefits" as any}
             control={control}
-            render={({ field }) => (
+            render={({ field }: { field: any }) => (
               <TextField
                 {...field}
                 className="w-full"
@@ -114,7 +124,7 @@ export default function BlogContentSection({ control, errors }: Props) {
                 variant="outlined"
                 sx={areaSx}
                 error={!!errors.benefits}
-                helperText={errors.benefits?.message}
+                helperText={errors.benefits?.message ?? ""}
               />
             )}
           />
